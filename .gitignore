@@ -11,7 +11,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+# build/ - needed for fbs
 develop-eggs/
 dist/
 downloads/

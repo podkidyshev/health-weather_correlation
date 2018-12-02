@@ -1,0 +1,6 @@
+{
+    "app_name": "Health-weather correlation",
+    "main_module": "src/main/python/main.py",
+    "author": "Molchanov V.A.",
+    "version": "0.0.1"
+}
