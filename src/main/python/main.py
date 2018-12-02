@@ -27,3 +27,6 @@ if __name__ == '__main__':
     appctxt = AppContext()                      # 4. Instantiate the subclass
     exit_code = appctxt.run()                   # 5. Invoke run()
     sys.exit(exit_code)
+
+# https://tproger.ru/translations/python-gui-pyqt/
+# pyuic5 path/to/design.ui -o output/path/to/design.py
