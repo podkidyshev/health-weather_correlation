@@ -19,9 +19,9 @@ def init_data(filename_reference: str, filenames_patients: list):
     """
     name = os.path.splitext(os.path.basename(filenames_patients[0]))[0]
 
-    data = read_sample(filename_reference)
-    print("Список Кр-значений:", data, len(data))
-    print("Список максимумов Кр-значений:", sequence_max(data), len(sequence_max(data)))
+    data_reference = read_sample(filename_reference)
+    print("Список Кр-значений:", data_reference, len(data_reference))
+    print("Список максимумов Кр-значений:", sequence_max(data_reference), len(sequence_max(data_reference)))
 
     data_patients = [None] * 4
     data_postfix = [
@@ -32,7 +32,7 @@ def init_data(filename_reference: str, filenames_patients: list):
     ]
 
     for idx, (filename_patient, postfix) in enumerate(zip(filenames_patients, data_postfix)):
-        if filenames_patients is not None:
+        if filename_patient is not None:
             data_patient = read_sample(filename_patient)
             data_patients[idx] = data_patient
 
@@ -48,25 +48,29 @@ def init_data(filename_reference: str, filenames_patients: list):
     print("Ряды расстояний и распределения расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
     # вычисление последовательностей расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
 
-    x_distance = [sequence_distance(sequence_max(d), sequence_max(data)) for d in data_patients]
-    x_distrib = [distrib(xri) for xri in x_distance]
+    x_distance = [sequence_distance(sequence_max(d), sequence_max(data_reference))
+                  if d is not None else None for d in data_patients]
+    x_distrib = [distrib(xi_distance)
+                 if xi_distance is not None else None for xi_distance in x_distance]
 
     for xi_distance, xi_distrib, postfix in zip(x_distance, x_distrib, data_postfix):
-        print("Ряд расстояний от максимумов пациента {} {} до ближайшего максимума Kp:".format(name, postfix),
-              xi_distance)
-        print("Распределение расстояний (значения от -3 до 3) пациента {} {}".format(name, postfix),
-              xi_distrib)
+        if xi_distance is not None:
+            print("Ряд расстояний от максимумов пациента {} {} до ближайшего максимума Kp:".format(name, postfix),
+                  xi_distance)
+            print("Распределение расстояний (значения от -3 до 3) пациента {} {}".format(name, postfix),
+                  xi_distrib)
     print()
 
     print("Анализ распределений расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
     for xi_distance, postfix in zip(x_distance, data_postfix):
-        print("Анализ распределений расстояний пациента {} {}:".format(name, postfix), "\n",
-              "\tвыборочное среднее = {:.4f}".format(np.mean(xi_distance)), "\n",
-              "\tстандартное отклонение = {:.4f}".format(np.std(xi_distance)), "\n",
-              "\tдоверительный интервал = ({:.4f}, {:.4f})".format(*st.t.interval(0.95,
-                                                                                  len(xi_distance) - 1,
-                                                                                  loc=np.mean(xi_distance),
-                                                                                  scale=st.sem(xi_distance))), "\n")
+        if xi_distance is not None:
+            print("Анализ распределений расстояний пациента {} {}:".format(name, postfix), "\n",
+                  "\tвыборочное среднее = {:.4f}".format(np.mean(xi_distance)), "\n",
+                  "\tстандартное отклонение = {:.4f}".format(np.std(xi_distance)), "\n",
+                  "\tдоверительный интервал = ({:.4f}, {:.4f})".format(*st.t.interval(0.95,
+                                                                                      len(xi_distance) - 1,
+                                                                                      loc=np.mean(xi_distance),
+                                                                                      scale=st.sem(xi_distance))), "\n")
     return x_distance
 
 
@@ -95,7 +99,8 @@ def plot(x_distance):
 
     values_range = np.linspace(0.9 * np.min(x_distance[0]), 1.1 * np.max(x_distance[0]), 106)
     for xi, c in zip(x_distance, colors):
-        plt.plot(values_range, st.gaussian_kde(xi)(values_range), color=c)
+        if xi is not None:
+            plt.plot(values_range, st.gaussian_kde(xi)(values_range), color=c)
 
     plt.plot(values_range, norm.pdf(values_range, 0, 1), '-.k')
     plt.style.use('seaborn-white')
