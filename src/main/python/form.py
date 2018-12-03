@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_health_weather(object):
+
+class UIMainBaseForm(object):
     def setupUi(self, health_weather):
         health_weather.setObjectName("health_weather")
         health_weather.resize(1304, 807)

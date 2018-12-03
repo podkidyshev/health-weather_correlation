@@ -1,21 +1,17 @@
 import sys
 
-from src.main.python.health_weather import Ui_health_weather
 from PyQt5.QtWidgets import *
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
+from form import UIMainBaseForm
 
-class Main(QWidget):
-    def __init__(self):
-        super(Main, self).__init__()
 
-        self.ui = Ui_health_weather()
-        self.ui.setupUi(self)
-
-        self.ui.start_btn.clicked.connect(self.btn_start_clicked)
-        self.ui.exit_btn.clicked.connect(self.btn_exit_clicked)
+class Main(UIMainBaseForm):
+    def start(self):
+        self.start_btn.clicked.connect(self.btn_start_clicked)
+        self.exit_btn.clicked.connect(self.btn_exit_clicked)
 
         self.show()
 
@@ -25,7 +21,7 @@ class Main(QWidget):
 
         self.plot()
 
-        self.ui.kde_layout.addWidget(self.canvas)
+        self.kde_layout.addWidget(self.canvas)
 
         self.show()
 

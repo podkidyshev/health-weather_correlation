@@ -3,18 +3,20 @@ from PyQt5.QtWidgets import QMainWindow
 
 import sys
 
-import test
+import logic
 
 
-class ExampleApp(QMainWindow, test.Ui_MainWindow):
+class ExampleApp(QMainWindow, logic.Main):
     def __init__(self):
-        # Это здесь нужно для доступа к переменным, методам
-        # и т.д. в файле design.py
+        # noinspection PyArgumentList
         super().__init__()
-        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+        # создание виджетов в MainForm (если что переопределить в logic.Main)
+        self.setupUi(self)
+        # старт (собстно show)
+        logic.Main.start(self)
 
 
-class AppContext(ApplicationContext, test.Ui_MainWindow):           # 1. Subclass ApplicationContext
+class AppContext(ApplicationContext):           # 1. Subclass ApplicationContext
     def run(self):                              # 2. Implement run()
         window = ExampleApp()
         window.setWindowTitle("Health-weather correlation")
