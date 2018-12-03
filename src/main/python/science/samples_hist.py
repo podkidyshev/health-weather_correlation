@@ -2,12 +2,16 @@
 # Ввод образцов_послед.максимумов_распред..расстояний_гистограммы
 import numpy as np
 import scipy.stats as st
+
+import matplotlib
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+from matplotlib.figure import Figure
 # noinspection PyUnresolvedReferences
-from numpy import sqrt, pi, e
 
 from src.main.python.science import *
+
+
+matplotlib.use("Qt5Agg")
 
 
 def init_data(filename_reference: str, filenames_patients: list):
@@ -74,14 +78,9 @@ def init_data(filename_reference: str, filenames_patients: list):
     return x_distance
 
 
-def plot(x_distance):
+def plot(x_distance, base_figure):
     fig, ax = plt.subplots(1, 1)
-
-    # kwargs = dict(histtype='stepfilled', alpha=0.3, normed=True, bins=7)
-    # plt.hist(xr1, **kwargs)
-    # plt.hist(xr2, **kwargs)
-    # plt.hist(xr3, **kwargs)
-    # plt.hist(xr4, **kwargs)
+    # fig = base_figure.subplots(1, 1)
 
     colors = [
         "blue",
@@ -102,13 +101,12 @@ def plot(x_distance):
         if xi is not None:
             plt.plot(values_range, st.gaussian_kde(xi)(values_range), color=c)
 
-    plt.plot(values_range, norm.pdf(values_range, 0, 1), '-.k')
+    plt.plot(values_range, st.norm.pdf(values_range, 0, 1), '-.k')
     plt.style.use('seaborn-white')
 
     t = '\n'.join([t for idx, t in enumerate(titles) if idx > 3 or x_distance[idx] is not None])
+    # fig.add_axes([-4, 0, 8, 0.5], xlabel='x', ylabel='', title=t)
     ax.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='', title=t)
-
-    plt.show()
 
 
 # printer = FakePrint()
@@ -118,7 +116,14 @@ _x_distance = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
                                                 "samples/1_1n.txt",
                                                 "samples/1_1o.txt",
                                                 "samples/1_1e.txt"])
-plot(_x_distance)
+
+_base_figure = Figure(figsize=(200, 200), dpi=100)
+# _base_figure = plt.figure(figsize=(200, 200), dpi=100)
+
+plot(_x_distance, _base_figure)
+
+plt.show()
+# _base_figure.show()
 
 # printer.deactivate()
 # for entry in printer.log:
