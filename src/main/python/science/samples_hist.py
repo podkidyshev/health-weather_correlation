@@ -6,7 +6,7 @@ import scipy.stats as st
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from src.main.python.science import *
+from science import *
 
 if __name__ == '__main__':
     import matplotlib
@@ -98,9 +98,8 @@ def init_data(filename_reference: str, filenames_patients: list):
     return report
 
 
-def plot(x_distance, base_figure):
-    fig, ax = plt.subplots(1, 1)
-    # fig = base_figure.subplots(1, 1)
+def plot(x_distance, base_figure: Figure):
+    fig = base_figure.subplots(1, 1)
 
     colors = [
         "blue",
@@ -119,14 +118,22 @@ def plot(x_distance, base_figure):
     values_range = np.linspace(0.9 * np.min(x_distance[0]), 1.1 * np.max(x_distance[0]), 106)
     for xi, c in zip(x_distance, colors):
         if xi is not None:
-            plt.plot(values_range, st.gaussian_kde(xi)(values_range), color=c)
+            fig.plot(values_range, st.gaussian_kde(xi)(values_range), color=c)
 
-    plt.plot(values_range, st.norm.pdf(values_range, 0, 1), '-.k')
+    fig.plot(values_range, st.norm.pdf(values_range, 0, 1), '-.k')
     plt.style.use('seaborn-white')
 
-    t = '\n'.join([t for idx, t in enumerate(titles) if idx > 3 or x_distance[idx] is not None])
-    # fig.add_axes([-4, 0, 8, 0.5], xlabel='x', ylabel='', title=t)
-    ax.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='', title=t)
+    t, count = '', 0
+    for idx, xi in enumerate(x_distance):
+        if xi is not None:
+            t += titles[idx] + ' '
+            count += 1
+            if count % 2 == 0:
+                t += '\n'
+    if t[-1] != '\n':
+        t += '\n'
+    t += titles[-1]
+    fig.set_title(t)
 
 
 def test():
@@ -137,7 +144,7 @@ def test():
                                                 "samples/1_1o.txt",
                                                 "samples/1_1e.txt"])
 
-    base_figure = Figure(figsize=(200, 200), dpi=100)
+    base_figure = Figure(figsize=(5, 4), dpi=100)
     # base_figure = plt.figure(figsize=(200, 200), dpi=100)
 
     sys.stdout.write(json.dumps(report, indent=2))

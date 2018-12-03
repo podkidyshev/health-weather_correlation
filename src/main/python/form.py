@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget
+
 
 class Ui_MainBaseForm(object):
     def setupUi(self, MainBaseForm):

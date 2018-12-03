@@ -59,4 +59,4 @@ def read_sample(filename):
 
 
 def patient_suffix(filename: str, suffix):
-    return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.') + 1:]
+    return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
