@@ -1,3 +1,6 @@
+# Upgrade pip
+python -m pip install --upgrade pip
+
 # Create a virtual environment in the current directory:
 python -m venv venv
 
