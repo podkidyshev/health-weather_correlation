@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainForm</class>
- <widget class="QWidget" name="MainForm">
+ <class>health_weather</class>
+ <widget class="QWidget" name="health_weather">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1303</width>
-    <height>813</height>
+    <width>1304</width>
+    <height>807</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -107,7 +107,7 @@
     <attribute name="title">
      <string>Совместный KDE</string>
     </attribute>
-    <widget class="QLabel" name="kde_image">
+    <widget class="QWidget" name="horizontalLayoutWidget">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -116,28 +116,14 @@
        <height>691</height>
       </rect>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
+     <layout class="QHBoxLayout" name="kde_layout"/>
     </widget>
    </widget>
    <widget class="QWidget" name="tests_tab">
     <attribute name="title">
      <string>Тесты статистической нормальности</string>
     </attribute>
-    <widget class="QLabel" name="tests_image">
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -146,28 +132,14 @@
        <height>691</height>
       </rect>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
+     <layout class="QHBoxLayout" name="tests_layout"/>
     </widget>
    </widget>
    <widget class="QWidget" name="table_tab">
     <attribute name="title">
      <string>Сводная таблица результатов</string>
     </attribute>
-    <widget class="QLabel" name="table_text">
+    <widget class="QWidget" name="horizontalLayoutWidget_3">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -176,21 +148,7 @@
        <height>691</height>
       </rect>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
+     <layout class="QHBoxLayout" name="table_layout"/>
     </widget>
    </widget>
   </widget>
