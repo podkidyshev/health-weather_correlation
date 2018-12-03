@@ -6,10 +6,8 @@ import scipy.stats as st
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-# noinspection PyUnresolvedReferences
 
 from src.main.python.science import *
-
 
 matplotlib.use("Qt5Agg")
 
@@ -21,11 +19,17 @@ def init_data(filename_reference: str, filenames_patients: list):
     x = np.arange(-3, 4, 0.01)
     # загрузка списка Kp и списков пациентов группы
     """
+    report = {}
+
     name = os.path.splitext(os.path.basename(filenames_patients[0]))[0]
+    report['name'] = name
 
     data_reference = read_sample(filename_reference)
-    print("Список Кр-значений:", data_reference, len(data_reference))
-    print("Список максимумов Кр-значений:", sequence_max(data_reference), len(sequence_max(data_reference)))
+    report['data'] = data_reference
+    report['data_seq_max'] = sequence_max(data_reference)
+
+    # print("Список Кр-значений:", data_reference, len(data_reference))
+    # print("Список максимумов Кр-значений:", sequence_max(data_reference), len(sequence_max(data_reference)))
 
     data_patients = [None] * 4
     data_postfix = [
@@ -35,21 +39,26 @@ def init_data(filename_reference: str, filenames_patients: list):
         "с эмоциональной нагрузкой"
     ]
 
+    report['patients'] = [None] * 4
     for idx, (filename_patient, postfix) in enumerate(zip(filenames_patients, data_postfix)):
         if filename_patient is not None:
             data_patient = read_sample(filename_patient)
             data_patients[idx] = data_patient
 
-            print("Список значений пациента {} {}:".format(name, postfix),
-                  data_patient,
-                  len(data_patient))
-            print("Список максимумов значений пациента {} без нагрузки:".format(name),
-                  sequence_max(data_patient),
-                  len(sequence_max(data_patient)))
-            print()
+            report['patients'][idx] = {
+                'data': data_patient,
+                'data_seq_max': sequence_max(data_patient)
+            }
+            # print("Список значений пациента {} {}:".format(name, postfix),
+            #       data_patient,
+            #       len(data_patient))
+            # print("Список максимумов значений пациента {} без нагрузки:".format(name),
+            #       sequence_max(data_patient),
+            #       len(sequence_max(data_patient)))
+            # print()
 
     # вычисление распределения расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
-    print("Ряды расстояний и распределения расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
+    # print("Ряды расстояний и распределения расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
     # вычисление последовательностей расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
 
     x_distance = [sequence_distance(sequence_max(d), sequence_max(data_reference))
@@ -57,25 +66,34 @@ def init_data(filename_reference: str, filenames_patients: list):
     x_distrib = [distrib(xi_distance)
                  if xi_distance is not None else None for xi_distance in x_distance]
 
-    for xi_distance, xi_distrib, postfix in zip(x_distance, x_distrib, data_postfix):
-        if xi_distance is not None:
-            print("Ряд расстояний от максимумов пациента {} {} до ближайшего максимума Kp:".format(name, postfix),
-                  xi_distance)
-            print("Распределение расстояний (значения от -3 до 3) пациента {} {}".format(name, postfix),
-                  xi_distrib)
-    print()
+    report['distances'] = x_distance
+    report['distribs'] = x_distrib
 
-    print("Анализ распределений расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
+    for idx, (xi_distance, xi_distrib, postfix) in enumerate(zip(x_distance, x_distrib, data_postfix)):
+        if xi_distance is not None:
+            report['patients'][idx]['distances'] = xi_distance
+            report['patients'][idx]['distribs'] = xi_distrib
+    #         print("Ряд расстояний от максимумов пациента {} {} до ближайшего максимума Kp:".format(name, postfix),
+    #               xi_distance)
+    #         print("Распределение расстояний (значения от -3 до 3) пациента {} {}".format(name, postfix),
+    #               xi_distrib)
+    # print()
+
+    # print("Анализ распределений расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
     for xi_distance, postfix in zip(x_distance, data_postfix):
         if xi_distance is not None:
-            print("Анализ распределений расстояний пациента {} {}:".format(name, postfix), "\n",
-                  "\tвыборочное среднее = {:.4f}".format(np.mean(xi_distance)), "\n",
-                  "\tстандартное отклонение = {:.4f}".format(np.std(xi_distance)), "\n",
-                  "\tдоверительный интервал = ({:.4f}, {:.4f})".format(*st.t.interval(0.95,
-                                                                                      len(xi_distance) - 1,
-                                                                                      loc=np.mean(xi_distance),
-                                                                                      scale=st.sem(xi_distance))), "\n")
-    return x_distance
+            report['patients'][idx]['mean'] = np.mean(xi_distance)
+            report['patients'][idx]['std'] = np.std(xi_distance)
+            report['patients'][idx]['t_interval'] = st.t.interval(0.95,
+                                                                  len(xi_distance) - 1,
+                                                                  loc=np.mean(xi_distance),
+                                                                  scale=st.sem(xi_distance))
+            # print("Анализ распределений расстояний пациента {} {}:".format(name, postfix), "\n",
+            #       "\tвыборочное среднее = {:.4f}".format(np.mean(xi_distance)), "\n",
+            #       "\tстандартное отклонение = {:.4f}".format(np.std(xi_distance)), "\n",
+            #       "\tдоверительный интервал = ({:.4f}, {:.4f})".format(*st.t.interval(0.95,
+            #       len(xi_distance) - 1, loc=np.mean(xi_distance), scale=st.sem(xi_distance))), "\n")
+    return report
 
 
 def plot(x_distance, base_figure):
@@ -112,15 +130,15 @@ def plot(x_distance, base_figure):
 # printer = FakePrint()
 # printer.activate()
 
-_x_distance = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
-                                                "samples/1_1n.txt",
-                                                "samples/1_1o.txt",
-                                                "samples/1_1e.txt"])
+_report = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
+                                            "samples/1_1n.txt",
+                                            "samples/1_1o.txt",
+                                            "samples/1_1e.txt"])
 
 _base_figure = Figure(figsize=(200, 200), dpi=100)
 # _base_figure = plt.figure(figsize=(200, 200), dpi=100)
 
-plot(_x_distance, _base_figure)
+plot(_report['distances'], _base_figure)
 
 plt.show()
 # _base_figure.show()
