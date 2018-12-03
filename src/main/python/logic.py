@@ -1,19 +1,39 @@
-import sys
+import os
 
-from PyQt5.QtWidgets import *
-
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from form import UIMainBaseForm
+from PyQt5.QtWidgets import QFileDialog, QVBoxLayout
+from PyQt5.QtWidgets import QWidget
 
 
-class Main(UIMainBaseForm):
+from form import Ui_MainBaseForm
+
+module = os.path.dirname(__file__)
+
+
+class Main(Ui_MainBaseForm):
+    def __init__(self):
+        self.dummy = QWidget()
+        self.verticalLayout = QVBoxLayout(self.dummy)
+        self.setCentralWidget(self.dummy)
+        self.verticalLayout = self.centralWidget().layout()
+
     def start(self):
-        self.start_btn.clicked.connect(self.btn_start_clicked)
-        self.exit_btn.clicked.connect(self.btn_exit_clicked)
+        # self.start_btn.clicked.connect(self.btn_start_clicked)
+        # self.exit_btn.clicked.connect(self.btn_exit_clicked)
+        # self.sample_btn.clicked.connect(self.sample_btn_clicked)
+        # self.show()
+        pass
 
-        self.show()
+    # КНОПКИ
+    def sample_btn_clicked(self):
+        options = QFileDialog.Options()
+        fname, _ = QFileDialog.getOpenFileName(self,
+                                               'Open file',
+                                               os.path.join(module, 'science', 'samples'),
+                                               options=options)
+        self.standard_line.setText(fname)
 
     def btn_start_clicked(self):
         self.figure = plt.figure(figsize=(5, 4), dpi=100)
@@ -23,7 +43,7 @@ class Main(UIMainBaseForm):
 
         self.kde_layout.addWidget(self.canvas)
 
-        self.show()
+        # self.show()
 
     def plot(self):
         data = [i for i in range(25)]

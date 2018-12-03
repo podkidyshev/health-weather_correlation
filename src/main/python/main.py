@@ -9,7 +9,8 @@ import logic
 class ExampleApp(QMainWindow, logic.Main):
     def __init__(self):
         # noinspection PyArgumentList
-        super().__init__()
+        QMainWindow.__init__(self)
+        logic.Main.__init__(self)
         # создание виджетов в MainForm (если что переопределить в logic.Main)
         self.setupUi(self)
         # старт (собстно show)
@@ -31,4 +32,4 @@ if __name__ == '__main__':
     sys.exit(exit_code)
 
 # https://tproger.ru/translations/python-gui-pyqt/
-# pyuic5 path/to/design.ui -o output/path/to/design.py
+# pyuic5 src\main\python\ui\healh_weather.ui -o src\main\python\form.py
