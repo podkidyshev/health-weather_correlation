@@ -47,36 +47,15 @@ def distrib(x):
     return y
 
 
-class FakePrint:
-    def __init__(self):
-        self.log = []
-        self.orig_stdout = sys.stdout
-
-    def write(self, *args):
-        self.log.append(' '.join(map(str, args)))
-
-    def activate(self):
-        sys.stdout = self
-
-    def deactivate(self):
-        sys.stdout = self.orig_stdout
-
-    def force_print(self, *args, **kwargs):
-        self.orig_stdout.write(*args, **kwargs)
-
-
 def read_sample(filename):
     """Чтение образцов и эталонов"""
     with open(filename) as file:
         data = [row.strip() for row in file]
 
     for idx, el in enumerate(data):
+        # noinspection PyTypeChecker
         data[idx] = float(el)
     return data
-
-
-def read_test_sample(filename):
-    return read_sample(os.path.join('samples', filename))
 
 
 def patient_suffix(filename: str, suffix):

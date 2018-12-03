@@ -3,13 +3,14 @@
 import numpy as np
 import scipy.stats as st
 
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 from src.main.python.science import *
 
-matplotlib.use("Qt5Agg")
+if __name__ == '__main__':
+    import matplotlib
+    matplotlib.use("Qt5Agg")
 
 
 def init_data(filename_reference: str, filenames_patients: list):
@@ -45,6 +46,7 @@ def init_data(filename_reference: str, filenames_patients: list):
             data_patient = read_sample(filename_patient)
             data_patients[idx] = data_patient
 
+            # noinspection PyTypeChecker
             report['patients'][idx] = {
                 'data': data_patient,
                 'data_seq_max': sequence_max(data_patient)
@@ -80,7 +82,7 @@ def init_data(filename_reference: str, filenames_patients: list):
     # print()
 
     # print("Анализ распределений расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
-    for xi_distance, postfix in zip(x_distance, data_postfix):
+    for idx, (xi_distance, postfix) in enumerate(zip(x_distance, data_postfix)):
         if xi_distance is not None:
             report['patients'][idx]['mean'] = np.mean(xi_distance)
             report['patients'][idx]['std'] = np.std(xi_distance)
@@ -127,22 +129,23 @@ def plot(x_distance, base_figure):
     ax.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='', title=t)
 
 
-# printer = FakePrint()
-# printer.activate()
+def test():
+    import json
 
-_report = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
-                                            "samples/1_1n.txt",
-                                            "samples/1_1o.txt",
-                                            "samples/1_1e.txt"])
+    report = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
+                                                "samples/1_1n.txt",
+                                                "samples/1_1o.txt",
+                                                "samples/1_1e.txt"])
 
-_base_figure = Figure(figsize=(200, 200), dpi=100)
-# _base_figure = plt.figure(figsize=(200, 200), dpi=100)
+    base_figure = Figure(figsize=(200, 200), dpi=100)
+    # base_figure = plt.figure(figsize=(200, 200), dpi=100)
 
-plot(_report['distances'], _base_figure)
+    sys.stdout.write(json.dumps(report, indent=2))
+    plot(report['distances'], base_figure)
 
-plt.show()
-# _base_figure.show()
+    plt.show()
+    # base_figure.show()
 
-# printer.deactivate()
-# for entry in printer.log:
-#     print(entry, end='')
+
+if __name__ == '__main__':
+    test()
