@@ -10,6 +10,7 @@ from science import *
 
 if __name__ == '__main__':
     import matplotlib
+
     matplotlib.use("Qt5Agg")
 
 
@@ -140,9 +141,9 @@ def test():
     import json
 
     report = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
-                                                "samples/1_1n.txt",
-                                                "samples/1_1o.txt",
-                                                "samples/1_1e.txt"])
+                                               "samples/1_1n.txt",
+                                               "samples/1_1o.txt",
+                                               "samples/1_1e.txt"])
 
     base_figure = Figure(figsize=(5, 4), dpi=100)
     # base_figure = plt.figure(figsize=(200, 200), dpi=100)
