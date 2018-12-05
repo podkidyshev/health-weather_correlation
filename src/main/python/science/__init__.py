@@ -1,5 +1,4 @@
 import os
-import sys
 
 
 def sequence_max(x):
@@ -45,6 +44,10 @@ def distrib(x):
     for i in range(7):
         y.append(x.count(i - 3))
     return y
+
+
+def file_base_name(filename: str):
+    return os.path.splitext(os.path.basename(filename))[0]
 
 
 def read_sample(filename):

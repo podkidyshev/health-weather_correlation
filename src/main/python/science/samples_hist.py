@@ -6,153 +6,99 @@ import scipy.stats as st
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
+from science.patient import Patient, Reference, DEFAULT_CATEGORIES_SHORT as categories
 from science import *
 
-if __name__ == '__main__':
-    import matplotlib
 
-    matplotlib.use("Qt5Agg")
+def ref_pat_stat_by_category(ref: Reference, pat: Patient, category: str):
+    distance = sequence_distance(pat.categories_seq_max[category], ref.seq_max)
+    return {
+        'seq_max': pat.categories_seq_max[category],
+        "distance": distance,
+        "distrib": distrib(distance),
+        'mean': np.mean(distance),
+        'std': np.std(distance),
+        't-interval': st.t.interval(0.95, len(distance) - 1, loc=np.mean(distance), scale=st.sem(distance))
+    }
 
 
-def init_data(filename_reference: str, filenames_patients: list):
-    """
-    n = 1000  # объём выборки
-    # noinspection PyUnresolvedReferences
-    x = np.arange(-3, 4, 0.01)
-    # загрузка списка Kp и списков пациентов группы
-    """
+def ref_pat_stat(ref: Reference, pat: Patient):
     report = {}
-
-    name = os.path.splitext(os.path.basename(filenames_patients[0]))[0]
-    report['name'] = name
-
-    data_reference = read_sample(filename_reference)
-    report['data'] = data_reference
-    report['data_seq_max'] = sequence_max(data_reference)
-
-    # print("Список Кр-значений:", data_reference, len(data_reference))
-    # print("Список максимумов Кр-значений:", sequence_max(data_reference), len(sequence_max(data_reference)))
-
-    data_patients = [None] * 4
-    data_postfix = [
-        "без нагрузки",
-        "с физической нагрузкой",
-        "после отдыха",
-        "с эмоциональной нагрузкой"
-    ]
-
-    report['patients'] = [None] * 4
-    for idx, (filename_patient, postfix) in enumerate(zip(filenames_patients, data_postfix)):
-        if filename_patient is not None:
-            data_patient = read_sample(filename_patient)
-            data_patients[idx] = data_patient
-
-            # noinspection PyTypeChecker
-            report['patients'][idx] = {
-                'data': data_patient,
-                'data_seq_max': sequence_max(data_patient)
-            }
-            # print("Список значений пациента {} {}:".format(name, postfix),
-            #       data_patient,
-            #       len(data_patient))
-            # print("Список максимумов значений пациента {} без нагрузки:".format(name),
-            #       sequence_max(data_patient),
-            #       len(sequence_max(data_patient)))
-            # print()
-
-    # вычисление распределения расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
-    # print("Ряды расстояний и распределения расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
-    # вычисление последовательностей расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
-
-    x_distance = [sequence_distance(sequence_max(d), sequence_max(data_reference))
-                  if d is not None else None for d in data_patients]
-    x_distrib = [distrib(xi_distance)
-                 if xi_distance is not None else None for xi_distance in x_distance]
-
-    report['distances'] = x_distance
-    report['distribs'] = x_distrib
-
-    for idx, (xi_distance, xi_distrib, postfix) in enumerate(zip(x_distance, x_distrib, data_postfix)):
-        if xi_distance is not None:
-            report['patients'][idx]['distances'] = xi_distance
-            report['patients'][idx]['distribs'] = xi_distrib
-    #         print("Ряд расстояний от максимумов пациента {} {} до ближайшего максимума Kp:".format(name, postfix),
-    #               xi_distance)
-    #         print("Распределение расстояний (значения от -3 до 3) пациента {} {}".format(name, postfix),
-    #               xi_distrib)
-    # print()
-
-    # print("Анализ распределений расстояний от максимумов пациента 1_1 до ближайшего максимума Kp")
-    for idx, (xi_distance, postfix) in enumerate(zip(x_distance, data_postfix)):
-        if xi_distance is not None:
-            report['patients'][idx]['mean'] = np.mean(xi_distance)
-            report['patients'][idx]['std'] = np.std(xi_distance)
-            report['patients'][idx]['t_interval'] = st.t.interval(0.95,
-                                                                  len(xi_distance) - 1,
-                                                                  loc=np.mean(xi_distance),
-                                                                  scale=st.sem(xi_distance))
-            # print("Анализ распределений расстояний пациента {} {}:".format(name, postfix), "\n",
-            #       "\tвыборочное среднее = {:.4f}".format(np.mean(xi_distance)), "\n",
-            #       "\tстандартное отклонение = {:.4f}".format(np.std(xi_distance)), "\n",
-            #       "\tдоверительный интервал = ({:.4f}, {:.4f})".format(*st.t.interval(0.95,
-            #       len(xi_distance) - 1, loc=np.mean(xi_distance), scale=st.sem(xi_distance))), "\n")
+    for cat, pat_data in pat.categories.items():
+        if pat_data is not None:
+            report[cat] = ref_pat_stat_by_category(ref, pat, cat)
     return report
 
 
-def plot(x_distance, base_figure: Figure):
-    fig = base_figure.subplots(1, 1)
+class ReferencePatientStat:
+    def __init__(self, ref: Reference, pat: Patient):
+        self.ref = ref
+        self.pat = pat
+        self.by_category = ref_pat_stat(ref, pat)
 
-    colors = [
-        "blue",
-        "red",
-        "green",
-        "yellow"
-    ]
-    titles = [
-        "синий график - без нагрузки",
-        "красный график - с физ.нагрузкой",
-        "зеленый график - после отдыха",
-        "желтый график - с эмоц.нагрузкой",
-        "черный штрихпунктирный график - стандартная кривая Гаусса"
-    ]
+    def draw_plot(self, base: Figure):
+        fig = base.subplots(1, 1)
 
-    values_range = np.linspace(0.9 * np.min(x_distance[0]), 1.1 * np.max(x_distance[0]), 106)
-    for xi, c in zip(x_distance, colors):
-        if xi is not None:
-            fig.plot(values_range, st.gaussian_kde(xi)(values_range), color=c)
+        colors = {"blue": "синий", "red": "красный", "green": "зеленый", "yellow": "желтый"}
+        titles = ["{} график – {}".format(colors[c], categories[cat])
+                  for c, cat in zip(colors, self.pat.categories) if self.pat.has_category(cat)]
+        titles.append("черный штрихпунктирный график – стандартная кривая Гаусса")
 
-    fig.plot(values_range, st.norm.pdf(values_range, 0, 1), '-.k')
-    plt.style.use('seaborn-white')
+        distance = self.by_category[list(self.by_category.keys())[0]]["distance"]  # произвольная дистанция
+        values_range = np.linspace(0.9 * np.min(distance), 1.1 * np.max(distance), 106)
+        for cat, c in zip(self.by_category, colors):
+            fig.plot(values_range, st.gaussian_kde(self.by_category[cat]["distance"])(values_range), color=c)
 
-    t, count = '', 0
-    for idx, xi in enumerate(x_distance):
-        if xi is not None:
-            t += titles[idx] + ' '
-            count += 1
-            if count % 2 == 0:
-                t += '\n'
-    if t[-1] != '\n':
-        t += '\n'
-    t += titles[-1]
-    fig.set_title(t)
+        fig.plot(values_range, st.norm.pdf(values_range, 0, 1), '-.k')
+        plt.style.use('seaborn-white')
+
+        title = '\n'.join([titles[idx] + ', ' + titles[idx + 1] if idx < len(titles) - 1 else titles[idx]
+                           for idx in range(0, len(titles), 2)])
+        fig.set_title(title)
+
+    def report(self):
+        # принт должен быть перегружен
+        print("Пациент {}. Эталон {}".format(self.pat.name, self.ref.name))
+        print("Список Кр-значений:", self.ref.data, len(self.ref.data))
+        print("Список максимумов Кр-значений:", self.ref.seq_max, len(self.ref.seq_max), "\n")
+
+        for cat in self.by_category:
+            print("Список значений пациента {}:".format(categories[cat]),
+                  self.pat.categories[cat], len(self.pat.categories[cat]))
+            print("Список максимумов значений пациента {}:".format(categories[cat]),
+                  self.pat.categories_seq_max[cat], len(self.pat.categories_seq_max[cat]), "\n")
+
+        # вычисление распределения расстояний от максимумов рядов пациентов до ближайшего максимума Kp
+        print("Ряды расстояний и распределения расстояний от максимумов пациента до ближайшего максимума эталона", "\n")
+        # вычисление последовательностей расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
+
+        for cat in self.by_category:
+            print("Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(categories[cat]),
+                  self.by_category[cat]["distance"])
+            print("Распределение расстояний (значения от -3 до 3) пациента {}".format(categories[cat]),
+                  self.by_category[cat]["distrib"], "\n")
+
+        print("Анализ распределений расстояний от максимумов пациента до ближайшего максимума эталона", "\n")
+        for cat in self.by_category:
+            print("Анализ распределений расстояний пациента {}:".format(categories[cat]))
+            print("\tвыборочное среднее = {:.4f}".format(self.by_category[cat]["mean"]))
+            print("\tстандартное отклонение = {:.4f}".format(self.by_category[cat]["std"]))
+            print("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*self.by_category[cat]["t-interval"]), "\n")
 
 
 def test():
-    import json
+    # import matplotlib
+    # matplotlib.use("Qt5Agg")
+    ref = Reference.from_file('samples\\Flow_62.txt')
+    pat = Patient('1_1')
+    for cat in categories:
+        pat.add_category(cat, "samples/1_1{}.txt".format(cat))
 
-    report = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
-                                               "samples/1_1n.txt",
-                                               "samples/1_1o.txt",
-                                               "samples/1_1e.txt"])
-
-    base_figure = Figure(figsize=(5, 4), dpi=100)
-    # base_figure = plt.figure(figsize=(200, 200), dpi=100)
-
-    sys.stdout.write(json.dumps(report, indent=2))
-    plot(report['distances'], base_figure)
-
+    stat = ReferencePatientStat(ref, pat)
+    stat.report()
+    base = plt.figure()
+    stat.draw_plot(base)
     plt.show()
-    # base_figure.show()
 
 
 if __name__ == '__main__':

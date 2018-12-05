@@ -49,9 +49,9 @@ def plot(x_distance, base_figure: Figure):
 
 
 def test():
-    from science.samples_hist import init_data
+    from science.samples_hist import patient_init_stat
 
-    report = init_data("samples/Flow_62.txt", ["samples/1_1.txt",
+    report = patient_init_stat("samples/Flow_62.txt", ["samples/1_1.txt",
                                                "samples/1_1n.txt",
                                                "samples/1_1o.txt",
                                                "samples/1_1e.txt"])
