@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 from science.classes import Patient, Standard, CATEGORIES_SHORT as categories
-from science import *
+from science.funcs import sequence_distance, distrib
 
 
 def std_pat_stat_by_category(std: Standard, pat: Patient, category: str):
-    distance = sequence_distance(pat.categories_seq_max[category], std.seq_max)
+    distance = sequence_distance(pat.categories_seq_max[category], std.seq_max, insert_zero=True)
     return {
         'seq_max': pat.categories_seq_max[category],
         "distance": distance,

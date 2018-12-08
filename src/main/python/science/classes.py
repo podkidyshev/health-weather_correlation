@@ -1,4 +1,5 @@
-from science import read_sample, file_base_name, sequence_max
+from science import read_sample, file_base_name
+from science.funcs import sequence_max
 
 
 CATEGORIES_SHORT = {
@@ -8,6 +9,7 @@ CATEGORIES_SHORT = {
     "e": "с эмоциональной нагрузкой"
 }
 CATEGORIES = {value: key for key, value in CATEGORIES_SHORT.items()}
+CATEGORIES_LIST = [(cat, CATEGORIES_SHORT[cat]) for cat in ["", "n", "o", "e"]]
 
 MAIN_CATEGORY = "без нагрузки"
 MAIN_CATEGORY_SHORT = ""
