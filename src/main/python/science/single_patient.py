@@ -36,7 +36,7 @@ class StandardPatientStat:
         self.pat = pat
         self.by_category = st_pat_stat(std, pat)
 
-    def draw_plot(self, base: Figure):
+    def plot_gaussian(self, base: Figure):
         fig = base.subplots(1, 1)
 
         colors = {"blue": "синий", "red": "красный", "green": "зеленый", "yellow": "желтый"}
@@ -85,6 +85,9 @@ class StandardPatientStat:
             print("\tстандартное отклонение = {:.4f}".format(self.by_category[cat]["std"]))
             print("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*self.by_category[cat]["t-interval"]), "\n")
 
+        print('График анализа:')
+        # TODO: здесь будет график по категориям + кривая Гаусса
+
 
 def test():
     # import matplotlib
@@ -97,7 +100,7 @@ def test():
     stat = StandardPatientStat(std, pat)
     stat.report()
     base = plt.figure()
-    stat.draw_plot(base)
+    stat.plot_gaussian(base)
     plt.show()
 
 
