@@ -1,40 +1,40 @@
 # -*- coding: utf-8 -*-
 # Ввод образцов_послед.максимумов_распред..расстояний_гистограммы
 import numpy as np
-import scipy.stats as st
+import scipy.stats as stats
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from science.classes import Patient, Reference, CATEGORIES_SHORT as categories
+from science.classes import Patient, Standard, CATEGORIES_SHORT as categories
 from science import *
 
 
-def ref_pat_stat_by_category(ref: Reference, pat: Patient, category: str):
-    distance = sequence_distance(pat.categories_seq_max[category], ref.seq_max)
+def std_pat_stat_by_category(std: Standard, pat: Patient, category: str):
+    distance = sequence_distance(pat.categories_seq_max[category], std.seq_max)
     return {
         'seq_max': pat.categories_seq_max[category],
         "distance": distance,
         "distrib": distrib(distance),
         'mean': np.mean(distance),
         'std': np.std(distance),
-        't-interval': st.t.interval(0.95, len(distance) - 1, loc=np.mean(distance), scale=st.sem(distance))
+        't-interval': stats.t.interval(0.95, len(distance) - 1, loc=np.mean(distance), scale=stats.sem(distance))
     }
 
 
-def ref_pat_stat(ref: Reference, pat: Patient):
+def st_pat_stat(std: Standard, pat: Patient):
     report = {}
     for cat, pat_data in pat.categories.items():
         if pat_data is not None:
-            report[cat] = ref_pat_stat_by_category(ref, pat, cat)
+            report[cat] = std_pat_stat_by_category(std, pat, cat)
     return report
 
 
-class ReferencePatientStat:
-    def __init__(self, ref: Reference, pat: Patient):
-        self.ref = ref
+class StandardPatientStat:
+    def __init__(self, std: Standard, pat: Patient):
+        self.std = std
         self.pat = pat
-        self.by_category = ref_pat_stat(ref, pat)
+        self.by_category = st_pat_stat(std, pat)
 
     def draw_plot(self, base: Figure):
         fig = base.subplots(1, 1)
@@ -47,9 +47,9 @@ class ReferencePatientStat:
         distance = self.by_category[list(self.by_category.keys())[0]]["distance"]  # произвольная дистанция
         values_range = np.linspace(0.9 * np.min(distance), 1.1 * np.max(distance), 106)
         for cat, c in zip(self.by_category, colors):
-            fig.plot(values_range, st.gaussian_kde(self.by_category[cat]["distance"])(values_range), color=c)
+            fig.plot(values_range, stats.gaussian_kde(self.by_category[cat]["distance"])(values_range), color=c)
 
-        fig.plot(values_range, st.norm.pdf(values_range, 0, 1), '-.k')
+        fig.plot(values_range, stats.norm.pdf(values_range, 0, 1), '-.k')
         plt.style.use('seaborn-white')
 
         title = '\n'.join([titles[idx] + ', ' + titles[idx + 1] if idx < len(titles) - 1 else titles[idx]
@@ -58,9 +58,9 @@ class ReferencePatientStat:
 
     def report(self):
         # принт должен быть перегружен
-        print("Пациент {}. Эталон {}".format(self.pat.name, self.ref.name))
-        print("Список Кр-значений:", self.ref.data, len(self.ref.data))
-        print("Список максимумов Кр-значений:", self.ref.seq_max, len(self.ref.seq_max), "\n")
+        print("Пациент {}. Эталон {}".format(self.pat.name, self.std.name))
+        print("Список Кр-значений:", self.std.data, len(self.std.data))
+        print("Список максимумов Кр-значений:", self.std.seq_max, len(self.std.seq_max), "\n")
 
         for cat in self.by_category:
             print("Список значений пациента {}:".format(categories[cat]),
@@ -89,12 +89,12 @@ class ReferencePatientStat:
 def test():
     # import matplotlib
     # matplotlib.use("Qt5Agg")
-    ref = Reference.from_file('samples\\Flow_62.txt')
+    std = Standard.from_file('samples\\Flow_62.txt')
     pat = Patient('1_1')
     for cat in categories:
         pat.add_category(cat, "samples/1_1{}.txt".format(cat))
 
-    stat = ReferencePatientStat(ref, pat)
+    stat = StandardPatientStat(std, pat)
     stat.report()
     base = plt.figure()
     stat.draw_plot(base)

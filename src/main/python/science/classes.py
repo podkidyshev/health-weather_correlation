@@ -22,12 +22,12 @@ class PatientDuplicateError(Exception):
 
 
 class Patient:
-    all_pats = {}
+    patients = {}
 
     def __init__(self, name):
-        if name in Patient.all_pats:
+        if name in Patient.patients:
             raise PatientDuplicateError('Пациент с именем {} уже загружен'.format(name))
-        Patient.all_pats[name] = self
+        Patient.patients[name] = self
 
         self.name = name
         # Удобные ссылки для основной категории (DEFAULT_MAIN_CATEGORY)
@@ -54,17 +54,17 @@ class Patient:
         self._add_category(cat, data)
 
 
-class ReferenceDuplicateError(Exception):
+class StandardDuplicateError(Exception):
     pass
 
 
-class Reference:
-    all_refs = {}
+class Standard:
+    standards = {}
 
     def __init__(self, name, data):
-        if name in Reference.all_refs:
-            raise ReferenceDuplicateError('Эталон {} уже загружен'.format(name))
-        Reference.all_refs[name] = self
+        if name in Standard.standards:
+            raise StandardDuplicateError('Эталон {} уже загружен'.format(name))
+        Standard.standards[name] = self
 
         self.name = name
         self.data = data
@@ -75,8 +75,8 @@ class Reference:
         if not name:
             name = file_base_name(filename)
         data = read_sample(filename)
-        return Reference(name, data)
+        return Standard(name, data)
 
     @staticmethod
     def cleanup():
-        Reference.all_refs.clear()
+        Standard.standards.clear()
