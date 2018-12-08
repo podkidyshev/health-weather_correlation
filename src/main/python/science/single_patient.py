@@ -6,7 +6,7 @@ import scipy.stats as st
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from science.patient import Patient, Reference, DEFAULT_CATEGORIES_SHORT as categories
+from science.classes import Patient, Reference, CATEGORIES_SHORT as categories
 from science import *
 
 

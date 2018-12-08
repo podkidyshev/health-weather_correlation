@@ -1,16 +1,16 @@
 from science import read_sample, file_base_name, sequence_max
 
 
-DEFAULT_CATEGORIES_SHORT = {
+CATEGORIES_SHORT = {
     "": "без нагрузки",
     "n": "с физической нагрузкой",
     "o": "после отдыха",
     "e": "с эмоциональной нагрузкой"
 }
-DEFAULT_CATEGORIES = {value: key for key, value in DEFAULT_CATEGORIES_SHORT.items()}
+CATEGORIES = {value: key for key, value in CATEGORIES_SHORT.items()}
 
-DEFAULT_MAIN_CATEGORY = "без нагрузки"
-DEFAULT_MAIN_CATEGORY_SHORT = ""
+MAIN_CATEGORY = "без нагрузки"
+MAIN_CATEGORY_SHORT = ""
 
 
 class CategoryError(Exception):
@@ -34,8 +34,8 @@ class Patient:
         self.data = None
         self.seq_max = None
 
-        self.categories = {cat: None for cat in DEFAULT_CATEGORIES_SHORT}
-        self.categories_seq_max = {cat: None for cat in DEFAULT_CATEGORIES_SHORT}
+        self.categories = {cat: None for cat in CATEGORIES_SHORT}
+        self.categories_seq_max = {cat: None for cat in CATEGORIES_SHORT}
 
     def has_category(self, category: str):
         return self.categories[category] is not None
@@ -43,12 +43,12 @@ class Patient:
     def _add_category(self, cat: str, data: list):
         self.categories[cat] = data
         self.categories_seq_max[cat] = sequence_max(data)
-        if cat == DEFAULT_CATEGORIES_SHORT:
+        if cat == CATEGORIES_SHORT:
             self.data = self.categories[cat]
             self.seq_max = self.categories_seq_max[cat]
 
     def add_category(self, cat: str, filename: str):
-        if cat not in DEFAULT_CATEGORIES_SHORT:
+        if cat not in CATEGORIES_SHORT:
             raise CategoryError('Неизвестная категория {}'.format(cat))
         data = read_sample(filename)
         self._add_category(cat, data)
