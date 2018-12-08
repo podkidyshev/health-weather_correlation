@@ -22,7 +22,7 @@ import scipy.stats as st
 
 from matplotlib.figure import Figure
 
-from science.classes import CATEGORIES_LIST
+from science.classes import CATS
 
 
 class StatComputingError(ValueError):
@@ -235,15 +235,18 @@ def test_normal(x, *, qq: bool, base: Figure = None):
 
 def graph_kde(xr: list, base: Figure):
     """Построение 4-х ядерных оценок плотности и кривой Гаусса"""
-    fig = base.subplots(1, 1)
+    fig = base.subplots(1)
     # инициализация цветов
-    colors = [("blue", "синий"), ("red", "красный"),
-              ("green", "зеленый"), ("yellow", "желтый")]
-    # задаем заголовки и отфлитровываем отсутствующие категории
-    titles = ["{} график – {}".format(colors[idx][1], CATEGORIES_LIST[idx][1])
-              for idx in range(4) if xr[idx] is not None] + \
-             ["черный штрихпунктирный график – стандартная кривая Гаусса"]
-    colors = [colors[idx] for idx in range(4) if xr[idx] is not None]
+    colors = [("blue", "синий"),
+              ("red", "красный"),
+              ("green", "зеленый"),
+              ("yellow", "желтый")]
+    # задаем заголовки
+    titles = ["{} график – {}".format(colors[idx][1], CATS[idx][1])
+              for idx in range(4) if xr[idx] is not None]
+    titles.append("черный штрихпунктирный график – стандартная кривая Гаусса")
+    # отфлитровываем отсутствующие категории
+    colors = [colors[idx][0] for idx in range(4) if xr[idx] is not None]
     xr = [el for el in xr if el is not None]
     rng = np.linspace(0.9 * np.min(xr[0]), 1.1 * np.max(xr[0]), 106)
     for xi, c in zip(xr, colors):
@@ -251,9 +254,11 @@ def graph_kde(xr: list, base: Figure):
 
     fig.plot(rng, st.norm.pdf(rng, 0, 1), '-.k')
     title = '\n'.join([titles[idx] + ', ' + titles[idx + 1] if idx < len(titles) - 1 else titles[idx]
-                       for idx in range(0, len(titles), 2)])
-    fig.set_title(title)
-
+                       for idx in range(0, len(titles) - 1, 2)]) + '\n' + titles[-1]
+    fig.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='', title=title)
+    # fig.set_title(title)
+    # fig.set_xlim((-4, 4)), fig.set_ylim((0, 0.5))
+    # fig.set_xlabel('x'), fig.set_ylabel('')
 
 # def graph_kde3(xr1, xr2, xr3):
 #     """Построение 3-х ядерных оценок плотности и кривой Гаусса"""

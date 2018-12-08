@@ -6,14 +6,15 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from science.classes import Patient, Standard, CATEGORIES_SHORT as categories
-from science.funcs import sequence_distance, distrib
+from science.classes import Patient, Standard
+from science.funcs import sequence_distance, distrib, graph_kde
+from science import CATS, nnone, plot_to_image
 
 
-def std_pat_stat_by_category(std: Standard, pat: Patient, category: str):
-    distance = sequence_distance(pat.categories_seq_max[category], std.seq_max, insert_zero=True)
+def std_pat_stat_by_category(std: Standard, pat: Patient, cat: int):
+    distance = sequence_distance(pat.data_seq_max[cat], std.seq_max, insert_zero=True)
     return {
-        'seq_max': pat.categories_seq_max[category],
+        "seq_max": pat.data_seq_max[cat],
         "distance": distance,
         "distrib": distrib(distance),
         'mean': np.mean(distance),
@@ -23,10 +24,9 @@ def std_pat_stat_by_category(std: Standard, pat: Patient, category: str):
 
 
 def st_pat_stat(std: Standard, pat: Patient):
-    report = {}
-    for cat, pat_data in pat.categories.items():
-        if pat_data is not None:
-            report[cat] = std_pat_stat_by_category(std, pat, cat)
+    report = [None] * len(CATS)
+    for cat, data in nnone(pat.data):
+        report[cat] = std_pat_stat_by_category(std, pat, cat)
     return report
 
 
@@ -34,73 +34,64 @@ class StandardPatientStat:
     def __init__(self, std: Standard, pat: Patient):
         self.std = std
         self.pat = pat
-        self.by_category = st_pat_stat(std, pat)
+        self.report = st_pat_stat(std, pat)
 
-    def plot_gaussian(self, base: Figure):
-        fig = base.subplots(1, 1)
+    def get_report_item(self, item: str):
+        return [self.report[idx][item] if self.report[idx] is not None else None for idx in range(len(CATS))]
 
-        colors = {"blue": "синий", "red": "красный", "green": "зеленый", "yellow": "желтый"}
-        titles = ["{} график – {}".format(colors[c], categories[cat])
-                  for c, cat in zip(colors, self.pat.categories) if self.pat.has_category(cat)]
-        titles.append("черный штрихпунктирный график – стандартная кривая Гаусса")
-
-        distance = self.by_category[list(self.by_category.keys())[0]]["distance"]  # произвольная дистанция
-        values_range = np.linspace(0.9 * np.min(distance), 1.1 * np.max(distance), 106)
-        for cat, c in zip(self.by_category, colors):
-            fig.plot(values_range, stats.gaussian_kde(self.by_category[cat]["distance"])(values_range), color=c)
-
-        fig.plot(values_range, stats.norm.pdf(values_range, 0, 1), '-.k')
-        plt.style.use('seaborn-white')
-
-        title = '\n'.join([titles[idx] + ', ' + titles[idx + 1] if idx < len(titles) - 1 else titles[idx]
-                           for idx in range(0, len(titles), 2)])
-        fig.set_title(title)
-
-    def report(self):
+    def get_report(self):
         # принт должен быть перегружен
         print("Пациент {}. Эталон {}".format(self.pat.name, self.std.name))
         print("Список Кр-значений:", self.std.data, len(self.std.data))
         print("Список максимумов Кр-значений:", self.std.seq_max, len(self.std.seq_max), "\n")
 
-        for cat in self.by_category:
-            print("Список значений пациента {}:".format(categories[cat]),
-                  self.pat.categories[cat], len(self.pat.categories[cat]))
-            print("Список максимумов значений пациента {}:".format(categories[cat]),
-                  self.pat.categories_seq_max[cat], len(self.pat.categories_seq_max[cat]), "\n")
+        for cat, report in nnone(self.report):
+            print("Список значений пациента {}:".format(CATS[cat][1]),
+                  self.pat.data[cat], len(self.pat.data[cat]))
+            print("Список максимумов значений пациента {}:".format(CATS[cat][1]),
+                  report["seq_max"], len(report["seq_max"]), "\n")
 
         # вычисление распределения расстояний от максимумов рядов пациентов до ближайшего максимума Kp
         print("Ряды расстояний и распределения расстояний от максимумов пациента до ближайшего максимума эталона", "\n")
         # вычисление последовательностей расстояний  от максимумов рядов пациентов до ближайшего максимума Kp
 
-        for cat in self.by_category:
-            print("Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(categories[cat]),
-                  self.by_category[cat]["distance"])
-            print("Распределение расстояний (значения от -3 до 3) пациента {}".format(categories[cat]),
-                  self.by_category[cat]["distrib"], "\n")
+        for cat, report in nnone(self.report):
+            print("Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(CATS[cat][1]),
+                  report["distance"])
+            print("Распределение расстояний (значения от -3 до 3) пациента {}".format(CATS[cat][1]),
+                  report["distrib"], "\n")
 
         print("Анализ распределений расстояний от максимумов пациента до ближайшего максимума эталона", "\n")
-        for cat in self.by_category:
-            print("Анализ распределений расстояний пациента {}:".format(categories[cat]))
-            print("\tвыборочное среднее = {:.4f}".format(self.by_category[cat]["mean"]))
-            print("\tстандартное отклонение = {:.4f}".format(self.by_category[cat]["std"]))
-            print("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*self.by_category[cat]["t-interval"]), "\n")
+        for cat, report in nnone(self.report):
+            print("Анализ распределений расстояний пациента {}:".format(CATS[cat][1]))
+            print("\tвыборочное среднее = {:.4f}".format(report["mean"]))
+            print("\tстандартное отклонение = {:.4f}".format(report["std"]))
+            print("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*report["t-interval"]), "\n")
 
         print('График анализа:')
         # TODO: здесь будет график по категориям + кривая Гаусса
+        # base = plt.figure(figsize=(5, 4), dpi=100)
+        # graph_kde(list(map(lambda idx: stat.report[idx]["distance"], range(len(CATS)))), base)
+        # img = plot_to_image()
+        # img.save('test1.png')
 
 
 def test():
-    # import matplotlib
+    import matplotlib
     # matplotlib.use("Qt5Agg")
+    matplotlib.rcParams.update({'font.size': 8})
+
     std = Standard.from_file('samples\\Flow_62.txt')
     pat = Patient('1_1')
-    for cat in categories:
-        pat.add_category(cat, "samples/1_1{}.txt".format(cat))
+    for cat_s, cat_l in CATS:
+        pat.add_category(cat_s, "samples/1_1{}.txt".format(cat_s))
 
     stat = StandardPatientStat(std, pat)
-    stat.report()
-    base = plt.figure()
-    stat.plot_gaussian(base)
+    stat.get_report()
+    base = plt.figure(1)
+    graph_kde(stat.get_report_item("distance"), base)
+    # img = plot_to_image()
+    # img.save('test.png')
     plt.show()
 
 

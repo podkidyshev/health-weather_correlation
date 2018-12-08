@@ -1,22 +1,5 @@
-from science import read_sample, file_base_name
+from science import *
 from science.funcs import sequence_max
-
-
-CATEGORIES_SHORT = {
-    "": "без нагрузки",
-    "n": "с физической нагрузкой",
-    "o": "после отдыха",
-    "e": "с эмоциональной нагрузкой"
-}
-CATEGORIES = {value: key for key, value in CATEGORIES_SHORT.items()}
-CATEGORIES_LIST = [(cat, CATEGORIES_SHORT[cat]) for cat in ["", "n", "o", "e"]]
-
-MAIN_CATEGORY = "без нагрузки"
-MAIN_CATEGORY_SHORT = ""
-
-
-class CategoryError(Exception):
-    pass
 
 
 class PatientDuplicateError(Exception):
@@ -32,28 +15,23 @@ class Patient:
         Patient.patients[name] = self
 
         self.name = name
-        # Удобные ссылки для основной категории (DEFAULT_MAIN_CATEGORY)
-        self.data = None
-        self.seq_max = None
+        self.data = [None] * len(CATS)
+        self.data_seq_max = [None] * len(CATS)
 
-        self.categories = {cat: None for cat in CATEGORIES_SHORT}
-        self.categories_seq_max = {cat: None for cat in CATEGORIES_SHORT}
+    def has_category(self, cat):
+        return self.data[cat_index(cat)] is not None
 
-    def has_category(self, category: str):
-        return self.categories[category] is not None
+    def _add_category(self, cat, data: list):
+        cat = cat_index(cat)
+        self.data[cat] = data
+        self.data_seq_max[cat] = sequence_max(data)
 
-    def _add_category(self, cat: str, data: list):
-        self.categories[cat] = data
-        self.categories_seq_max[cat] = sequence_max(data)
-        if cat == CATEGORIES_SHORT:
-            self.data = self.categories[cat]
-            self.seq_max = self.categories_seq_max[cat]
-
-    def add_category(self, cat: str, filename: str):
-        if cat not in CATEGORIES_SHORT:
-            raise CategoryError('Неизвестная категория {}'.format(cat))
+    def add_category(self, cat, filename: str):
         data = read_sample(filename)
         self._add_category(cat, data)
+
+    def delete(self):
+        del Patient.patients[self.name]
 
 
 class StandardDuplicateError(Exception):
@@ -71,6 +49,9 @@ class Standard:
         self.name = name
         self.data = data
         self.seq_max = sequence_max(self.data)
+
+    def delete(self):
+        del Standard.standards[self.name]
 
     @staticmethod
     def from_file(filename: str, name: str=""):
