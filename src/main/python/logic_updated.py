@@ -17,9 +17,9 @@ class Main(Ui_MainBaseForm):
     def __init__(self):
         # КОСТЫЛЬ, НЕ ТРОГАТЬ
         self.dummy = QWidget()
-        self.verticalLayout = QVBoxLayout(self.dummy)
+        self.ref_layout = QVBoxLayout(self.dummy)
         self.setCentralWidget(self.dummy)
-        self.verticalLayout = self.centralWidget().layout()
+        self.ref_layout = self.centralWidget().layout()
         # КОСТЫЛЬ, НЕ ТРОГАТЬ
 
     def start(self):
@@ -44,10 +44,13 @@ class Main(Ui_MainBaseForm):
                                                'Выбрать эталон',
                                                os.path.join(module, 'science', 'samples'),
                                                options=options)
-        self.ref_list.addItem(fname)
+        self.ref_list.addItem(fname[fname.rfind('/') + 1:fname.rfind('.')])
 
     def del_ref_btn_clicked(self):
-        self.ref_list.removeItemWidget(self.ref_list.selectedItems())
+        listItems = self.ref_list.selectedItems()
+        if not listItems: return
+        for i in range(len(listItems)):
+            self.ref_list.takeItem(i)
 
     def add_patient_btn_clicked(self):
         options = QFileDialog.Options()
@@ -55,10 +58,13 @@ class Main(Ui_MainBaseForm):
                                                'Выбрать файл пациента',
                                                os.path.join(module, 'science', 'samples'),
                                                options=options)
-        self.patient_list.addItem(fname)
+        self.patient_list.addItem(fname[fname.rfind('/') + 1:fname.rfind('.')])
 
     def del_patient_btn_clicked(self):
-        pass
+        listItems = self.patient_list.selectedItems()
+        if not listItems: return
+        for i in range(len(listItems)):
+            self.patient_list.takeItem(i)
 
     def btn_start_clicked(self):
         self.figure = plt.figure(figsize=(5, 4), dpi=100)  # plt.figure(figsize=(100, 100), dpi=100)
