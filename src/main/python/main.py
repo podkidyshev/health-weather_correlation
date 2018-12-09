@@ -12,7 +12,6 @@ class ExampleApp(QMainWindow, logic_updated.Main):
         # noinspection PyArgumentList
         QMainWindow.__init__(self)
         logic_updated.Main.__init__(self)
-        #logic.Main.__init__(self)
         # создание виджетов в MainForm (если что переопределить в logic.Main)
         self.setupUi(self)
         # старт (собстно show)
