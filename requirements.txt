@@ -1,5 +1,8 @@
-numpy
-scipy
-pandas
-matplotlib
-statsmodels
+numpy==1.15.4
+scipy==1.1.0
+pandas==0.23.4
+matplotlib==3.0.2
+statsmodels==0.9.0
+pillow==5.3.0
+pyqt5==5.9.2
+pyinstaller==3.4

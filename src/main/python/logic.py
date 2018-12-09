@@ -6,7 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import QFileDialog, QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 
-from science.samples_hist import init_data, plot
+# from science.samples_hist import patient_init_stat, plot
 from form import Ui_MainBaseForm
 from science import patient_suffix
 
@@ -57,11 +57,11 @@ class Main(Ui_MainBaseForm):
 
     def plot(self):
         patient = self.sample_line.text()
-        samples_hist_report = init_data(self.standard_line.text(), [patient,
-                                                                    patient_suffix(patient, 'n'),
-                                                                    patient_suffix(patient, 'o'),
-                                                                    patient_suffix(patient, 'e')])
-        plot(samples_hist_report['distances'], self.figure)
+        # samples_hist_report = patient_init_stat(self.standard_line.text(), [patient,
+        #                                                                     patient_suffix(patient, 'n'),
+        #                                                                     patient_suffix(patient, 'o'),
+        #                                                                     patient_suffix(patient, 'e')])
+        # plot(samples_hist_report['distances'], self.figure)
         self.canvas.draw()
 
         # data = [i for i in range(25)]

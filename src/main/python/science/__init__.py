@@ -1,50 +1,43 @@
 import os
-import sys
+
+from PIL import Image
+from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 
 
-def sequence_max(x):
-    """функция вычисления максимумов временного ряда"""
-    y = []
-    for i in range(1, len(x) - 1):
-        if x[i - 1] <= x[i] and x[i + 1] <= x[i]:
-            y.append(1)
-        else:
-            y.append(0)
-    return y
+CATS_SHORT = {
+    "": "без нагрузки",
+    "n": "с физической нагрузкой",
+    "o": "после отдыха",
+    "e": "с эмоциональной нагрузкой"
+}
+CATS_FULL = {value: key for key, value in CATS_SHORT.items()}
+CATS = [(cat, CATS_SHORT[cat]) for cat in ["", "n", "o", "e"]]
 
 
-def sequence_distance(x, y):
-    """
-    функция вычисления расстояний от максимумов ряда пациента до ближайшего максимума Kp:
-    "-" максимум Kp находится слева, "+" максимум Kp находится справа
-    """
-    x.insert(0, 0)
-    u = []
-    for i in range(len(x)):
-        if x[i] == 1:
-            for j in range(len(y)):
-                if (i - j >= 0 and y[i - j] == 1) and (i + j < len(y) and y[i + j] == 1):
-                    if j == 0:
-                        u.append(j)
-                    else:
-                        u.append(j)
-                        u.append(-j)
-                    break
-                elif i - j >= 0 and y[i - j] == 1:
-                    u.append(j)
-                    break
-                elif i + j < len(y) and y[i + j] == 1:
-                    u.append(-j)
-                    break
-    return u
+class CategoryError(Exception):
+    pass
 
 
-def distrib(x):
-    """функция вычисления распределения расстояний от максимумов ряда пациента до ближайшего максимума Kp"""
-    y = []
-    for i in range(7):
-        y.append(x.count(i - 3))
-    return y
+def cat_index(cat):
+    if isinstance(cat, int):
+        return cat
+    if not isinstance(cat, str):
+        raise CategoryError('Неизвестный тип нахождения категории: {}'.format(type(cat)))
+    for idx, (short, long) in enumerate(CATS):
+        if short == cat or long == cat:
+            return idx
+    raise CategoryError('Неизвестная категоря: ""'.format(cat))
+
+
+def nnone(arr):
+    for idx, el in enumerate(arr):
+        if el is not None:
+            yield idx, el
+
+
+def file_base_name(filename: str):
+    return os.path.splitext(os.path.basename(filename))[0]
 
 
 def read_sample(filename):
@@ -60,3 +53,10 @@ def read_sample(filename):
 
 def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
+
+
+def plot_to_image():
+    """Вовзращет PIL.Image последнего вызова plt.figure()"""
+    canvas = plt.get_current_fig_manager().canvas
+    canvas.draw()
+    return Image.frombytes('RGB', canvas.get_width_height(), canvas.tostring_rgb())
