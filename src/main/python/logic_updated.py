@@ -17,16 +17,14 @@ class Main(Ui_MainBaseForm):
     def __init__(self):
         # КОСТЫЛЬ, НЕ ТРОГАТЬ
         self.dummy = QWidget()
-        self.ref_layout = QVBoxLayout(self.dummy)
+        self.verticalLayout = QVBoxLayout(self.dummy)
         self.setCentralWidget(self.dummy)
-        self.ref_layout = self.centralWidget().layout()
+        self.verticalLayout = self.centralWidget().layout()
         # КОСТЫЛЬ, НЕ ТРОГАТЬ
 
     def start(self):
-
         self.exit_btn.clicked.connect(self.btn_exit_clicked)
         #self.report_btn.clicked.connect(self.report_btn_clicked)
-
 
         self.add_ref_btn.clicked.connect(self.add_ref_btn_clicked)
         self.del_ref_btn.clicked.connect(self.del_ref_btn_clicked)
@@ -34,7 +32,6 @@ class Main(Ui_MainBaseForm):
         # self.del_group_btn.clicked.connect(self.del_group_btn_clicked)
         self.add_patient_btn.clicked.connect(self.add_patient_btn_clicked)
         self.del_patient_btn.clicked.connect(self.del_patient_btn_clicked)
-
         self.show()
 
     # КНОПКИ
