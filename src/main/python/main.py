@@ -3,18 +3,20 @@ from PyQt5.QtWidgets import QMainWindow
 
 import sys
 
-import logic
+#import logic
+import logic_updated
 
 
-class ExampleApp(QMainWindow, logic.Main):
+class ExampleApp(QMainWindow, logic_updated.Main):
     def __init__(self):
         # noinspection PyArgumentList
         QMainWindow.__init__(self)
-        logic.Main.__init__(self)
+        logic_updated.Main.__init__(self)
+        #logic.Main.__init__(self)
         # создание виджетов в MainForm (если что переопределить в logic.Main)
         self.setupUi(self)
         # старт (собстно show)
-        logic.Main.start(self)
+        logic_updated.Main.start(self)
 
 
 class AppContext(ApplicationContext):           # 1. Subclass ApplicationContext

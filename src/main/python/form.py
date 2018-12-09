@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src\main\python\ui\health_weather.ui'
+# Form implementation generated from reading ui file 'src\main\python\ui\health_weather_test.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
