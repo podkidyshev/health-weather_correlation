@@ -1,8 +1,4 @@
 # Тест нормальности
-import time
-# noinspection PyUnresolvedReferences
-from numpy.random import seed
-from scipy.stats import shapiro, normaltest, anderson
 import scipy.stats as stats
 from numpy import *
 import numpy as np
@@ -10,29 +6,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from src.main.python.science import read_sample, sequence_distance, sequence_max
+import science.funcs as funcs
 
 
-def tests(data_reference: list):
-    report = {}
-    # seed the random number generator
-    if __name__ == '__main__':
-        seed(1)
-    else:
-        seed(int(time.time() * 1000))
-
-    # generate univariate observations
-    # normality test
-    # print("Shapiro-Wilk Test")
-    stat, p = shapiro(data_reference)
-    # print('Statistics=%.3f, p=%.3f' % (stat, p))
-    # interpret
+def test_normal(x: list, *, qq: bool, base: Figure = None):
+    """Тестирование распределения на нормальность"""
+    report = {"x": x[:]}
     alpha = 0.05
-    # if p > alpha:
-    #     print('Sample looks Gaussian (fail to reject H0)')
-    # else:
-    #     print('Sample does not look Gaussian (reject H0)')
-    report["shapiro-wilk"] = {
+
+    stat, p = stats.shapiro(x)
+    report["shapiro"] = {
         "name": "Shapiro-Wilk Test",
         "alpha": alpha,
         "stat": stat,
@@ -40,17 +23,8 @@ def tests(data_reference: list):
         "res": p > alpha
     }
 
-    # print("D'Agostino and Pearson's Test")
-    # normality test
-    stat, p = normaltest(data_reference)
-    # print('Statistics=%.3f, p=%.3f' % (stat, p))
-    # interpret
-    alpha = 0.05
-    # if p > alpha:
-    #     print('Sample looks Gaussian (fail to reject H0)')
-    # else:
-    #     print('Sample does not look Gaussian (reject H0)')
-    report["agostino_pearson"] = {
+    stat, p = stats.normaltest(x)
+    report["agostino"] = {
         "name": "D'Agostino and Pearson's Test",
         "alpha": alpha,
         "stat": stat,
@@ -58,36 +32,23 @@ def tests(data_reference: list):
         "res": p > alpha
     }
 
-    # print("Anderson-Darling Test")
-    result = anderson(data_reference)
-
+    statistic, critical_values, significance_level = stats.anderson(x)
     report["anderson"] = {
         "name": "Anderson-Darling Test",
-        "statistic": result[0],
-        "critical": result[1],
-        "res": []
+        "statistic": statistic,
+        "critical": critical_values,
+        "sig_level": significance_level,
+        "res": [statistic < cv for cv in critical_values]
     }
-    # print('Statistic: %.3f' % result.statistic)
-    # for i in range(len(result[1])):
-    for sl, cv in zip(result[2], result[1]):
-        report["anderson"]["res"].append((sl, cv, result[0] < cv))
-        # if result.statistic < result.critical_values[i]:
-        #     print('%.3f: %.3f, data looks normal (fail to reject H0)' % (sl, cv))
-        #     report["anderson"]["res"].append((sl, cv, True))
-        # else:
-        #     print('%.3f: %.3f, data does not look normal (reject H0)' % (sl, cv))
 
-    # print("Kolmogorov-Smirnov Test")
-    num_tests = 10 ** 3
+    num_tests = 10 ** (3 if qq else 2)
     num_rejects = 0
     for i in range(num_tests):
-        normed_data = (data_reference - mean(data_reference)) / std(data_reference)
+        normed_data = (x - np.mean(x)) / np.std(x)
         D, pval = stats.kstest(normed_data, 'norm')
         if pval < alpha:
             num_rejects += 1
     ratio = float(num_rejects) / num_tests
-    # print("Kolmogorov test for normality:", '{}/{} = {:.2f} rejects at rejection level {}'.format(
-    #     num_rejects, num_tests, ratio, alpha))
     report["ks"] = {
         "name": "Kolmogorov-Smirnov Test",
         "num_tests": num_tests,
@@ -96,32 +57,59 @@ def tests(data_reference: list):
         "alpha": alpha
     }
 
+    if qq and base is None:
+        raise funcs.StatComputingError('Не передана фигура для рисования графика')
+    if qq:
+        stats.probplot(x, dist="norm", plot=base.subplots(1))
     return report
 
 
-def prob_plot(data_reference, base_figure):
-    # fig = base_figure.subplots(1, 1)
+def get_report(report):
+    shapiro = report["shapiro"]
+    print("Тест нормальности Шапиро-Вилка")
+    print('Statistics=%.3f, p=%.3f' % (shapiro["stat"], shapiro["p"]))
+    if shapiro["res"]:
+        print('Образец выглядит гауссовским (не может отклонить гипотезу H0)')
+    else:
+        print('Образец не выглядит гауссовским (отклонить гипотезу H0)')
 
-    _range = np.linspace(0.9 * np.min(data_reference), 1.1 * np.max(data_reference), 100)
-    stats.probplot(data_reference, dist="norm", plot=plt)
-    # stats.probplot(stats.gaussian_kde(data)(_range), dist="norm", plot=plt)
+    agostino = report["agostino"]
+    print("D'Agostino and Pearson's Test")
+    print('Statistics=%.3f, p=%.3f' % (agostino["stat"], agostino["p"]))
+    if agostino["res"]:
+        print('Образец выглядит гауссовским (не может отклонить гипотезу H0)')
+    else:
+        print('Образец не выглядит гауссовским (отклонить H0)')
+
+    anderson = report["anderson"]
+    print("Тест нормальности Андерсона-Дарлинга")
+    print('Statistic: %.3f' % anderson["statistic"])
+    for res, cv, sl in zip(anderson["res"], anderson["critical"], anderson["sig_level"]):
+        if res:
+            print('{:.3f}: {:.3f}, Образец выглядит гауссовским (не может отклонить гипотезу H0)'.format(sl, cv))
+        else:
+            print('{:.3f}: {:.3f}, Образец не выглядит гауссовским (отклонить H0)'.format(sl, cv))
+
+    ks = report["ks"]
+    print("Тест нормальности Колмогорова-Смирнова")
+    num_tests = ks["num_tests"]
+    num_rejects = ks["num_rejects"]
+    ratio = ks["ratio"]
+    alpha = ks["alpha"]
+    print("Результаты теста Колмогорова-Смирнова: ", "из {} прогонов доля".format(num_tests),
+          '{}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}'.format(num_rejects, num_tests, ratio, alpha))
+    # TODO: здесь график если надо
+    # base = plt.figure()
+    # st.probplot(report["x"], dist="norm", plot=base)
 
 
 def test():
-    data_reference = read_sample("samples/Flow_62.txt")
-    data_patient = read_sample("samples/1_1.txt")
-    x_distance = sequence_distance(sequence_max(data_patient), sequence_max(data_reference))
+    x_distance = [1, -1, 1, 1, -3, 2, 0, 2, -2, -1, 0, 1, 1, 3, -3, 0, 1, -1, 3]
 
-    # data_reference = [1, -1, 1, 1, -3, 2, 0, 2, -2, -1, 0, 1, 1, 3, -3, 0, 1, -1, 3]
-    report = tests(x_distance)
-
-    base_figure = Figure(figsize=(200, 200), dpi=100)
-    # base_figure = plt.figure(figsize=(200, 200), dpi=100)
-
-    prob_plot(data_reference, base_figure)
-
-    plt.show()
-    # base_figure.show()
+    base = plt.figure()
+    report = test_normal(x_distance, qq=True, base=base)
+    get_report(report)
+    base.show()
 
 
 if __name__ == '__main__':

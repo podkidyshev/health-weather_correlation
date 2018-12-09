@@ -6,7 +6,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from science.classes import Patient, Standard
+from science.classes import Patient, Standard, Group
 from science.funcs import sequence_distance, distrib, graph_kde
 from science import CATS, nnone, plot_to_image
 
@@ -82,7 +82,9 @@ def test():
     matplotlib.rcParams.update({'font.size': 8})
 
     std = Standard.from_file('samples\\Flow_62.txt')
-    pat = Patient('1_1')
+
+    Group('1')
+    pat = Patient('1_1', '1')
     for cat_s, cat_l in CATS:
         pat.add_category(cat_s, "samples/1_1{}.txt".format(cat_s))
 

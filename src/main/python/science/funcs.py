@@ -22,7 +22,7 @@ import scipy.stats as st
 
 from matplotlib.figure import Figure
 
-from science.classes import CATS
+import science
 
 
 class StatComputingError(ValueError):
@@ -130,109 +130,6 @@ def visual_analysis2(x, y, base: Figure):
     fig[1].plot(rng, st.gaussian_kde(y)(rng))
 
 
-def test_normal(x, *, qq: bool, base: Figure = None):
-    """Тестирование распределения на нормальность"""
-    report = {}
-    alpha = 0.05
-    # print("Тест нормальности Шапиро-Вилка")
-    # stat, p = shapiro(x)
-    # print('Statistics=%.3f, p=%.3f' % (stat, p))
-    # alpha = 0.05
-    # if p > alpha:
-    #     print('Образец выглядит гауссовским (не может отклонить гипотезу H0)')
-    # else:
-    #     print('Образец не выглядит гауссовским (отклонить гипотезу H0)')
-    stat, p = st.shapiro(x)
-    report["shapiro-wilk"] = {
-        "name": "Shapiro-Wilk Test",
-        "alpha": alpha,
-        "stat": stat,
-        "p": p,
-        "res": p > alpha
-    }
-
-    # print("Тест нормальности Д'Агостино-Пирсона")
-    # if len(x) > 19:
-    #     x1 = x
-    # else:
-    #     x1 = []
-    #     for i in range(50):
-    #         x1.append(random.choice(x))
-    # stat, p = normaltest(x1)
-    # print('Statistics=%.3f, p=%.3f' % (stat, p))
-    # if p > alpha:
-    #     print('Образец выглядит гауссовским (не может отклонить гипотезу H0)')
-    # else:
-    #     print('Образец не выглядит гауссовским (отклонить H0)')
-    stat, p = st.normaltest(x)
-    report["agostino_pearson"] = {
-        "name": "D'Agostino and Pearson's Test",
-        "alpha": alpha,
-        "stat": stat,
-        "p": p,
-        "res": p > alpha
-    }
-
-    # print("Тест нормальности Андерсона-Дарлинга")
-    # result = anderson(x)
-    # print('Statistic: %.3f' % result.statistic)
-    # p = 0
-    # for i in range(len(result.critical_values)):
-    #     sl, cv = result.significance_level[i], result.critical_values[i]
-    #     if result.statistic < result.critical_values[i]:
-    #         print('%.3f: %.3f, Образец выглядит гауссовским (не может отклонить гипотезу H0)' % (sl, cv))
-    #     else:
-    #         print('%.3f: %.3f, Образец не выглядит гауссовским (отклонить H0)' % (sl, cv))
-
-    # result[0] = result.statistic
-    # result[1] = result.critical_values
-    # result[2] = result.significance_level
-    # result = anderson(data_reference)
-    statistic, critical_values, significance_level = st.anderson(x)
-    report["anderson"] = {
-        "name": "Anderson-Darling Test",
-        "statistic": statistic,
-        "critical": critical_values,
-        "res": []
-    }
-    for sl, cv in zip(significance_level, critical_values):
-        report["anderson"]["res"].append((sl, cv, statistic < cv))
-
-    # print("Тест нормальности Колмогорова-Смирнова")
-    # num_tests = 10 ** 2
-    # num_rejects = 0
-    # for i in range(num_tests):
-    #     normed_data = (x - mean(x)) / std(x)
-    #     D, pval = stats.kstest(normed_data, 'norm')
-    #     if pval < alpha:
-    #         num_rejects += 1
-    # ratio = float(num_rejects) / num_tests
-    # print("Результаты теста Колмогорова-Смирнова: ", "из 100 прогонов доля",
-    #       '{}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}'.format(num_rejects, num_tests, ratio, alpha))
-    # print("Результаты теста Колмогорова-Смирнова: ", "из 1000 прогонов доля",
-    #       '{}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}'.format(num_rejects, num_tests, ratio, alpha))
-    num_tests = 10 ** (3 if qq else 2)
-    num_rejects = 0
-    for i in range(num_tests):
-        normed_data = (x - np.mean(x)) / np.std(x)
-        D, pval = st.kstest(normed_data, 'norm')
-        if pval < alpha:
-            num_rejects += 1
-    ratio = float(num_rejects) / num_tests
-    report["ks"] = {
-        "name": "Kolmogorov-Smirnov Test",
-        "num_tests": num_tests,
-        "num_rejects": num_rejects,
-        "ratio": ratio,
-        "alpha": alpha
-    }
-    if qq and base is None:
-        raise StatComputingError('Не передана фигура для рисования графика')
-    if qq:
-        st.probplot(x, dist="norm", plot=base)
-    return report
-
-
 def graph_kde(xr: list, base: Figure):
     """Построение 4-х ядерных оценок плотности и кривой Гаусса"""
     fig = base.subplots(1)
@@ -242,7 +139,7 @@ def graph_kde(xr: list, base: Figure):
               ("green", "зеленый"),
               ("yellow", "желтый")]
     # задаем заголовки
-    titles = ["{} график – {}".format(colors[idx][1], CATS[idx][1])
+    titles = ["{} график – {}".format(colors[idx][1], science.CATS[idx][1])
               for idx in range(4) if xr[idx] is not None]
     titles.append("черный штрихпунктирный график – стандартная кривая Гаусса")
     # отфлитровываем отсутствующие категории
@@ -256,9 +153,7 @@ def graph_kde(xr: list, base: Figure):
     title = '\n'.join([titles[idx] + ', ' + titles[idx + 1] if idx < len(titles) - 1 else titles[idx]
                        for idx in range(0, len(titles) - 1, 2)]) + '\n' + titles[-1]
     fig.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='', title=title)
-    # fig.set_title(title)
-    # fig.set_xlim((-4, 4)), fig.set_ylim((0, 0.5))
-    # fig.set_xlabel('x'), fig.set_ylabel('')
+
 
 # def graph_kde3(xr1, xr2, xr3):
 #     """Построение 3-х ядерных оценок плотности и кривой Гаусса"""
