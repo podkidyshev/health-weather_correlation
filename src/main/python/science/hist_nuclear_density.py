@@ -7,10 +7,6 @@ from matplotlib import pyplot as plt
 from matplotlib.pyplot import Figure
 from scipy.stats import norm
 
-if __name__ == '__main__':
-    import matplotlib
-    matplotlib.use("Qt5Agg")
-
 
 def descriptive1d(x):
     x = x[:]  # Для возможности предобработки данных (например, исключения нечисловых значений)
@@ -42,23 +38,23 @@ def plot(x_distance, base_figure: Figure):
     fig.plot(rng, st.gaussian_kde(x_distance)(rng))
     fig.plot(rng, norm.pdf(rng, np.mean(x_distance), np.std(x_distance)))
     # plt.plot(density(data, bw=0.5))
-    # plt.style.use('seaborn-white')
     fig.hist(x_distance, bins=7, range=(-3, 4), normed=True, alpha=0.5,
              histtype='stepfilled', color='steelblue',
              edgecolor='none')
 
 
 def test():
-    from science.samples_hist import patient_init_stat
-
-    report = patient_init_stat("samples/Flow_62.txt", ["samples/1_1.txt",
-                                               "samples/1_1n.txt",
-                                               "samples/1_1o.txt",
-                                               "samples/1_1e.txt"])
-
-    base_figure = plt.figure(figsize=(5, 4), dpi=100)
-    plot(report["distances"][0], base_figure)
-    plt.show()
+    # from science.samples_hist import patient_init_stat
+    #
+    # report = patient_init_stat("samples/Flow_62.txt", ["samples/1_1.txt",
+    #                                            "samples/1_1n.txt",
+    #                                            "samples/1_1o.txt",
+    #                                            "samples/1_1e.txt"])
+    #
+    # base_figure = plt.figure(figsize=(5, 4), dpi=100)
+    # plot(report["distances"][0], base_figure)
+    # plt.show()
+    pass
 
 
 if __name__ == '__main__':
