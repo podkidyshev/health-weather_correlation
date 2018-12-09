@@ -3,8 +3,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PyQt5.QtWidgets import QFileDialog, QVBoxLayout
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QFileDialog, QGridLayout, QWidget
 
 # from science.samples_hist import patient_init_stat, plot
 from form_updated import Ui_MainBaseForm
@@ -17,9 +16,9 @@ class Main(Ui_MainBaseForm):
     def __init__(self):
         # КОСТЫЛЬ, НЕ ТРОГАТЬ
         self.dummy = QWidget()
-        self.verticalLayout = QVBoxLayout(self.dummy)
+        self.gridLayout = QGridLayout(self.dummy)
         self.setCentralWidget(self.dummy)
-        self.verticalLayout = self.centralWidget().layout()
+        self.gridLayout = self.centralWidget().layout()
         # КОСТЫЛЬ, НЕ ТРОГАТЬ
 
     def start(self):
