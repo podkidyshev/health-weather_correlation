@@ -20,6 +20,7 @@ from operator import add
 import numpy as np
 import scipy.stats as st
 
+from matplotlib import rcParams
 from matplotlib.figure import Figure
 
 import science
@@ -141,7 +142,6 @@ def graph_kde(xr: list, base: Figure):
     # задаем заголовки
     titles = ["{} график – {}".format(colors[idx][1], science.CATS[idx][1])
               for idx in range(4) if xr[idx] is not None]
-    titles.append("черный штрихпунктирный график – стандартная кривая Гаусса")
     # отфлитровываем отсутствующие категории
     colors = [colors[idx][0] for idx in range(4) if xr[idx] is not None]
     xr = [el for el in xr if el is not None]
@@ -150,9 +150,13 @@ def graph_kde(xr: list, base: Figure):
         fig.plot(rng, st.gaussian_kde(xi)(rng), color=c)
 
     fig.plot(rng, st.norm.pdf(rng, 0, 1), '-.k')
-    title = '\n'.join([titles[idx] + ', ' + titles[idx + 1] if idx < len(titles) - 1 else titles[idx]
-                       for idx in range(0, len(titles) - 1, 2)]) + '\n' + titles[-1]
+
+    old_size = rcParams["font.size"]
+    rcParams.update({"font.size": 9})
+    title = '\n'.join([', '.join(titles[idx:idx + 2]) for idx in range(0, len(titles), 2)])
+    title += "\nчерный штрихпунктирный график – стандартная кривая Гаусса"
     fig.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='', title=title)
+    rcParams.update({"font.size": old_size})
 
 
 # def graph_kde3(xr1, xr2, xr3):
