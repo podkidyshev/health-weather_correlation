@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1421</width>
-    <height>649</height>
+    <width>925</width>
+    <height>551</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,6 +73,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="batchSize">
           <number>150</number>
          </property>
@@ -84,28 +90,6 @@
    </item>
    <item row="0" column="4">
     <layout class="QVBoxLayout" name="data_layout">
-     <item>
-      <widget class="QTabWidget" name="tabWidget">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="kde_tab">
-        <attribute name="title">
-         <string>Совместный KDE</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_2">
-        <attribute name="title">
-         <string>Tab 2</string>
-        </attribute>
-       </widget>
-      </widget>
-     </item>
      <item>
       <layout class="QGridLayout" name="report_layout">
        <property name="sizeConstraint">
@@ -166,6 +150,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="batchSize">
           <number>150</number>
          </property>
@@ -214,6 +204,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
          </property>
          <property name="batchSize">
           <number>150</number>
