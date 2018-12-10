@@ -3,12 +3,17 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QFileDialog, QGridLayout, QWidget, QFrame
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QFileDialog, QGridLayout, QWidget, QFrame, QTextEdit
+
 
 from form import Ui_MainBaseForm
 from frame_patient import Ui_FramePatient
 from frame_default import Ui_FrameDefault
+
+from science.classes import *
+from science.single_patient import StandardPatientStat
+from science import CATS
 
 
 module = os.path.dirname(__file__)
@@ -24,14 +29,33 @@ class BaseFrame(QFrame):
 
 
 class QDefaultFrame(BaseFrame, Ui_FrameDefault):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         BaseFrame.__init__(self, parent, Ui_FrameDefault)
 
 
 class QPatientFrame(BaseFrame, Ui_FramePatient):
-    def __init__(self, parent, patient_name):
+    def __init__(self, standard_name, patient_name, parent=None):
         BaseFrame.__init__(self, parent, Ui_FramePatient)
         # делать остальные дела
+
+        # Дичь новую добавил
+        self.std = Standard.standards[standard_name]
+        self.pat = Patient.patients[patient_name]
+        self.get_report()
+
+    def get_report(self):
+        for cat_s, cat_l in CATS:
+            self.pat.add_category(cat_s, "science/samples/1_1{}.txt".format(cat_s))
+        self.stat = StandardPatientStat(self.std, self.pat)
+        # выводит в консоль, перенос в QTextEdit не делал
+        self.stat.get_report()
+        # тест добавленяи информации в форму
+        self.tab.layout = QGridLayout(self)
+        self.text = QTextEdit()
+        self.tab.layout.addWidget(self.text)
+        self.tab.setLayout(self.tab.layout)
+        self.text.append("12312")
+        self.show()
 
 
 class Main(Ui_MainBaseForm):
@@ -53,8 +77,8 @@ class Main(Ui_MainBaseForm):
 
         self.add_ref_btn.clicked.connect(self.add_ref_btn_clicked)
         self.del_ref_btn.clicked.connect(self.del_ref_btn_clicked)
-        #self.add_group_btn.clicked.connect(self.add_group_btn_clicked)
-        # self.del_group_btn.clicked.connect(self.del_group_btn_clicked)
+        self.add_group_btn.clicked.connect(self.add_group_btn_clicked)
+        self.del_group_btn.clicked.connect(self.del_group_btn_clicked)
         self.add_patient_btn.clicked.connect(self.add_patient_btn_clicked)
         self.del_patient_btn.clicked.connect(self.del_patient_btn_clicked)
 
@@ -68,6 +92,13 @@ class Main(Ui_MainBaseForm):
         self.data_frame = frame_class(self, *args)
         self.data_layout.insertWidget(0, self.data_frame)
 
+    def patient_info(self):
+        selected_ref = self.ref_list.currentItem()
+        selected_patient = self.patient_list.currentItem()
+        if selected_ref is not None and selected_patient is not None:
+            self.patient = QPatientFrame(selected_ref.text(), selected_patient.text())
+            self.patient.show()
+
     # КНОПКИ
     def add_ref_btn_clicked(self):
         options = QFileDialog.Options()
@@ -75,27 +106,48 @@ class Main(Ui_MainBaseForm):
                                                'Выбрать эталон',
                                                os.path.join(module, 'science', 'samples'),
                                                options=options)
-        self.ref_list.addItem(fname[fname.rfind('/') + 1:fname.rfind('.')])
+        standard = fname[fname.rfind('/') + 1:fname.rfind('.')]
+        Standard.from_file(fname, standard)
+        self.ref_list.addItem(standard)
 
     def del_ref_btn_clicked(self):
-        listItems = self.ref_list.selectedItems()
-        if not listItems: return
-        for i in range(len(listItems)):
-            self.ref_list.takeItem(i)
+        standard = self.ref_list.currentItem().text()
+        self.ref_list.takeItem(self.ref_list.currentRow())
+        Standard.delete(Standard.standards[standard])
+
+    def add_group_btn_clicked(self):
+        # Для тестирования, добавляется только одна группа '1'
+        group = '1'
+        self.group_list.addItem(group)
+        Group(group)
+
+    def del_group_btn_clicked(self):
+        group = self.group_list.currentItem().text()
+        for patient in Group.groups[group].pats:
+            items = self.patient_list.findItems(patient, QtCore.Qt.MatchExactly)
+            for item in items:
+                self.patient_list.takeItem(self.patient_list.row(item))
+        self.group_list.takeItem(self.group_list.currentRow())
+        Group.delete(Group.groups[group])
 
     def add_patient_btn_clicked(self):
+        if self.group_list.currentItem() is None:
+            return
+        group = self.group_list.currentItem().text()
         options = QFileDialog.Options()
         fname, _ = QFileDialog.getOpenFileName(self,
                                                'Выбрать файл пациента',
                                                os.path.join(module, 'science', 'samples'),
                                                options=options)
-        self.patient_list.addItem(fname[fname.rfind('/') + 1:fname.rfind('.')])
+        patient = fname[fname.rfind('/') + 1:fname.rfind('.')]
+        Patient(patient, group)
+        self.patient_list.addItem(patient)
+        self.patient_list.itemClicked.connect(self.patient_info)
 
     def del_patient_btn_clicked(self):
-        listItems = self.patient_list.selectedItems()
-        if not listItems: return
-        for i in range(len(listItems)):
-            self.patient_list.takeItem(i)
+        patient = self.patient_list.currentItem().text()
+        self.patient_list.takeItem(self.patient_list.currentRow())
+        Patient.delete(Patient.patients[patient])
 
     def btn_start_clicked(self):
         self.figure = plt.figure(figsize=(5, 4), dpi=100)  # plt.figure(figsize=(100, 100), dpi=100)
@@ -122,6 +174,7 @@ class Main(Ui_MainBaseForm):
 
     def btn_exit_clicked(self):
         exit()
+
 
 
 # if __name__ == '__main__':
