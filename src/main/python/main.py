@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 import sys
 
-import logic
+import logic as logic
 
 
 class ExampleApp(QMainWindow, logic.Main):
@@ -31,5 +31,11 @@ if __name__ == '__main__':
     exit_code = appctxt.run()                   # 5. Invoke run()
     sys.exit(exit_code)
 
+# https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
 # https://tproger.ru/translations/python-gui-pyqt/
-# pyuic5 src\main\python\ui\healh_weather.ui -o src\main\python\form.py
+r"""
+pyuic5 src\main\python\ui\form.ui -o src\main\python\form.py
+pyuic5 src\main\python\ui\frame_default.ui -o src\main\python\frame_default.py
+pyuic5 src\main\python\ui\frame_patient.ui -o src\main\python\frame_patient.py
+
+"""
