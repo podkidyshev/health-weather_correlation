@@ -1,8 +1,11 @@
 import os
+from io import BytesIO
 
 from PIL import Image
 from matplotlib import pyplot as plt
-from matplotlib.figure import Figure
+
+from docx import Document
+from docx.shared import Cm
 
 
 CATS_SHORT = {
@@ -55,8 +58,32 @@ def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
 
 
-def plot_to_image():
+def plot_to_image(figure):
     """Вовзращет PIL.Image последнего вызова plt.figure()"""
-    canvas = plt.get_current_fig_manager().canvas
-    canvas.draw()
-    return Image.frombytes('RGB', canvas.get_width_height(), canvas.tostring_rgb())
+    # wh = plt.get_current_fig_manager().canvas.get_width_height()
+    buf = plot_to_stream(figure)
+    return Image.open(buf)
+
+
+def plot_to_stream(figure):
+    # img = plot_to_image()
+    buffer = BytesIO()
+    figure.savefig(buffer)
+    # img.save(buffer, 'png')
+    buffer.seek(0)
+    return buffer
+
+
+def create_docx():
+    doc = Document()
+    doc.core_properties.author = "Молчанов В.А."
+    return doc
+
+
+def save_docx(doc, obj):
+    for section in doc.sections:
+        section.top_margin = Cm(2)
+        section.bottom_margin = Cm(2)
+        section.left_margin = Cm(2.5)
+        section.right_margin = Cm(1.5)
+    doc.save(obj)
