@@ -1,5 +1,7 @@
 import os
+import sip
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -12,8 +14,11 @@ from frame_default import Ui_FrameDefault
 
 from science.classes import *
 from science.single_patient import StandardPatientStat
-from science import CATS, file_base_name
+from science import CATS, file_base_name, create_docx, save_docx
 from science.funcs import graph_kde
+
+
+matplotlib.use("Qt5Agg")
 
 module = os.path.dirname(__file__)
 
@@ -49,11 +54,13 @@ class QPatientFrame(BaseFrame, Ui_FramePatient):
         self.get_report()
 
     def save_report(self):
-        # fname, _ = QFileDialog.getSaveFileName(self,
-        #                                        'Сохранить отчет',
-        #                                        os.path.join(module, 'science', 'samples'),
-        #                                        options=QFileDialog.Options())
-        return
+        fname, _ = QFileDialog.getSaveFileName(self,
+                                               'Сохранить отчет',
+                                               os.path.join(module, 'science', 'samples'),
+                                               options=QFileDialog.Options())
+        doc = create_docx()
+        self.report.get_report(doc)
+        save_docx(doc, fname)
 
     def get_report(self):
         pass
@@ -103,7 +110,8 @@ class Main(Ui_MainBaseForm):
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
             self.data_layout.removeWidget(self.data_frame)
-            self.data_frame.deleteLater()
+            sip.delete(self.data_frame)
+            self.data_frame = None
         self.data_frame = frame_class(self, *args)
         self.data_layout.insertWidget(0, self.data_frame)
 
