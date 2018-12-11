@@ -14,14 +14,16 @@ class Ui_FramePatient(object):
         FramePatient.resize(491, 342)
         self.verticalLayout = QtWidgets.QVBoxLayout(FramePatient)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.std_pat_label = QtWidgets.QLabel(FramePatient)
+        self.std_pat_label.setObjectName("std_pat_label")
+        self.verticalLayout.addWidget(self.std_pat_label)
         self.tabs = QtWidgets.QTabWidget(FramePatient)
         self.tabs.setObjectName("tabs")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.tabs.addTab(self.tab, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.tabs.addTab(self.tab_2, "")
+        self.tab_graphics = QtWidgets.QWidget()
+        self.tab_graphics.setObjectName("tab_graphics")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.tab_graphics)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.tabs.addTab(self.tab_graphics, "")
         self.verticalLayout.addWidget(self.tabs)
 
         self.retranslateUi(FramePatient)
@@ -31,6 +33,6 @@ class Ui_FramePatient(object):
     def retranslateUi(self, FramePatient):
         _translate = QtCore.QCoreApplication.translate
         FramePatient.setWindowTitle(_translate("FramePatient", "Frame"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab), _translate("FramePatient", "Tab 1"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_2), _translate("FramePatient", "Tab 2"))
+        self.std_pat_label.setText(_translate("FramePatient", "Статистика"))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_graphics), _translate("FramePatient", "График"))
 
