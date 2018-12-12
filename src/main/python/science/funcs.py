@@ -56,7 +56,7 @@ def sequence_distance(x, y, *, insert_zero):
     "-" максимум Kp находится слева, "+" максимум Kp находится справа
     """
     if insert_zero:
-        x.insert(0, 0)
+        x = [0] + x
     u = []
     for i in range(len(x)):
         if x[i] == 1:
