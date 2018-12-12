@@ -1,12 +1,13 @@
 import os
-import sip
 
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QFileDialog, QGridLayout, QWidget, QFrame, QTextEdit
+from PyQt5 import QtCore
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QWidget, QFrame, QLabel
+from PIL.ImageQt import ImageQt
 
 from form import Ui_MainBaseForm
 from frame_patient import Ui_FramePatient
@@ -14,7 +15,7 @@ from frame_default import Ui_FrameDefault
 
 from science.classes import *
 from science.single_patient import StandardPatientStat
-from science import CATS, file_base_name, create_docx, save_docx
+from science import create_docx, save_docx, plot_to_image
 from science.funcs import graph_kde
 
 
@@ -29,7 +30,8 @@ class BaseFrame(QFrame):
         QFrame.__init__(self, parent=parent)
         child_frame_class.setupUi(self, self)
         self.resize(500, 500)
-        self.setMinimumSize(QtCore.QSize(500, 500))
+        self.setMinimumSize(QtCore.QSize(250, 250))
+        self.layout().setContentsMargins(0, 0, 0, 0)
 
 
 class QDefaultFrame(BaseFrame, Ui_FrameDefault):
@@ -46,10 +48,17 @@ class QPatientFrame(BaseFrame, Ui_FramePatient):
         self.report = StandardPatientStat(self.std, self.pat)
 
         self.plot = plt.figure()
-        self.plot_canvas = FigureCanvas(self.plot)
         graph_kde(self.report.get_report_item("distance"), self.plot)
-        self.plot_canvas.draw()
-        self.tab_graphics.layout().addWidget(self.plot_canvas)
+        self.img_qt = ImageQt(plot_to_image(self.plot))
+        self.img = QImage(self.img_qt)
+
+        self.plot_canvas = QPixmap.fromImage(self.img)
+
+        self.label = QLabel(self)
+        self.tab_graphics.layout().insertWidget(0, self.label)
+
+        self.label.setPixmap(self.plot_canvas)
+        self.label.setScaledContents(True)
 
         self.get_report()
 
@@ -78,13 +87,9 @@ class QPatientFrame(BaseFrame, Ui_FramePatient):
 class Main(Ui_MainBaseForm):
     # noinspection PyArgumentList,PyUnresolvedReferences
     def __init__(self):
-        # НЕ ТРОГАТЬ
         self.dummy = QWidget()
-        self.gridLayout = QGridLayout(self.dummy)
+        self.horizontalLayout = QHBoxLayout(self.dummy)
         self.setCentralWidget(self.dummy)
-        self.gridLayout = self.centralWidget().layout()
-        # НЕ ТРОГАТЬ
-
         # фрейм данных
         self.data_frame = None
 
@@ -92,14 +97,11 @@ class Main(Ui_MainBaseForm):
         # Создание/удаление эталона
         self.add_ref_btn.clicked.connect(self.add_ref_btn_clicked)
         self.del_ref_btn.clicked.connect(self.del_ref_btn_clicked)
-        # Создание/удаление группы
-        self.add_group_btn.clicked.connect(self.add_group_btn_clicked)
-        self.del_group_btn.clicked.connect(self.del_group_btn_clicked)
         # Создание/удаление пациента
-        self.add_patient_btn.clicked.connect(self.add_patient_btn_clicked)
-        self.del_patient_btn.clicked.connect(self.del_patient_btn_clicked)
+        self.add_pat_btn.clicked.connect(self.add_patient_btn_clicked)
+        self.del_pat_btn.clicked.connect(self.del_patient_btn_clicked)
         # Кастомные фреймы
-        self.patient_list.itemClicked.connect(self.patient_info)
+        self.pat_list.itemClicked.connect(self.patient_info)
         self.ref_list.itemClicked.connect(self.patient_info)
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
@@ -110,14 +112,15 @@ class Main(Ui_MainBaseForm):
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
             self.data_layout.removeWidget(self.data_frame)
-            sip.delete(self.data_frame)
+            # sip.delete(self.data_frame)
+            self.data_frame.hide()
             self.data_frame = None
         self.data_frame = frame_class(self, *args)
         self.data_layout.insertWidget(0, self.data_frame)
 
     def patient_info(self):
         selected_ref = self.ref_list.currentItem()
-        selected_patient = self.patient_list.currentItem()
+        selected_patient = self.pat_list.currentItem()
         if selected_ref is None:
             # TODO: всплывающее окно
             print('Выберите эталон!')
@@ -148,59 +151,29 @@ class Main(Ui_MainBaseForm):
         Standard.delete(Standard.standards[standard])
         self.set_data_frame(QDefaultFrame)
 
-    def add_group_btn_clicked(self):
-        if len(Group.groups) > 0:
-            return
-        # Для тестирования, добавляется только одна группа '1'
-        group = '1'
-        self.group_list.addItem(group)
-        Group(group)
-
-    def del_group_btn_clicked(self):
-        group = self.group_list.currentItem()
-        if group is None:
-            # TODO: всплывающее окно
-            print('Выберите группу для удаления!')
-            return
-        group = group.text()
-        for patient in Group.groups[group].pats:
-            items = self.patient_list.findItems(patient, QtCore.Qt.MatchExactly)
-            for item in items:
-                self.patient_list.takeItem(self.patient_list.row(item))
-        self.group_list.takeItem(self.group_list.currentRow())
-        Group.delete(Group.groups[group])
-        self.set_data_frame(QDefaultFrame)
-
     def add_patient_btn_clicked(self):
-        if self.group_list.currentItem() is None:
-            # TODO: здесь будет всплывающее окно с подсказкой
-            print('Сначала надо выбрать группу')
-            return
-        group = self.group_list.currentItem().text()
         options = QFileDialog.Options()
         fname, _ = QFileDialog.getOpenFileName(self,
                                                'Выбрать файл пациента',
                                                "",  # os.path.join(module, 'science', 'samples'),
                                                options=options)
-        patient = file_base_name(fname)
         try:
-            pat = Patient(patient, group)
-            pat.add_category("", fname)
-        except PatientDuplicateError:
+            pat = Patient.from_file(fname)
+        except PatientDuplicateError as e:
             # TODO: всплывающее окно
-            print("Пациент с имненем {} уже загружен".format(patient))
+            print(e.args[0])
             return
-        self.patient_list.addItem(patient)
+        self.pat_list.addItem(pat.name)
 
     def del_patient_btn_clicked(self):
-        patient = self.patient_list.currentItem()
-        if patient is None:
+        pat = self.pat_list.currentItem()
+        if pat is None:
             # TODO: всплывающее окно
             print('Для удаления пациента кликните по нему!')
             return
-        patient = patient.text()
-        self.patient_list.takeItem(self.patient_list.currentRow())
-        Patient.delete(Patient.patients[patient])
+        pat = pat.text()
+        self.pat_list.takeItem(self.pat_list.currentRow())
+        Patient.delete(Patient.patients[pat])
         self.set_data_frame(QDefaultFrame)
 
     def report_btn_clicked(self):
