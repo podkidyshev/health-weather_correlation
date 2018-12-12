@@ -2,35 +2,21 @@ import os
 from io import BytesIO
 
 from PIL import Image
-from matplotlib import pyplot as plt
 
 from docx import Document
 from docx.shared import Cm
+from openpyxl import load_workbook
+
+CATS = [
+    "без нагрузки",
+    "с физической нагрузкой",
+    "после отдыха",
+    "с эмоциональной нагрузкой"
+]
 
 
-CATS_SHORT = {
-    "": "без нагрузки",
-    "n": "с физической нагрузкой",
-    "o": "после отдыха",
-    "e": "с эмоциональной нагрузкой"
-}
-CATS_FULL = {value: key for key, value in CATS_SHORT.items()}
-CATS = [(cat, CATS_SHORT[cat]) for cat in ["", "n", "o", "e"]]
-
-
-class CategoryError(Exception):
+class XLSXParseError(ValueError):
     pass
-
-
-def cat_index(cat):
-    if isinstance(cat, int):
-        return cat
-    if not isinstance(cat, str):
-        raise CategoryError('Неизвестный тип нахождения категории: {}'.format(type(cat)))
-    for idx, (short, long) in enumerate(CATS):
-        if short == cat or long == cat:
-            return idx
-    raise CategoryError('Неизвестная категоря: ""'.format(cat))
 
 
 def nnone(arr):
@@ -39,12 +25,19 @@ def nnone(arr):
             yield idx, el
 
 
+def is_float(s: str):
+    try:
+        return float(s)
+    except ValueError:
+        return False
+
+
 def file_base_name(filename: str):
     return os.path.splitext(os.path.basename(filename))[0]
 
 
 def read_sample(filename):
-    """Чтение образцов и эталонов"""
+    """Чтение эталонов"""
     with open(filename) as file:
         data = [row.strip() for row in file]
 
@@ -54,22 +47,44 @@ def read_sample(filename):
     return data
 
 
+def read_xlsx_sample(filename):
+    wb = load_workbook(filename=filename)
+    sheet = wb.get_active_sheet()
+
+    datas = []
+    for col in range(1, 4 + 1):
+        data, row = [], 1
+        val = sheet.cell(row, col).value.strip()
+        # Пропустим первую строку, если там не число (заголовок, например)
+        if is_float(val) is False:
+            row += 1
+        while sheet.cell(row, col).value is not None and sheet.cell(row, col).value.strip():
+            try:
+                data.append(float(sheet.cell(row, col).value))
+            except ValueError:
+                err = 'Ошибка при парсе файла {}, страницы {}, ячейки {}{}'.format(filename,
+                                                                                   sheet.title,
+                                                                                   'ABCD'[col],
+                                                                                   row)
+                print(err)
+                raise XLSXParseError(err)
+            row += 1
+        datas.append(data)
+    return datas
+
+
 def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
 
 
 def plot_to_image(figure):
     """Вовзращет PIL.Image последнего вызова plt.figure()"""
-    # wh = plt.get_current_fig_manager().canvas.get_width_height()
-    buf = plot_to_stream(figure)
-    return Image.open(buf)
+    return Image.open(plot_to_stream(figure))
 
 
 def plot_to_stream(figure):
-    # img = plot_to_image()
     buffer = BytesIO()
     figure.savefig(buffer)
-    # img.save(buffer, 'png')
     buffer.seek(0)
     return buffer
 
@@ -87,3 +102,7 @@ def save_docx(doc, obj):
         section.left_margin = Cm(2.5)
         section.right_margin = Cm(1.5)
     doc.save(obj)
+
+
+if __name__ == '__main__':
+    print('\n'.join(map(str, read_xlsx_sample("samples/1_1.xlsx"))))

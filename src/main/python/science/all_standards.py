@@ -21,7 +21,7 @@ class AllStandards:
 
         error_samples = []
         for sample in samples:
-            if not sample.has_category(cat):
+            if not sample.has_cat(cat):
                 error_samples.append(sample.name)
         if len(error_samples):
             raise funcs.StatComputingError('Запрошена обработка категории "{}".\n '

@@ -13,9 +13,9 @@ from science import CATS, nnone, plot_to_stream
 
 
 def std_pat_stat_by_category(std: Standard, pat: Patient, cat: int):
-    distance = sequence_distance(pat.data_seq_max[cat], std.seq_max, insert_zero=True)
+    distance = sequence_distance(pat.seq_max[cat], std.seq_max, insert_zero=True)
     return {
-        "seq_max": pat.data_seq_max[cat],
+        "seq_max": pat.seq_max[cat],
         "distance": distance,
         "distrib": distrib(distance),
         'mean': np.mean(distance),
@@ -60,8 +60,8 @@ class StandardPatientStat:
             doc.add_paragraph(str(self.pat.data[cat]))
 
             doc.add_paragraph("Список максимумов значений пациента {}:".format(CATS[cat][1]))
-            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.data_seq_max[cat])))
-            doc.add_paragraph(str(self.pat.data_seq_max[cat]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.seq_max[cat])))
+            doc.add_paragraph(str(self.pat.seq_max[cat]))
             doc.add_paragraph()
 
         # вычисление распределения расстояний от максимумов рядов пациентов до ближайшего максимума эталона
