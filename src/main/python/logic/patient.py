@@ -29,22 +29,8 @@ class QFramePatient(QFrameBase, Ui_FramePatient):
 
         self.std_pat_label.setText("Пациент {}".format(self.pat.name))
 
-        self.get_report()
-
     def save_report(self):
         fname = dialog_save(self, "Сохранить отчет")
         doc = create_docx()
         self.report.get_report(doc)
         save_docx(doc, fname)
-
-    def get_report(self):
-        pass
-        # for cat_s, cat_l in CATS:
-        #     self.pat.add_category(cat_s, "science/samples/1_1{}.txt".format(cat_s))
-        # тест добавленяи информации в форму
-        # self.tab.layout = QGridLayout(self)
-        # self.text = QTextEdit()
-        # self.tab.layout.addWidget(self.text)
-        # self.tab.setLayout(self.tab.layout)
-        # self.text.append("12312")
-        # self.show()

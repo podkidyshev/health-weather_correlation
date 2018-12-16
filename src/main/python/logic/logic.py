@@ -1,8 +1,4 @@
-import os
-
 import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt5.QtWidgets import QHBoxLayout, QWidget
 
@@ -10,7 +6,7 @@ from form import Ui_MainBaseForm
 
 from science.classes import *
 
-from logic import dialog_open, dialog_save
+from logic import dialog_open
 from logic.default import QFrameDefault
 from logic.patient import QFramePatient
 
@@ -105,32 +101,3 @@ class Main(Ui_MainBaseForm):
     def report_btn_clicked(self):
         if hasattr(self.data_frame, "save_report"):
             self.data_frame.save_report()
-
-    def btn_start_clicked(self):
-        self.figure = plt.figure(figsize=(5, 4), dpi=100)  # plt.figure(figsize=(100, 100), dpi=100)
-        self.canvas = FigureCanvas(self.figure)
-
-        self.plot()
-
-        self.kde_layout.addWidget(self.canvas)
-
-    def plot(self):
-        patient = self.sample_line.text()
-        # samples_hist_report = patient_init_stat(self.standard_line.text(), [patient,
-        #                                                                     patient_suffix(patient, 'n'),
-        #                                                                     patient_suffix(patient, 'o'),
-        #                                                                     patient_suffix(patient, 'e')])
-        # plot(samples_hist_report['distances'], self.figure)
-        self.canvas.draw()
-
-        # data = [i for i in range(25)]
-        # self.figure.clear()
-        # ax = self.figure.add_subplot(111)
-        # ax.plot(data, 'r-')
-        # self.canvas.draw()
-
-
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     window = Main()
-#     sys.exit(app.exec_())
