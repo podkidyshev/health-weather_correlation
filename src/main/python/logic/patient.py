@@ -1,13 +1,11 @@
 import matplotlib.pyplot as plt
 
-from PIL.ImageQt import ImageQt
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtGui import QPixmap
 
 from logic import QFrameBase, dialog_save
 from frames.patient import Ui_FramePatient
 
-from science import plot_to_image, create_docx, save_docx
+from science import plot_to_qimage, create_docx, save_docx
 from science.classes import Standard, Patient
 from science.single_patient import StandardPatientStat
 from science.funcs import graph_kde
@@ -23,16 +21,13 @@ class QFramePatient(QFrameBase, Ui_FramePatient):
 
         self.plot = plt.figure()
         graph_kde(self.report.get_report_item("distance"), self.plot)
-        self.img_qt = ImageQt(plot_to_image(self.plot))
-        self.img = QImage(self.img_qt)
-
+        self.img = plot_to_qimage(self.plot)
         self.plot_canvas = QPixmap.fromImage(self.img)
 
-        self.label = QLabel(self)
-        self.tab_graphics.layout().insertWidget(0, self.label)
+        self.graph_label.setPixmap(self.plot_canvas)
+        self.graph_label.setScaledContents(True)
 
-        self.label.setPixmap(self.plot_canvas)
-        self.label.setScaledContents(True)
+        self.std_pat_label.setText("Пациент {}".format(self.pat.name))
 
         self.get_report()
 

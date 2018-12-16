@@ -2,6 +2,8 @@ import os
 from io import BytesIO
 
 from PIL import Image
+from PIL.ImageQt import ImageQt
+from PyQt5.QtGui import QImage, QPixmap
 
 from docx import Document
 from docx.shared import Cm
@@ -54,7 +56,12 @@ def read_xlsx_sample(filename):
     datas = []
     for col in range(1, 4 + 1):
         data, row = [], 1
-        val = sheet.cell(row, col).value.strip()
+        val = sheet.cell(row, col).value
+        if not val:
+            datas.append(None)
+            continue
+
+        val = val.strip()
         # Пропустим первую строку, если там не число (заголовок, например)
         if is_float(val) is False:
             row += 1
@@ -80,6 +87,14 @@ def patient_suffix(filename: str, suffix):
 def plot_to_image(figure):
     """Вовзращет PIL.Image последнего вызова plt.figure()"""
     return Image.open(plot_to_stream(figure))
+
+
+def plot_to_qimage(figure):
+    return QImage(ImageQt(plot_to_image(figure)))
+
+
+def plot_to_pixmap(figure):
+    return QPixmap.fromImage(plot_to_qimage(figure))
 
 
 def plot_to_stream(figure):
