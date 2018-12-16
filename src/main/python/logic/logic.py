@@ -4,84 +4,18 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QFileDialog, QHBoxLayout, QWidget, QFrame, QLabel
-from PIL.ImageQt import ImageQt
+from PyQt5.QtWidgets import QHBoxLayout, QWidget
 
 from form import Ui_MainBaseForm
-from frame_patient import Ui_FramePatient
-from frame_default import Ui_FrameDefault
 
 from science.classes import *
-from science.single_patient import StandardPatientStat
-from science import create_docx, save_docx, plot_to_image
-from science.funcs import graph_kde
+
+from logic import dialog_open, dialog_save
+from logic.default import QDefaultFrame
+from logic.patient import QPatientFrame
 
 
 matplotlib.use("Qt5Agg")
-
-module = os.path.dirname(__file__)
-
-
-class BaseFrame(QFrame):
-    def __init__(self, parent, child_frame_class):
-        # noinspection PyArgumentList
-        QFrame.__init__(self, parent=parent)
-        child_frame_class.setupUi(self, self)
-        self.resize(500, 500)
-        self.setMinimumSize(QtCore.QSize(250, 250))
-        self.layout().setContentsMargins(0, 0, 0, 0)
-
-
-class QDefaultFrame(BaseFrame, Ui_FrameDefault):
-    def __init__(self, parent):
-        BaseFrame.__init__(self, parent, Ui_FrameDefault)
-
-
-class QPatientFrame(BaseFrame, Ui_FramePatient):
-    def __init__(self, parent, pat_name, std_name):
-        BaseFrame.__init__(self, parent, Ui_FramePatient)
-
-        self.std = Standard.standards[std_name]
-        self.pat = Patient.patients[pat_name]
-        self.report = StandardPatientStat(self.std, self.pat)
-
-        self.plot = plt.figure()
-        graph_kde(self.report.get_report_item("distance"), self.plot)
-        self.img_qt = ImageQt(plot_to_image(self.plot))
-        self.img = QImage(self.img_qt)
-
-        self.plot_canvas = QPixmap.fromImage(self.img)
-
-        self.label = QLabel(self)
-        self.tab_graphics.layout().insertWidget(0, self.label)
-
-        self.label.setPixmap(self.plot_canvas)
-        self.label.setScaledContents(True)
-
-        self.get_report()
-
-    def save_report(self):
-        fname, _ = QFileDialog.getSaveFileName(self,
-                                               'Сохранить отчет',
-                                               os.path.join(module, 'science', 'samples'),
-                                               options=QFileDialog.Options())
-        doc = create_docx()
-        self.report.get_report(doc)
-        save_docx(doc, fname)
-
-    def get_report(self):
-        pass
-        # for cat_s, cat_l in CATS:
-        #     self.pat.add_category(cat_s, "science/samples/1_1{}.txt".format(cat_s))
-        # тест добавленяи информации в форму
-        # self.tab.layout = QGridLayout(self)
-        # self.text = QTextEdit()
-        # self.tab.layout.addWidget(self.text)
-        # self.tab.setLayout(self.tab.layout)
-        # self.text.append("12312")
-        # self.show()
 
 
 class Main(Ui_MainBaseForm):
@@ -132,11 +66,7 @@ class Main(Ui_MainBaseForm):
 
     # КНОПКИ
     def add_ref_btn_clicked(self):
-        options = QFileDialog.Options()
-        fname, _ = QFileDialog.getOpenFileName(self,
-                                               'Выбрать эталон',
-                                               os.path.join(module, 'science', 'samples'),
-                                               options=options)
+        fname = dialog_open(self, " Выбрать эталон")
         standard = fname[fname.rfind('/') + 1:fname.rfind('.')]
         Standard.from_file(fname, standard)
         self.ref_list.addItem(standard)
@@ -152,11 +82,7 @@ class Main(Ui_MainBaseForm):
         self.set_data_frame(QDefaultFrame)
 
     def add_patient_btn_clicked(self):
-        options = QFileDialog.Options()
-        fname, _ = QFileDialog.getOpenFileName(self,
-                                               'Выбрать файл пациента',
-                                               "",  # os.path.join(module, 'science', 'samples'),
-                                               options=options)
+        fname = dialog_open(self, "Выбрать файл пациента")
         try:
             pat = Patient.from_file(fname)
         except PatientDuplicateError as e:
