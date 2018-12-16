@@ -1,7 +1,7 @@
-from logic import BaseFrame
+from logic import QFrameBase
 from frames.default import Ui_FrameDefault
 
 
-class QDefaultFrame(BaseFrame, Ui_FrameDefault):
+class QFrameDefault(QFrameBase, Ui_FrameDefault):
     def __init__(self, parent):
-        BaseFrame.__init__(self, parent, Ui_FrameDefault)
+        QFrameBase.__init__(self, parent, Ui_FrameDefault)

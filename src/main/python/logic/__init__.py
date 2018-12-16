@@ -19,7 +19,7 @@ def dialog_save(parent, title, path=root):
     return fname
 
 
-class BaseFrame(QFrame):
+class QFrameBase(QFrame):
     def __init__(self, parent, child_frame_class):
         # noinspection PyArgumentList
         QFrame.__init__(self, parent=parent)

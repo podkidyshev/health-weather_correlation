@@ -4,7 +4,7 @@ from PIL.ImageQt import ImageQt
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QLabel
 
-from logic import BaseFrame, dialog_save
+from logic import QFrameBase, dialog_save
 from frames.patient import Ui_FramePatient
 
 from science import plot_to_image, create_docx, save_docx
@@ -13,9 +13,9 @@ from science.single_patient import StandardPatientStat
 from science.funcs import graph_kde
 
 
-class QPatientFrame(BaseFrame, Ui_FramePatient):
+class QFramePatient(QFrameBase, Ui_FramePatient):
     def __init__(self, parent, pat_name, std_name):
-        BaseFrame.__init__(self, parent, Ui_FramePatient)
+        QFrameBase.__init__(self, parent, Ui_FramePatient)
 
         self.std = Standard.standards[std_name]
         self.pat = Patient.patients[pat_name]

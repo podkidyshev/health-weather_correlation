@@ -11,8 +11,8 @@ from form import Ui_MainBaseForm
 from science.classes import *
 
 from logic import dialog_open, dialog_save
-from logic.default import QDefaultFrame
-from logic.patient import QPatientFrame
+from logic.default import QFrameDefault
+from logic.patient import QFramePatient
 
 
 matplotlib.use("Qt5Agg")
@@ -40,7 +40,7 @@ class Main(Ui_MainBaseForm):
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
 
-        self.set_data_frame(QDefaultFrame)
+        self.set_data_frame(QFrameDefault)
         self.show()
 
     def set_data_frame(self, frame_class, *args):
@@ -62,7 +62,7 @@ class Main(Ui_MainBaseForm):
             # TODO: выберите пациента
             print('Выберите пациента!')
         else:
-            self.set_data_frame(QPatientFrame, selected_patient.text(), selected_ref.text())
+            self.set_data_frame(QFramePatient, selected_patient.text(), selected_ref.text())
 
     # КНОПКИ
     def add_ref_btn_clicked(self):
@@ -79,7 +79,7 @@ class Main(Ui_MainBaseForm):
         standard = standard.text()
         self.ref_list.takeItem(self.ref_list.currentRow())
         Standard.delete(Standard.standards[standard])
-        self.set_data_frame(QDefaultFrame)
+        self.set_data_frame(QFrameDefault)
 
     def add_patient_btn_clicked(self):
         fname = dialog_open(self, "Выбрать файл пациента")
@@ -100,7 +100,7 @@ class Main(Ui_MainBaseForm):
         pat = pat.text()
         self.pat_list.takeItem(self.pat_list.currentRow())
         Patient.delete(Patient.patients[pat])
-        self.set_data_frame(QDefaultFrame)
+        self.set_data_frame(QFrameDefault)
 
     def report_btn_clicked(self):
         if hasattr(self.data_frame, "save_report"):
