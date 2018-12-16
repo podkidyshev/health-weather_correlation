@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 from docx import Document
@@ -41,6 +42,9 @@ class AllStandards:
                            for pat_seq_max in self.pats_seq_max]
                           for std_seq_max in self.stds_seq_max]
 
+        self.distances_all = [funcs.sequence_distance(self.pats_seq_max_all, std_seq_max, insert_zero=True)
+                              for std_seq_max in self.stds_seq_max]
+
         self.concats = [funcs.sum_list(self.distances[i]) for i in range(self.stds_count)]
         self.tn_by_day = [tn.test_normal(funcs.sequence_distance(self.pats_seq_max_all,
                                                                  std_seq_max,
@@ -78,18 +82,16 @@ class AllStandards:
             "Результаты сравнительного визуального анализа по дням и по пациентам всех образцов со всеми эталонами", 1)
         for std_idx in range(self.stds_count):
             doc.add_heading("Эталон {}".format(self.stds[std_idx].name), 2)
-            # TODO: сделать метод для графика
             base = plt.figure()
             funcs.visual_analysis2(funcs.sequence_distance(funcs.sequence_max(self.pats_data_all),
                                                            self.stds_seq_max[std_idx], insert_zero=True),
                                    self.concats[std_idx], base)
             doc.add_picture(science.plot_to_stream(base))
 
-            # TODO: отчет по тестам нормальности (там наверное тоже в doc писать
             doc.add_paragraph("Результаты тестирования нормальности распределения группового образца по дням")
-            # tn.get_report(self.tn_by_day[std_idx])
+            tn.get_report(self.tn_by_day[std_idx], doc)
             doc.add_paragraph("Результаты тестирования нормальности распределения группового образца по пациентам")
-            # tn.get_report(self.tn_by_pat[std_idx])
+            tn.get_report(self.tn_by_pat[std_idx], doc)
 
         doc.add_heading("Результаты группового анализа по дням", 1)
         doc.add_paragraph("[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] =")
@@ -100,8 +102,28 @@ class AllStandards:
             doc.add_paragraph("Результаты группового анализа по пациентам")
             doc.add_paragraph(str(funcs.stat_analysis(self.concats[std_idx])))
 
-        # TODO: таблица графиков
-        # Групповой анализ всех со всеми.py (324-329)
+        doc.add_heading("Визуализация данных для группового образца по дням: гистограмма, "
+                        "ядерная оценка плотности распределения расстояний, плотность нормального распределения", 1)
+        for idx, std in enumerate(self.stds):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            base = plt.figure()
+            funcs.visual_analysis(self.distances_all[idx], base)
+            doc.add_picture(science.plot_to_stream(base))
+
+        doc.add_heading("Результаты статистического анализа", 1)
+        for sidx, std in enumerate(self.stds):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            for pidx, pat in enumerate(self.pats):
+                data = self.distances[sidx][pidx]
+                doc.add_paragraph("Выборочное среднее = {:.3f}".format(np.mean(data)))
+                doc.add_paragraph("Стандартное отклонение = {:.3f}".format(np.std(data)))
+                doc.add_paragraph("Доверительный интервал = {}".format(stats.t.interval(0.95, len(data)-1,
+                                                                                        loc=np.mean(data),
+                                                                                        scale=stats.sem(data))))
+
+                base = plt.figure()
+                funcs.visual_analysis(data, base)
+                doc.add_picture(science.plot_to_stream(base))
 
 
 def test():

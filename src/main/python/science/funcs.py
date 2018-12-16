@@ -19,6 +19,7 @@ from operator import add
 
 import numpy as np
 import scipy.stats as st
+import matplotlib.pyplot as plt
 
 from matplotlib import rcParams
 from matplotlib.figure import Figure
@@ -109,8 +110,8 @@ def visual_analysis(x, base: Figure):
     """Визуальный анализ ряда распределений"""
     fig = base.subplots()
     _range = np.linspace(-3, 4, 100)
-    # plt.style.use('seaborn-white')
-    fig.hist(x, bins=7, range=(-3, 4), normed=True, alpha=0.5, histtype='stepfilled', color='steelblue',
+    plt.style.use('seaborn-white')
+    fig.hist(x, bins=7, range=(-3, 4), density=True, alpha=0.5, histtype='stepfilled', color='steelblue',
              edgecolor='none')
     fig.plot(_range, st.norm.pdf(_range, np.mean(x), np.std(x)))
     fig.plot(_range, st.gaussian_kde(x)(_range))
@@ -120,12 +121,12 @@ def visual_analysis2(x, y, base: Figure):
     """Визуальный анализ двух рядов распределений"""
     fig = base.subplots(2)
     rng = np.linspace(-3, 4, 100)
-    # plt.style.use('seaborn-white')
-    fig[0].hist(x, bins=11, range=(-3, 4), normed=True, alpha=0.5, histtype='stepfilled', color='steelblue',
+    plt.style.use('seaborn-white')
+    fig[0].hist(x, bins=11, range=(-3, 4), density=True, alpha=0.5, histtype='stepfilled', color='steelblue',
                 edgecolor='none')
     fig[0].plot(rng, st.norm.pdf(rng, np.mean(x), np.std(x)))
     fig[0].plot(rng, st.gaussian_kde(x)(rng))
-    fig[1].hist(y, bins=11, range=(-3, 4), normed=True, alpha=0.5, histtype='stepfilled', color='steelblue',
+    fig[1].hist(y, bins=11, range=(-3, 4), density=True, alpha=0.5, histtype='stepfilled', color='steelblue',
                 edgecolor='none')
     fig[1].plot(rng, st.norm.pdf(rng, np.mean(y), np.std(y)))
     fig[1].plot(rng, st.gaussian_kde(y)(rng))

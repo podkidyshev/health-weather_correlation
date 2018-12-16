@@ -1,15 +1,14 @@
-# Тест нормальности
-import scipy.stats as stats
-from numpy import *
 import numpy as np
-
+import scipy.stats as stats
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 
+from docx import Document
+
+import science
 import science.funcs as funcs
 
 
-def test_normal(x: list, *, qq: bool, base: Figure = None):
+def test_normal(x: list, *, qq: bool):
     """Тестирование распределения на нормальность"""
     report = {"x": x[:]}
     alpha = 0.05
@@ -45,7 +44,7 @@ def test_normal(x: list, *, qq: bool, base: Figure = None):
     num_rejects = 0
     for i in range(num_tests):
         normed_data = (x - np.mean(x)) / np.std(x)
-        D, pval = stats.kstest(normed_data, 'norm')
+        d, pval = stats.kstest(normed_data, 'norm')
         if pval < alpha:
             num_rejects += 1
     ratio = float(num_rejects) / num_tests
@@ -56,60 +55,57 @@ def test_normal(x: list, *, qq: bool, base: Figure = None):
         "ratio": ratio,
         "alpha": alpha
     }
-
-    if qq and base is None:
-        raise funcs.StatComputingError('Не передана фигура для рисования графика')
-    if qq:
-        stats.probplot(x, dist="norm", plot=base.subplots(1))
     return report
 
 
-def get_report(report):
+def get_report(report, doc: Document):
+    res_ok = "Образец выглядит гауссовским (не может отклонить гипотезу H0)"
+    res_nok = "Образец не выглядит гауссовским (отклонить гипотезу H0)"
+
     shapiro = report["shapiro"]
-    print("Тест нормальности Шапиро-Вилка")
-    print('Statistics=%.3f, p=%.3f' % (shapiro["stat"], shapiro["p"]))
-    if shapiro["res"]:
-        print('Образец выглядит гауссовским (не может отклонить гипотезу H0)')
-    else:
-        print('Образец не выглядит гауссовским (отклонить гипотезу H0)')
+    doc.add_heading("Тест нормальности Шапиро-Вилка", 2)
+    doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(shapiro["stat"], shapiro["p"]))
+    doc.add_paragraph(res_ok if shapiro["res"] else res_nok)
 
     agostino = report["agostino"]
-    print("D'Agostino and Pearson's Test")
-    print('Statistics=%.3f, p=%.3f' % (agostino["stat"], agostino["p"]))
-    if agostino["res"]:
-        print('Образец выглядит гауссовским (не может отклонить гипотезу H0)')
-    else:
-        print('Образец не выглядит гауссовским (отклонить H0)')
+    doc.add_heading("D'Agostino and Pearson's Test", 2)
+    doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(agostino["stat"], agostino["p"]))
+    doc.add_paragraph(res_ok if agostino["res"] else res_nok)
 
     anderson = report["anderson"]
-    print("Тест нормальности Андерсона-Дарлинга")
-    print('Statistic: %.3f' % anderson["statistic"])
+    doc.add_heading("Тест нормальности Андерсона-Дарлинга", 2)
+    doc.add_paragraph("Statistic = {:.3f}".format(anderson["statistic"]))
     for res, cv, sl in zip(anderson["res"], anderson["critical"], anderson["sig_level"]):
-        if res:
-            print('{:.3f}: {:.3f}, Образец выглядит гауссовским (не может отклонить гипотезу H0)'.format(sl, cv))
-        else:
-            print('{:.3f}: {:.3f}, Образец не выглядит гауссовским (отклонить H0)'.format(sl, cv))
+        doc.add_paragraph("{:.3f}: {:.3f}, {}".format(sl, cv, res_ok if res else res_nok))
 
     ks = report["ks"]
-    print("Тест нормальности Колмогорова-Смирнова")
+    doc.add_heading("Тест нормальности Колмогорова-Смирнова", 2)
     num_tests = ks["num_tests"]
     num_rejects = ks["num_rejects"]
     ratio = ks["ratio"]
     alpha = ks["alpha"]
-    print("Результаты теста Колмогорова-Смирнова: ", "из {} прогонов доля".format(num_tests),
-          '{}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}'.format(num_rejects, num_tests, ratio, alpha))
-    # TODO: здесь график если надо
-    # base = plt.figure()
-    # st.probplot(report["x"], dist="norm", plot=base)
+    doc.add_paragraph(
+        "Результаты теста Колмогорова-Смирнова: "
+        "из {} прогонов доля {}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}".format(
+            num_tests, num_rejects, num_tests, ratio, alpha))
+    base = plt.figure()
+    get_plot(report, base)
+    doc.add_picture(science.plot_to_stream(base))
+
+
+def get_plot(report, base):
+    fig = base.subplots(1, 1)
+    stats.probplot(report["x"], dist="norm", plot=fig)
 
 
 def test():
     x_distance = [1, -1, 1, 1, -3, 2, 0, 2, -2, -1, 0, 1, 1, 3, -3, 0, 1, -1, 3]
 
-    base = plt.figure()
-    report = test_normal(x_distance, qq=True, base=base)
-    get_report(report)
-    base.show()
+    report = test_normal(x_distance, qq=True)
+
+    doc = science.create_docx()
+    get_report(report, doc)
+    science.save_docx(doc, "../test_normal.docx")
 
 
 if __name__ == '__main__':
