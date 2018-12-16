@@ -42,7 +42,6 @@ class StandardPatientStat:
         return [self.report[idx][item] if self.report[idx] is not None else None for idx in range(len(CATS))]
 
     def get_report(self, doc: Document):
-        # принт должен быть перегружен
         doc.add_heading("Пациент {}. Эталон {}".format(self.pat.name, self.std.name), 0)
 
         doc.add_heading("Список значений эталона", 1)
@@ -67,9 +66,11 @@ class StandardPatientStat:
         # вычисление распределения расстояний от максимумов рядов пациентов до ближайшего максимума эталона
         # вычисление последовательностей расстояний  от максимумов рядов пациентов до ближайшего максимума эталона
         doc.add_paragraph()
-        doc.add_heading("Ряды расстояний и распределения расстояний от максимумов пациента до ближайшего максимума эталона", 1)
+        doc.add_heading(
+            "Ряды расстояний и распределения расстояний от максимумов пациента до ближайшего максимума эталона", 1)
         for cat, report in nnone(self.report):
-            doc.add_paragraph("Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(CATS[cat][1]))
+            doc.add_paragraph(
+                "Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(CATS[cat][1]))
             doc.add_paragraph(str(report["distance"]))
             doc.add_paragraph("Распределение расстояний (значения от -3 до 3) пациента {}".format(CATS[cat][1]))
             doc.add_paragraph(str(report["distrib"]))
