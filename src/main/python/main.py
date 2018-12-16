@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 import sys
 
-import logic as logic
+import logic.logic as logic
 
 
 class ExampleApp(QMainWindow, logic.Main):
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 # https://tproger.ru/translations/python-gui-pyqt/
 r"""
 pyuic5 src\main\python\ui\form.ui -o src\main\python\form.py
-pyuic5 src\main\python\ui\frame_default.ui -o src\main\python\frame_default.py
-pyuic5 src\main\python\ui\frame_patient.ui -o src\main\python\frame_patient.py
+pyuic5 src\main\python\ui\frame_default.ui -o src\main\python\frames\default.py
+pyuic5 src\main\python\ui\frame_patient.ui -o src\main\python\frames\patient.py
 
 """

@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 
 from docx import Document
 
-from science.classes import Patient, Standard, Group
+from science.classes import Patient, Standard
 from science.funcs import sequence_distance, distrib, graph_kde
 from science import CATS, nnone, plot_to_stream
 
 
 def std_pat_stat_by_category(std: Standard, pat: Patient, cat: int):
-    distance = sequence_distance(pat.data_seq_max[cat], std.seq_max, insert_zero=True)
+    distance = sequence_distance(pat.seq_max[cat], std.seq_max, insert_zero=True)
     return {
-        "seq_max": pat.data_seq_max[cat],
+        "seq_max": pat.seq_max[cat],
         "distance": distance,
         "distrib": distrib(distance),
         'mean': np.mean(distance),
@@ -60,8 +60,8 @@ class StandardPatientStat:
             doc.add_paragraph(str(self.pat.data[cat]))
 
             doc.add_paragraph("Список максимумов значений пациента {}:".format(CATS[cat][1]))
-            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.data_seq_max[cat])))
-            doc.add_paragraph(str(self.pat.data_seq_max[cat]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.seq_max[cat])))
+            doc.add_paragraph(str(self.pat.seq_max[cat]))
             doc.add_paragraph()
 
         # вычисление распределения расстояний от максимумов рядов пациентов до ближайшего максимума эталона
@@ -93,11 +93,7 @@ def test():
 
     std = Standard.from_file('samples\\Flow_62.txt')
 
-    Group('1')
-    pat = Patient('1_1', '1')
-    for cat_s, cat_l in CATS:
-        pat.add_category(cat_s, "samples/1_1{}.txt".format(cat_s))
-
+    pat = Patient.from_file("samples/1_1.xlsx")
     stat = StandardPatientStat(std, pat)
 
     doc = create_docx()
@@ -108,8 +104,6 @@ def test():
 
     base = plt.figure()
     graph_kde(stat.get_report_item("distance"), base)
-    img = plot_to_image(base)
-    img.save('test.png')
     plt.show()
 
 

@@ -56,7 +56,7 @@ def sequence_distance(x, y, *, insert_zero):
     "-" максимум Kp находится слева, "+" максимум Kp находится справа
     """
     if insert_zero:
-        x.insert(0, 0)
+        x = [0] + x
     u = []
     for i in range(len(x)):
         if x[i] == 1:
@@ -140,7 +140,7 @@ def graph_kde(xr: list, base: Figure):
               ("green", "зеленый"),
               ("yellow", "желтый")]
     # задаем заголовки
-    titles = ["{} график – {}".format(colors[idx][1], science.CATS[idx][1])
+    titles = ["{} график – {}".format(colors[idx][1], science.CATS[idx])
               for idx in range(4) if xr[idx] is not None]
     # отфлитровываем отсутствующие категории
     colors = [colors[idx][0] for idx in range(4) if xr[idx] is not None]
