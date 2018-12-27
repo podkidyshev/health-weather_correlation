@@ -33,10 +33,10 @@ class SampleStandard:
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
 
-        stats = [stat_analysis(xr) for xr in self.distance]
-        self.stat_mean = [stats[i][0] for i in range(4)]
-        self.stat_std = [stats[i][1] for i in range(4)]
-        self.stat_interval = [stats[i][2] for i in range(4)]
+        stat = [stat_analysis(xr) for xr in self.distance]
+        self.stat_mean = [stat[i][0] for i in range(4)]
+        self.stat_std = [stat[i][1] for i in range(4)]
+        self.stat_interval = [stat[i][2] for i in range(4)]
 
         # резерв
 
@@ -71,7 +71,63 @@ class MulSamplesStandard:
         self.group_sample_ntest = [test_normal(self.group_sample_distance[factor], qq=False) for factor in range(4)]
         self.max_list_ntest = [test_normal(self.max_list[factor], qq=False) for factor in range(4)]
 
-        stats = [stat_analysis(self.max_list[factor]) for factor in range(4)]
-        self.stat_mean = [stats[i][0] for i in range(4)]
-        self.stat_std = [stats[i][1] for i in range(4)]
-        self.stat_interval = [stats[i][2] for i in range(4)]
+        stat = [stat_analysis(self.max_list[factor]) for factor in range(4)]
+        self.stat_mean = [stat[i][0] for i in range(4)]
+        self.stat_std = [stat[i][1] for i in range(4)]
+        self.stat_interval = [stat[i][2] for i in range(4)]
+
+
+class FactorSampleMulStandards:
+    def __init__(self, sample: Sample, factor: int, stds: list):
+        self.sample = sample
+        self.factor = factor
+        self.stds = stds[:]
+
+        self.distance = [sequence_distance(self.sample.seq_max[factor], std.seq_max, insert_zero=True)
+                         for std in stds]
+        self.distance1 = [sequence_distance(self.sample.seq_max[factor], std.seq_max, insert_zero=False)
+                          for std in stds]
+
+        stat = [stat_analysis(self.distance[std_num]) for std_num in range(len(stds))]
+        self.stat_mean = [stat[std_num][0] for std_num in range(len(stds))]
+        self.stat_std = [stat[std_num][1] for std_num in range(len(stds))]
+        self.stat_interval = [stat[std_num][2] for std_num in range(len(stds))]
+
+
+class SampleMulStandards:
+    def __init__(self, sample: Sample, stds: list):
+        self.sample = sample
+        self.stds = stds[:]
+
+        self.distance = [[sequence_distance(sample.seq_max[factor], std.seq_max, insert_zero=True)
+                          for factor in range(4)]
+                         for std in stds]
+        self.distance1 = [[sequence_distance(sample.seq_max[factor], std.seq_max, insert_zero=False)
+                           for factor in range(4)]
+                          for std in stds]
+
+        stat = [[stat_analysis(self.distance[std_num][factor]) for factor in range(4)]
+                for std_num in range(len(stds))]
+        self.stat_mean = [[stat[std_num][factor][0] for factor in range(4)] for std_num in range(len(stds))]
+        self.stat_std = [[stat[std_num][factor][1] for factor in range(4)] for std_num in range(len(stds))]
+        self.stat_interval = [[stat[std_num][factor][2] for factor in range(4)] for std_num in range(len(stds))]
+
+
+class MulSamplesMulStandards:
+    def __init__(self, samples: list, stds: list):
+        self.samples = samples[:]
+        self.stds = stds[:]
+
+        self.distance = [[[sequence_distance(sample.seq_max[factor], std.seq_max, insert_zero=True)
+                           for factor in range(4)] for sample in samples] for std in stds]
+        self.distance1 = [[[sequence_distance(sample.seq_max[factor], std.seq_max, insert_zero=False)
+                            for factor in range(4)] for sample in samples] for std in stds]
+
+        stat = [[[stat_analysis(self.distance[std_num][sample_num][factor]) for factor in range(4)]
+                 for sample_num in range(len(samples))] for std_num in range(len(stds))]
+        self.stat_mean = [[[stat[std_num][sample_num][factor][0] for factor in range(4)]
+                           for sample_num in range(len(samples))] for std_num in range(len(stds))]
+        self.stat_std = [[[stat[std_num][sample_num][factor][1] for factor in range(4)]
+                          for sample_num in range(len(samples))] for std_num in range(len(stds))]
+        self.stat_interval = [[[stat[std_num][sample_num][factor][2] for factor in range(4)]
+                               for sample_num in range(len(samples))] for std_num in range(len(stds))]
