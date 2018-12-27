@@ -2,17 +2,16 @@ import science
 import science.funcs as funcs
 
 
-class PatientDuplicateError(Exception):
-    pass
+class Sample:
+    class SampleDuplicateError(Exception):
+        pass
 
-
-class Patient:
-    patients = {}
+    samples = {}
 
     def __init__(self, name, datas):
-        if name in Patient.patients:
-            raise PatientDuplicateError('Пациент с именем {} уже загружен'.format(name))
-        Patient.patients[name] = self
+        if name in Sample.samples:
+            raise Sample.SampleDuplicateError('Пациент с именем {} уже загружен'.format(name))
+        Sample.samples[name] = self
 
         self.name = name
         self.data, self.seq_max = [], []
@@ -24,26 +23,25 @@ class Patient:
         return self.data[factor] is not None
 
     def delete(self):
-        del Patient.patients[self.name]
+        del Sample.samples[self.name]
 
     @staticmethod
     def from_file(filename, name: str=""):
         if not name:
             name = science.file_base_name(filename)
         datas = science.read_xlsx_sample(filename)
-        return Patient(name, datas)
-
-
-class StandardDuplicateError(Exception):
-    pass
+        return Sample(name, datas)
 
 
 class Standard:
+    class StandardDuplicateError(Exception):
+        pass
+
     standards = {}
 
     def __init__(self, name, data):
         if name in Standard.standards:
-            raise StandardDuplicateError('Эталон {} уже загружен'.format(name))
+            raise Standard.StandardDuplicateError('Эталон {} уже загружен'.format(name))
         Standard.standards[name] = self
 
         self.name = name

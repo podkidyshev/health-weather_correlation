@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+
 from io import BytesIO
 
 from PIL import Image
@@ -82,6 +84,12 @@ def read_xlsx_sample(filename):
 
 def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
+
+
+def plot_image(plot_func, *args):
+    figure = plt.figure()
+    plot_func(*args, figure)
+    return plot_to_image(figure)
 
 
 def plot_to_image(figure):

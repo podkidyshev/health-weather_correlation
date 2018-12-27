@@ -80,7 +80,7 @@ class Main(Ui_MainBaseForm):
     def add_patient_btn_clicked(self):
         fname = dialog_open(self, "Выбрать файл пациента")
         try:
-            pat = Patient.from_file(fname)
+            pat = Sample.from_file(fname)
         except PatientDuplicateError as e:
             # TODO: всплывающее окно
             print(e.args[0])
@@ -95,7 +95,7 @@ class Main(Ui_MainBaseForm):
             return
         pat = pat.text()
         self.pat_list.takeItem(self.pat_list.currentRow())
-        Patient.delete(Patient.patients[pat])
+        Sample.delete(Sample.samples[pat])
         self.set_data_frame(QFrameDefault)
 
     def report_btn_clicked(self):

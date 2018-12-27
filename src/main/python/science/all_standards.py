@@ -127,12 +127,12 @@ class AllStandards:
 
 
 def test():
-    from science.classes import Patient, Standard
+    from science.classes import Sample, Standard
     Standard.from_file("samples/Flow_62.txt")
     Standard.from_file("samples/Kp_62.txt")
 
-    pat1 = Patient.from_file("samples/1_1.xlsx")
-    pat2 = Patient.from_file("samples/1_2.xlsx")
+    pat1 = Sample.from_file("samples/1_1.xlsx")
+    pat2 = Sample.from_file("samples/1_2.xlsx")
 
     stat = AllStandards([pat1, pat2], 0)
 
