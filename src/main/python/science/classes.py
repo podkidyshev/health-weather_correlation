@@ -20,8 +20,8 @@ class Patient:
             self.data.append(data)
             self.seq_max.append(data if data is None else funcs.sequence_max(data))
 
-    def has_cat(self, cat: int):
-        return self.data[cat] is not None
+    def has_factor(self, factor: int):
+        return self.data[factor] is not None
 
     def delete(self):
         del Patient.patients[self.name]

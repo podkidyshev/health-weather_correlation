@@ -141,7 +141,7 @@ def graph_kde(xr: list, base: Figure):
               ("green", "зеленый"),
               ("yellow", "желтый")]
     # задаем заголовки
-    titles = ["{} график – {}".format(colors[idx][1], science.CATS[idx])
+    titles = ["{} график – {}".format(colors[idx][1], science.FACTORS[idx])
               for idx in range(4) if xr[idx] is not None]
     # отфлитровываем отсутствующие категории
     colors = [colors[idx][0] for idx in range(4) if xr[idx] is not None]

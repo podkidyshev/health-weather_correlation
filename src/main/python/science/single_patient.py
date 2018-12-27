@@ -9,13 +9,13 @@ from docx import Document
 
 from science.classes import Patient, Standard
 from science.funcs import sequence_distance, distrib, graph_kde
-from science import CATS, nnone, plot_to_stream
+from science import FACTORS, nnone, plot_to_stream
 
 
-def std_pat_stat_by_category(std: Standard, pat: Patient, cat: int):
-    distance = sequence_distance(pat.seq_max[cat], std.seq_max, insert_zero=True)
+def std_pat_stat_by_factor(std: Standard, pat: Patient, factor: int):
+    distance = sequence_distance(pat.seq_max[factor], std.seq_max, insert_zero=True)
     return {
-        "seq_max": pat.seq_max[cat],
+        "seq_max": pat.seq_max[factor],
         "distance": distance,
         "distrib": distrib(distance),
         'mean': np.mean(distance),
@@ -25,9 +25,9 @@ def std_pat_stat_by_category(std: Standard, pat: Patient, cat: int):
 
 
 def st_pat_stat(std: Standard, pat: Patient):
-    report = [None] * len(CATS)
-    for cat, data in nnone(pat.data):
-        report[cat] = std_pat_stat_by_category(std, pat, cat)
+    report = [None] * len(FACTORS)
+    for factor, data in nnone(pat.data):
+        report[factor] = std_pat_stat_by_factor(std, pat, factor)
     return report
 
 
@@ -39,7 +39,7 @@ class StandardPatientStat:
         self.report = st_pat_stat(std, pat)
 
     def get_report_item(self, item: str):
-        return [self.report[idx][item] if self.report[idx] is not None else None for idx in range(len(CATS))]
+        return [self.report[idx][item] if self.report[idx] is not None else None for idx in range(len(FACTORS))]
 
     def get_report(self, doc: Document):
         doc.add_heading("Пациент {}. Эталон {}".format(self.pat.name, self.std.name), 0)
@@ -53,14 +53,14 @@ class StandardPatientStat:
         doc.add_paragraph(str(self.std.seq_max))
 
         doc.add_paragraph()
-        for cat, report in nnone(self.report):
-            doc.add_paragraph("Список значений пациента {}:".format(CATS[cat][1]))
-            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.data[cat])))
-            doc.add_paragraph(str(self.pat.data[cat]))
+        for factor, report in nnone(self.report):
+            doc.add_paragraph("Список значений пациента {}:".format(FACTORS[factor][1]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.data[factor])))
+            doc.add_paragraph(str(self.pat.data[factor]))
 
-            doc.add_paragraph("Список максимумов значений пациента {}:".format(CATS[cat][1]))
-            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.seq_max[cat])))
-            doc.add_paragraph(str(self.pat.seq_max[cat]))
+            doc.add_paragraph("Список максимумов значений пациента {}:".format(FACTORS[factor][1]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(self.pat.seq_max[factor])))
+            doc.add_paragraph(str(self.pat.seq_max[factor]))
             doc.add_paragraph()
 
         # вычисление распределения расстояний от максимумов рядов пациентов до ближайшего максимума эталона
@@ -68,17 +68,17 @@ class StandardPatientStat:
         doc.add_paragraph()
         doc.add_heading(
             "Ряды расстояний и распределения расстояний от максимумов пациента до ближайшего максимума эталона", 1)
-        for cat, report in nnone(self.report):
+        for factor, report in nnone(self.report):
             doc.add_paragraph(
-                "Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(CATS[cat][1]))
+                "Ряд расстояний от максимумов пациента {} до ближайшего максимума эталона:".format(FACTORS[factor][1]))
             doc.add_paragraph(str(report["distance"]))
-            doc.add_paragraph("Распределение расстояний (значения от -3 до 3) пациента {}".format(CATS[cat][1]))
+            doc.add_paragraph("Распределение расстояний (значения от -3 до 3) пациента {}".format(FACTORS[factor][1]))
             doc.add_paragraph(str(report["distrib"]))
             doc.add_paragraph()
 
         doc.add_heading("Анализ распределений расстояний от максимумов пациента до ближайшего максимума эталона", 1)
-        for cat, report in nnone(self.report):
-            doc.add_paragraph("Анализ распределений расстояний пациента {}:".format(CATS[cat][1]))
+        for factor, report in nnone(self.report):
+            doc.add_paragraph("Анализ распределений расстояний пациента {}:".format(FACTORS[factor][1]))
             doc.add_paragraph("\tвыборочное среднее = {:.4f}".format(report["mean"]))
             doc.add_paragraph("\tстандартное отклонение = {:.4f}".format(report["std"]))
             doc.add_paragraph("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*report["t-interval"]))

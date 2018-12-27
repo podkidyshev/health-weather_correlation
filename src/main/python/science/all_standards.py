@@ -11,19 +11,19 @@ import science.classes as classes
 
 
 class AllStandards:
-    def __init__(self, samples: list, cat: int):
-        """Анализ по всем эталонам и переданным пациентам в категории cat"""
-        self.cat = cat
-        self.cat_name = science.CATS[cat]
+    def __init__(self, samples: list, factor: int):
+        """Анализ по всем эталонам и переданным пациентам с фактором factor"""
+        self.factor = factor
+        self.factor_name = science.FACTORS[factor]
 
         error_samples = []
         for sample in samples:
-            if not sample.has_cat(cat):
+            if not sample.has_factor(factor):
                 error_samples.append(sample.name)
         if len(error_samples):
-            raise funcs.StatComputingError('Запрошена обработка категории "{}".\n '
-                                           'У пациентов {} нет данных в этой категории'.format(self.cat_name,
-                                                                                               error_samples))
+            raise funcs.StatComputingError('Запрошена обработка фактора "{}".\n '
+                                           'У пациентов {} нет данных с этим фактором'.format(self.factor_name,
+                                                                                              error_samples))
 
         self.stds = [std for std in classes.Standard.standards.values()]
         self.stds_count = len(self.stds)
@@ -32,8 +32,8 @@ class AllStandards:
 
         self.pats = samples[:]
         self.pats_count = len(self.pats)
-        self.pats_data = [pat.data[self.cat] for pat in self.pats]
-        self.pats_seq_max = [pat.seq_max[self.cat] for pat in self.pats]
+        self.pats_data = [pat.data[self.factor] for pat in self.pats]
+        self.pats_seq_max = [pat.seq_max[self.factor] for pat in self.pats]
 
         self.pats_data_all = funcs.sum_list(self.pats_data)
         self.pats_seq_max_all = funcs.sequence_max(self.pats_data_all)
@@ -54,7 +54,7 @@ class AllStandards:
         self.tn_by_pat = [tn.test_normal(concat, qq=False) for concat in self.concats]
 
     def get_report(self, doc: Document):
-        doc.add_heading("Анализ по всем эталонам по всем пациентам {}".format(self.cat_name), 0)
+        doc.add_heading("Анализ по всем эталонам по всем пациентам {}".format(self.factor_name), 0)
 
         doc.add_paragraph("Число эталонов = {}\n".format(self.stds_count))
         for std in self.stds:

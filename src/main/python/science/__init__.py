@@ -9,7 +9,7 @@ from docx import Document
 from docx.shared import Cm
 from openpyxl import load_workbook
 
-CATS = [
+FACTORS = [
     "без нагрузки",
     "с физической нагрузкой",
     "с эмоциональной нагрузкой",
