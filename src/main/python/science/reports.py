@@ -53,7 +53,7 @@ class MulSamplesStandard:
                                                         insert_zero=True)
                                       for factor in range(4)]
 
-        self.distance = [[sequence_distance(sample.seq_max[factor], std, insert_zero=True)
+        self.distance = [[sequence_distance(sample.seq_max[factor], std.seq_max, insert_zero=True)
                           for factor in range(4)] for sample in samples]
 
         self.max_list = []
@@ -131,3 +131,21 @@ class MulSamplesMulStandards:
                           for sample_num in range(len(samples))] for std_num in range(len(stds))]
         self.stat_interval = [[[stat[std_num][sample_num][factor][2] for factor in range(4)]
                                for sample_num in range(len(samples))] for std_num in range(len(stds))]
+
+
+if __name__ == '__main__':
+    s1 = Sample.from_file('samples/1_1.xlsx')
+    s2 = Sample.from_file('samples/1_2.xlsx')
+    s3 = Sample.from_file('samples/1_3.xlsx')
+    samples = [s1, s2, s3]
+
+    std1 = Standard.from_file('samples/Flow_62.txt')
+    std2 = Standard.from_file('samples/Kp_62.txt')
+    stds = [std1, std2]
+
+    FactorSampleStandard(s1, 0, std1)
+    SampleStandard(s1, std1)
+    # MulSamplesStandard(samples, std1)  нужно загрузить хотя бы 8 образцов
+    FactorSampleMulStandards(s1, 0, stds)
+    SampleMulStandards(s1, stds)
+    MulSamplesMulStandards(samples, stds)
