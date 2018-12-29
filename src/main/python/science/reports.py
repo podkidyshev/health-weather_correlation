@@ -29,7 +29,7 @@ class SampleStandard:
         self.distance1 = [sequence_distance(sample.seq_max[factor], std.seq_max, insert_zero=False)
                           for factor in range(4)]
 
-        self.graph_kde = plot_image(graph_kde, self.distance)
+        self.kde = plot_image(graph_kde, self.distance)
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
 
@@ -134,18 +134,25 @@ class MulSamplesMulStandards:
 
 
 if __name__ == '__main__':
-    s1 = Sample.from_file('samples/1_1.xlsx')
-    s2 = Sample.from_file('samples/1_2.xlsx')
-    s3 = Sample.from_file('samples/1_3.xlsx')
-    samples = [s1, s2, s3]
+    # тест всех отчетов
+    import os
 
-    std1 = Standard.from_file('samples/Flow_62.txt')
-    std2 = Standard.from_file('samples/Kp_62.txt')
-    stds = [std1, std2]
+    for group in '123':
+        for idx in '123456':
+            Sample.from_file('samples/{}_{}.xlsx'.format(group, idx))
+    samples = list(Sample.samples.values())
+
+    for entry in os.listdir('samples'):
+        if entry[-4:] == '.txt':
+            Standard.from_file('samples/' + entry)
+    stds = list(Standard.standards.values())
+
+    s1 = samples[0]
+    std1 = stds[0]
 
     FactorSampleStandard(s1, 0, std1)
     SampleStandard(s1, std1)
-    # MulSamplesStandard(samples, std1)  нужно загрузить хотя бы 8 образцов
+    MulSamplesStandard(samples, std1)
     FactorSampleMulStandards(s1, 0, stds)
     SampleMulStandards(s1, stds)
     MulSamplesMulStandards(samples, stds)

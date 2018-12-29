@@ -1,36 +1,34 @@
-import matplotlib.pyplot as plt
-
-from PyQt5.QtGui import QPixmap
+from PIL.ImageQt import ImageQt
+from PyQt5.QtGui import QPixmap, QImage
 
 from logic import QFrameBase, dialog_save
 from frames.patient import Ui_FramePatient
 
-from science import plot_to_qimage, create_docx, save_docx
+from science import create_docx, save_docx
 from science.classes import Standard, Sample
-from science.single_patient import StandardPatientStat
-from science.funcs import graph_kde
+from science.reports import FactorSampleStandard, SampleStandard
 
 
 class QFramePatient(QFrameBase, Ui_FramePatient):
-    def __init__(self, parent, pat_name, std_name):
+    def __init__(self, parent, sample_name, std_name):
         QFrameBase.__init__(self, parent, Ui_FramePatient)
 
         self.std = Standard.standards[std_name]
-        self.pat = Sample.samples[pat_name]
-        self.report = StandardPatientStat(self.std, self.pat)
+        self.sample = Sample.samples[sample_name]
+        self.report_factors = SampleStandard(self.sample, self.std)
+        self.reports = [FactorSampleStandard(self.sample, factor, self.std) for factor in range(4)]
 
-        self.plot = plt.figure()
-        graph_kde(self.report.get_report_item("distance"), self.plot)
-        self.img = plot_to_qimage(self.plot)
-        self.plot_canvas = QPixmap.fromImage(self.img)
+        self.add_image(self.report_factors.kde, self.factors_label, 'rfs_kde')
+        for factor in range(4):
+            self.add_image(self.reports[factor].va,
+                           self.__dict__['label_{}'.format(factor)],
+                           'rs_{}_va'.format(factor))
 
-        self.graph_label.setPixmap(self.plot_canvas)
-        self.graph_label.setScaledContents(True)
-
-        self.std_pat_label.setText("Пациент {}".format(self.pat.name))
+        self.std_pat_label.setText("Образец {}".format(self.sample.name))
 
     def save_report(self):
-        fname = dialog_save(self, "Сохранить отчет")
-        doc = create_docx()
-        self.report.get_report(doc)
-        save_docx(doc, fname)
+        # fname = dialog_save(self, "Сохранить отчет")
+        # doc = create_docx()
+        # self.report.get_report(doc)
+        # save_docx(doc, fname)
+        print('NOT YET COMPLETED')

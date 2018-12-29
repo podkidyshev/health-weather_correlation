@@ -101,8 +101,18 @@ def plot_to_qimage(figure):
     return QImage(ImageQt(plot_to_image(figure)))
 
 
+def plot_qimage(plot_func, *args):
+    img = plot_image(plot_func, *args)
+    return QImage(ImageQt(img))
+
+
 def plot_to_pixmap(figure):
     return QPixmap.fromImage(plot_to_qimage(figure))
+
+
+def plot_pixmap(plot_func, *args):
+    img = plot_image(plot_func, *args)
+    return QPixmap.fromImage(QImage(ImageQt(img)))
 
 
 def plot_to_stream(figure):
