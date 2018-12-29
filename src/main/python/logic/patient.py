@@ -1,6 +1,3 @@
-from PIL.ImageQt import ImageQt
-from PyQt5.QtGui import QPixmap, QImage
-
 from logic import QFrameBase, dialog_save
 from frames.patient import Ui_FramePatient
 
@@ -24,6 +21,7 @@ class QFramePatient(QFrameBase, Ui_FramePatient):
                            self.__dict__['label_{}'.format(factor)],
                            'rs_{}_va'.format(factor))
 
+        # self.text_factor_0.setPlaceholderText('kek')
         self.std_pat_label.setText("Образец {}".format(self.sample.name))
 
     def save_report(self):

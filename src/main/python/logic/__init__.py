@@ -54,3 +54,4 @@ class QFrameBase(QFrame):
 
         img_label.setPixmap(self.__dict__[canvas_name])
         img_label.setScaledContents(True)
+        img_label.setMinimumSize(QSize(200, 200))

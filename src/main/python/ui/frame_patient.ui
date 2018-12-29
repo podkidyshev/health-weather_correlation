@@ -61,13 +61,42 @@
       <attribute name="title">
        <string>Без нагрузки</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1">
         <widget class="QLabel" name="label_0">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>200</height>
+          </size>
+         </property>
          <property name="text">
-          <string>TextLabel</string>
+          <string>label_0</string>
          </property>
         </widget>
+       </item>
+       <item row="0" column="0">
+        <layout class="QVBoxLayout" name="layout_factor_0">
+         <item>
+          <widget class="QTextBrowser" name="text_factor_0">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>345678</height>
+            </size>
+           </property>
+           <property name="placeholderText">
+            <string>Initial text</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -79,7 +108,7 @@
        <item>
         <widget class="QLabel" name="label_1">
          <property name="text">
-          <string>TextLabel</string>
+          <string>label_1</string>
          </property>
         </widget>
        </item>
@@ -93,7 +122,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>TextLabel</string>
+          <string>label_2</string>
          </property>
         </widget>
        </item>
@@ -107,7 +136,7 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>TextLabel</string>
+          <string>label_3</string>
          </property>
         </widget>
        </item>
