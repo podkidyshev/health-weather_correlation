@@ -38,7 +38,7 @@
       <number>6</number>
      </property>
      <item row="1" column="0">
-      <widget class="QListWidget" name="ref_list">
+      <widget class="QListWidget" name="std_list">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -63,7 +63,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QPushButton" name="add_ref_btn">
+      <widget class="QPushButton" name="add_std_btn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -82,7 +82,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QPushButton" name="del_ref_btn">
+      <widget class="QPushButton" name="del_std_btn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -101,7 +101,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="ref_label">
+      <widget class="QLabel" name="std_label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -130,12 +130,12 @@
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="pat_layout">
+    <layout class="QGridLayout" name="sample_layout">
      <property name="sizeConstraint">
       <enum>QLayout::SetFixedSize</enum>
      </property>
      <item row="4" column="0">
-      <widget class="QPushButton" name="del_pat_btn">
+      <widget class="QPushButton" name="del_sample_btn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -154,7 +154,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QPushButton" name="add_pat_btn">
+      <widget class="QPushButton" name="add_sample_btn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -173,7 +173,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QListWidget" name="pat_list">
+      <widget class="QListWidget" name="sample_list">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -198,7 +198,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="pat_label">
+      <widget class="QLabel" name="sample_label">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>

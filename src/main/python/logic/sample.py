@@ -6,7 +6,7 @@ from science.classes import Standard, Sample
 from science.reports import FactorSampleStandard, SampleStandard
 
 
-class QFramePatient(QFrameBase, Ui_FramePatient):
+class QFrameSample(QFrameBase, Ui_FramePatient):
     def __init__(self, parent, sample_name, std_name):
         QFrameBase.__init__(self, parent, Ui_FramePatient)
 
@@ -22,7 +22,7 @@ class QFramePatient(QFrameBase, Ui_FramePatient):
                            'rs_{}_va'.format(factor))
 
         # self.text_factor_0.setPlaceholderText('kek')
-        self.std_pat_label.setText("Образец {}".format(self.sample.name))
+        self.title_label.setText("Образец {}".format(self.sample.name))
 
     def save_report(self):
         # fname = dialog_save(self, "Сохранить отчет")

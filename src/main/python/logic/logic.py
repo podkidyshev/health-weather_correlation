@@ -8,7 +8,7 @@ from science.classes import *
 
 from logic import dialog_open
 from logic.default import QFrameDefault
-from logic.sample import QFramePatient
+from logic.sample import QFrameSample
 
 
 matplotlib.use("Qt5Agg")
@@ -25,14 +25,14 @@ class Main(Ui_MainBaseForm):
 
     def start(self):
         # Создание/удаление эталона
-        self.add_ref_btn.clicked.connect(self.add_ref_btn_clicked)
-        self.del_ref_btn.clicked.connect(self.del_ref_btn_clicked)
+        self.add_std_btn.clicked.connect(self.add_std_btn_clicked)
+        self.del_std_btn.clicked.connect(self.del_std_btn_clicked)
         # Создание/удаление пациента
-        self.add_pat_btn.clicked.connect(self.add_patient_btn_clicked)
-        self.del_pat_btn.clicked.connect(self.del_patient_btn_clicked)
+        self.add_sample_btn.clicked.connect(self.add_sample_btn_clicked)
+        self.del_sample_btn.clicked.connect(self.del_sample_btn_clicked)
         # Кастомные фреймы
-        self.pat_list.itemClicked.connect(self.patient_info)
-        self.ref_list.itemClicked.connect(self.patient_info)
+        self.sample_list.itemClicked.connect(self.choose_data_frame)
+        self.std_list.itemClicked.connect(self.choose_data_frame)
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
 
@@ -42,60 +42,59 @@ class Main(Ui_MainBaseForm):
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
             self.data_layout.removeWidget(self.data_frame)
-            # sip.delete(self.data_frame)
             self.data_frame.hide()
             self.data_frame = None
         self.data_frame = frame_class(self, *args)
         self.data_layout.insertWidget(0, self.data_frame)
 
-    def patient_info(self):
-        selected_ref = self.ref_list.currentItem()
-        selected_patient = self.pat_list.currentItem()
-        if selected_ref is None:
+    def choose_data_frame(self):
+        selected_std = self.std_list.currentItem()
+        selected_sample = self.sample_list.currentItem()
+        if selected_std is None:
             # TODO: всплывающее окно
             print('Выберите эталон!')
-        elif selected_patient is None:
+        elif selected_sample is None:
             # TODO: выберите пациента
             print('Выберите пациента!')
         else:
-            self.set_data_frame(QFramePatient, selected_patient.text(), selected_ref.text())
+            self.set_data_frame(QFrameSample, selected_sample.text(), selected_std.text())
 
     # КНОПКИ
-    def add_ref_btn_clicked(self):
+    def add_std_btn_clicked(self):
         fname = dialog_open(self, " Выбрать эталон")
-        standard = fname[fname.rfind('/') + 1:fname.rfind('.')]
-        Standard.from_file(fname, standard)
-        self.ref_list.addItem(standard)
+        std = fname[fname.rfind('/') + 1:fname.rfind('.')]
+        Standard.from_file(fname, std)
+        self.std_list.addItem(std)
 
-    def del_ref_btn_clicked(self):
-        standard = self.ref_list.currentItem()
-        if standard is None:
+    def del_std_btn_clicked(self):
+        std = self.std_list.currentItem()
+        if std is None:
             # TODO: всплывающее окно
             print('Выберите эталон для удаления!')
-        standard = standard.text()
-        self.ref_list.takeItem(self.ref_list.currentRow())
-        Standard.delete(Standard.standards[standard])
+        std = std.text()
+        self.std_list.takeItem(self.std_list.currentRow())
+        Standard.delete(Standard.standards[std])
         self.set_data_frame(QFrameDefault)
 
-    def add_patient_btn_clicked(self):
+    def add_sample_btn_clicked(self):
         fname = dialog_open(self, "Выбрать файл пациента")
         try:
-            pat = Sample.from_file(fname)
-        except PatientDuplicateError as e:
+            sample = Sample.from_file(fname)
+        except Sample.SampleDuplicateError as e:
             # TODO: всплывающее окно
             print(e.args[0])
             return
-        self.pat_list.addItem(pat.name)
+        self.sample_list.addItem(sample.name)
 
-    def del_patient_btn_clicked(self):
-        pat = self.pat_list.currentItem()
-        if pat is None:
+    def del_sample_btn_clicked(self):
+        sample = self.sample_list.currentItem()
+        if sample is None:
             # TODO: всплывающее окно
             print('Для удаления пациента кликните по нему!')
             return
-        pat = pat.text()
-        self.pat_list.takeItem(self.pat_list.currentRow())
-        Sample.delete(Sample.samples[pat])
+        sample = sample.text()
+        self.sample_list.takeItem(self.sample_list.currentRow())
+        Sample.delete(Sample.samples[sample])
         self.set_data_frame(QFrameDefault)
 
     def report_btn_clicked(self):
