@@ -36,6 +36,6 @@ if __name__ == '__main__':
 r"""
 pyuic5 src\main\python\ui\form.ui -o src\main\python\form.py
 pyuic5 src\main\python\ui\frame_default.ui -o src\main\python\frames\default.py
-pyuic5 src/main/python/ui/frame_patient.ui -o src/main/python/frames/patient.py
+pyuic5 src/main/python/ui/frame_sample.ui -o src/main/python/frames/sample.py
 
 """

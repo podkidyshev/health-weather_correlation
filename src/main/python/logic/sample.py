@@ -1,5 +1,5 @@
 from logic import QFrameBase, dialog_save
-from frames.patient import Ui_FramePatient
+from frames.sample import Ui_FramePatient
 
 from science import create_docx, save_docx
 from science.classes import Standard, Sample

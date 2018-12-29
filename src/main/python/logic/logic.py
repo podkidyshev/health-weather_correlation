@@ -8,7 +8,7 @@ from science.classes import *
 
 from logic import dialog_open
 from logic.default import QFrameDefault
-from logic.patient import QFramePatient
+from logic.sample import QFramePatient
 
 
 matplotlib.use("Qt5Agg")
