@@ -80,7 +80,7 @@ class Main(Ui_MainBaseForm):
         fname = dialog_open(self, "Выбрать файл пациента")
         try:
             sample = Sample.from_file(fname)
-        except Sample.SampleDuplicateError as e:
+        except Sample.SampleError as e:
             # TODO: всплывающее окно
             print(e.args[0])
             return

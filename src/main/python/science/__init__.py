@@ -87,6 +87,7 @@ def patient_suffix(filename: str, suffix):
 
 
 def plot_image(plot_func, *args):
+    # TODO: создавать фигуры не через matplotlib.pyplot.figure() - жрет слишком много RAM
     figure = plt.figure()
     plot_func(*args, figure)
     return plot_to_image(figure)

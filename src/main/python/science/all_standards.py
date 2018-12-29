@@ -16,14 +16,14 @@ class AllStandards:
         self.factor = factor
         self.factor_name = science.FACTORS[factor]
 
-        error_samples = []
-        for sample in samples:
-            if not sample.has_factor(factor):
-                error_samples.append(sample.name)
-        if len(error_samples):
-            raise funcs.StatComputingError('Запрошена обработка фактора "{}".\n '
-                                           'У пациентов {} нет данных с этим фактором'.format(self.factor_name,
-                                                                                              error_samples))
+        # error_samples = []
+        # for sample in samples:
+        #     if not sample.has_factor(factor):
+        #         error_samples.append(sample.name)
+        # if len(error_samples):
+        #     raise funcs.StatComputingError('Запрошена обработка фактора "{}".\n '
+        #                                    'У пациентов {} нет данных с этим фактором'.format(self.factor_name,
+        #                                                                                       error_samples))
 
         self.stds = [std for std in classes.Standard.standards.values()]
         self.stds_count = len(self.stds)
