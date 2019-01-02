@@ -3,13 +3,19 @@ import sys
 
 from PIL.ImageQt import ImageQt
 
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import QFrame, QFileDialog
 
 
 root = os.path.dirname(sys.argv[0])
+main_window = None
 samples = os.path.join(root, "science", "samples")
+
+
+def set_main_window(window):
+    global main_window
+    main_window = window
 
 
 def dialog_open(parent, title, path=samples):
@@ -52,6 +58,8 @@ class QFrameBase(QFrame):
         self.__dict__[img_name] = QImage(ImageQt(img_obj))
         self.__dict__[canvas_name] = QPixmap.fromImage(self.__dict__[img_name])
 
+        img_label.installEventFilter(main_window)
+        img_label._pixmap = self.__dict__[canvas_name]
         img_label.setPixmap(self.__dict__[canvas_name])
-        img_label.setScaledContents(True)
+        img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(200, 200))

@@ -88,7 +88,7 @@ def patient_suffix(filename: str, suffix):
 
 
 def plot_image(plot_func, *args):
-    figure = Figure()
+    figure = Figure(dpi=200)
     canvas = FigureCanvasQT(figure)
     plot_func(*args, figure)
 

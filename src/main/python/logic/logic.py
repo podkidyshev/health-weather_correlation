@@ -1,12 +1,13 @@
 import matplotlib
 
-from PyQt5.QtWidgets import QHBoxLayout, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QWidget, QLabel, QMainWindow
+from PyQt5.QtCore import QEvent, Qt
 
 from form import Ui_MainBaseForm
 
 from science.classes import *
 
-from logic import dialog_open
+from logic import dialog_open, set_main_window
 from logic.default import QFrameDefault
 from logic.sample import QFrameSample
 
@@ -22,6 +23,8 @@ class Main(Ui_MainBaseForm):
         self.setCentralWidget(self.dummy)
         # фрейм данных
         self.data_frame = None
+        # для автоскейлинга графиков
+        set_main_window(self)
 
     def start(self):
         # Создание/удаление эталона
@@ -100,3 +103,9 @@ class Main(Ui_MainBaseForm):
     def report_btn_clicked(self):
         if hasattr(self.data_frame, "save_report"):
             self.data_frame.save_report()
+
+    def eventFilter(self, widget, event):
+        if event.type() == QEvent.Resize and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
+            widget.setPixmap(widget._pixmap.scaled(widget.width(), widget.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            return True
+        return QMainWindow.eventFilter(self, widget, event)
