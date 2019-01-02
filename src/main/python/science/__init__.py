@@ -1,5 +1,6 @@
 import os
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5 import FigureCanvasQT
 
 from io import BytesIO
 
@@ -87,10 +88,14 @@ def patient_suffix(filename: str, suffix):
 
 
 def plot_image(plot_func, *args):
-    # TODO: создавать фигуры не через matplotlib.pyplot.figure() - жрет слишком много RAM
-    figure = plt.figure()
+    figure = Figure()
+    canvas = FigureCanvasQT(figure)
     plot_func(*args, figure)
-    return plot_to_image(figure)
+
+    buffer = BytesIO()
+    canvas.print_figure(buffer)
+    buffer.seek(0)
+    return Image.open(buffer)
 
 
 def plot_to_image(figure):
