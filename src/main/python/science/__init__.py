@@ -1,4 +1,7 @@
 import os
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5 import FigureCanvasQT
+
 from io import BytesIO
 
 from PIL import Image
@@ -84,6 +87,17 @@ def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
 
 
+def plot_image(plot_func, *args):
+    figure = Figure()
+    canvas = FigureCanvasQT(figure)
+    plot_func(*args, figure)
+
+    buffer = BytesIO()
+    canvas.print_figure(buffer)
+    buffer.seek(0)
+    return Image.open(buffer)
+
+
 def plot_to_image(figure):
     """Вовзращет PIL.Image последнего вызова plt.figure()"""
     return Image.open(plot_to_stream(figure))
@@ -93,8 +107,18 @@ def plot_to_qimage(figure):
     return QImage(ImageQt(plot_to_image(figure)))
 
 
+def plot_qimage(plot_func, *args):
+    img = plot_image(plot_func, *args)
+    return QImage(ImageQt(img))
+
+
 def plot_to_pixmap(figure):
     return QPixmap.fromImage(plot_to_qimage(figure))
+
+
+def plot_pixmap(plot_func, *args):
+    img = plot_image(plot_func, *args)
+    return QPixmap.fromImage(QImage(ImageQt(img)))
 
 
 def plot_to_stream(figure):

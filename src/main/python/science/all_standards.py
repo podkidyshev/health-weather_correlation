@@ -16,14 +16,14 @@ class AllStandards:
         self.factor = factor
         self.factor_name = science.FACTORS[factor]
 
-        error_samples = []
-        for sample in samples:
-            if not sample.has_factor(factor):
-                error_samples.append(sample.name)
-        if len(error_samples):
-            raise funcs.StatComputingError('Запрошена обработка фактора "{}".\n '
-                                           'У пациентов {} нет данных с этим фактором'.format(self.factor_name,
-                                                                                              error_samples))
+        # error_samples = []
+        # for sample in samples:
+        #     if not sample.has_factor(factor):
+        #         error_samples.append(sample.name)
+        # if len(error_samples):
+        #     raise funcs.StatComputingError('Запрошена обработка фактора "{}".\n '
+        #                                    'У пациентов {} нет данных с этим фактором'.format(self.factor_name,
+        #                                                                                       error_samples))
 
         self.stds = [std for std in classes.Standard.standards.values()]
         self.stds_count = len(self.stds)
@@ -127,12 +127,12 @@ class AllStandards:
 
 
 def test():
-    from science.classes import Patient, Standard
+    from science.classes import Sample, Standard
     Standard.from_file("samples/Flow_62.txt")
     Standard.from_file("samples/Kp_62.txt")
 
-    pat1 = Patient.from_file("samples/1_1.xlsx")
-    pat2 = Patient.from_file("samples/1_2.xlsx")
+    pat1 = Sample.from_file("samples/1_1.xlsx")
+    pat2 = Sample.from_file("samples/1_2.xlsx")
 
     stat = AllStandards([pat1, pat2], 0)
 

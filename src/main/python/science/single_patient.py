@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 
 from docx import Document
 
-from science.classes import Patient, Standard
+from science.classes import Sample, Standard
 from science.funcs import sequence_distance, distrib, graph_kde
 from science import FACTORS, nnone, plot_to_stream
 
 
-def std_pat_stat_by_factor(std: Standard, pat: Patient, factor: int):
+def std_pat_stat_by_factor(std: Standard, pat: Sample, factor: int):
     distance = sequence_distance(pat.seq_max[factor], std.seq_max, insert_zero=True)
     return {
         "seq_max": pat.seq_max[factor],
@@ -24,7 +24,7 @@ def std_pat_stat_by_factor(std: Standard, pat: Patient, factor: int):
     }
 
 
-def st_pat_stat(std: Standard, pat: Patient):
+def st_pat_stat(std: Standard, pat: Sample):
     report = [None] * len(FACTORS)
     for factor, data in nnone(pat.data):
         report[factor] = std_pat_stat_by_factor(std, pat, factor)
@@ -32,7 +32,7 @@ def st_pat_stat(std: Standard, pat: Patient):
 
 
 class StandardPatientStat:
-    def __init__(self, std: Standard, pat: Patient):
+    def __init__(self, std: Standard, pat: Sample):
         self.std = std
         self.pat = pat
 
@@ -94,7 +94,7 @@ def test():
 
     std = Standard.from_file('samples\\Flow_62.txt')
 
-    pat = Patient.from_file("samples/1_1.xlsx")
+    pat = Sample.from_file("samples/1_1.xlsx")
     stat = StandardPatientStat(std, pat)
 
     doc = create_docx()
