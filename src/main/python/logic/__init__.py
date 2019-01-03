@@ -3,7 +3,7 @@ import sys
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QFrame, QFileDialog
+from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel
 
 
 root = os.path.dirname(sys.argv[0])
@@ -38,13 +38,13 @@ class QFrameBase(QFrame):
         self.setMinimumSize(QSize(500, 250))
         self.layout().setContentsMargins(0, 0, 0, 0)
 
-    def add_image(self, img_obj, img_label, img_name):
+    def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
         """
         принимает PIL-изображение и рисует на img-label картинку:
         добавляет необходимые объекты в корневой объект и конфигурирует лейбл
         :param img_obj: PIL-изображение для рисование
         :param img_label: лейбл, на котором рисовать
-        :param canvas_name: имя объекта канваса - должно быть уникальным
+        :param img_name: имя объекта изображения - должно быть уникальным в self.__dict__
         :return: None
         """
         if img_name in self.__dict__:
@@ -56,6 +56,6 @@ class QFrameBase(QFrame):
 
         img_label.installEventFilter(main_window)
         img_label._pixmap = pixmap
-        # img_label.setPixmap(pixmap)
+        img_label.setPixmap(pixmap)
         img_label.setAlignment(Qt.AlignCenter)
-        img_label.setMinimumSize(QSize(200, 200))
+        img_label.setMinimumSize(QSize(600, 600))

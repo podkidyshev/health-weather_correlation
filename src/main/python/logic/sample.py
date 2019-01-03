@@ -21,8 +21,8 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
                            self.__dict__['label_{}'.format(factor)],
                            'rs_{}_va'.format(factor))
 
-        # self.text_factor_0.setPlaceholderText('kek')
         self.title_label.setText("Образец {}".format(self.sample.name))
+        self.textEdit.setText('Лол Кек Чебурек')
 
     def save_report(self):
         # fname = dialog_save(self, "Сохранить отчет")
