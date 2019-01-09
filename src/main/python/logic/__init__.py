@@ -42,6 +42,10 @@ class QFrameBase(QFrame):
         """
         принимает PIL-изображение и рисует на img-label картинку:
         добавляет необходимые объекты в корневой объект и конфигурирует лейбл
+        ВАЖНО!
+        label.sizePolicy: Expanding, Maximum
+        label_layout.layoutSizeConstraint.SetDefaultSizeConstraint
+        ВАЖНО!
         :param img_obj: PIL-изображение для рисование
         :param img_label: лейбл, на котором рисовать
         :param img_name: имя объекта изображения - должно быть уникальным в self.__dict__
@@ -57,5 +61,6 @@ class QFrameBase(QFrame):
         img_label.installEventFilter(main_window)
         img_label._pixmap = pixmap
         # img_label.setPixmap(pixmap)
+        img_label._updating = False
         img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(200, 200))

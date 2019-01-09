@@ -78,8 +78,8 @@
            <item>
             <widget class="QLabel" name="factors_label">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>1</horstretch>
+              <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+               <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>

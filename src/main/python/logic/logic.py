@@ -121,8 +121,12 @@ class Main(Ui_MainBaseForm):
 
     def eventFilter(self, widget, event):
         if event.type() == QEvent.Resize and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
-            widget.setPixmap(widget._pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            # ratio = widget.height() / widget.width()
-            # widget.setMinimumHeight(widget.width() * ratio + 2)
+            if widget._updating:
+                widget.setPixmap(widget._pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                widget._updating = False
+            else:
+                widget._updating = True
+                ratio = widget._pixmap.height() / widget._pixmap.width()
+                widget.setMinimumHeight(widget.width() * ratio + 2)
             return True
         return QMainWindow.eventFilter(self, widget, event)
