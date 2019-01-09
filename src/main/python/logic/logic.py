@@ -1,7 +1,7 @@
 import matplotlib
 
 from PyQt5.QtWidgets import QHBoxLayout, QWidget, QLabel, QMainWindow
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import QEvent, Qt, QSize
 
 from form import Ui_MainBaseForm
 
@@ -41,6 +41,29 @@ class Main(Ui_MainBaseForm):
 
         self.set_data_frame(QFrameDefault)
         self.show()
+        # тестовый скрипт (для удобства)
+        self.startup()
+
+    def startup(self):
+        self.add_sample(r'src/main/python/science/samples/1_1.xlsx')
+        self.add_std(r'src/main/python/science/samples/BX_62.txt')
+
+        self.sample_list.setCurrentRow(0)
+        self.std_list.setCurrentRow(0)
+
+    def add_sample(self, fname):
+        try:
+            sample = Sample.from_file(fname)
+        except Sample.SampleError as e:
+            # TODO: всплывающее окно
+            print(e.args[0])
+            return
+        self.sample_list.addItem(sample.name)
+
+    def add_std(self, fname):
+        std = fname[fname.rfind('/') + 1:fname.rfind('.')]
+        Standard.from_file(fname, std)
+        self.std_list.addItem(std)
 
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
@@ -65,9 +88,7 @@ class Main(Ui_MainBaseForm):
     # КНОПКИ
     def add_std_btn_clicked(self):
         fname = dialog_open(self, " Выбрать эталон")
-        std = fname[fname.rfind('/') + 1:fname.rfind('.')]
-        Standard.from_file(fname, std)
-        self.std_list.addItem(std)
+        self.add_std(fname)
 
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
@@ -81,13 +102,7 @@ class Main(Ui_MainBaseForm):
 
     def add_sample_btn_clicked(self):
         fname = dialog_open(self, "Выбрать файл пациента")
-        try:
-            sample = Sample.from_file(fname)
-        except Sample.SampleError as e:
-            # TODO: всплывающее окно
-            print(e.args[0])
-            return
-        self.sample_list.addItem(sample.name)
+        self.add_sample(fname)
 
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()
@@ -106,6 +121,8 @@ class Main(Ui_MainBaseForm):
 
     def eventFilter(self, widget, event):
         if event.type() == QEvent.Resize and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
-            widget.setPixmap(widget._pixmap.scaled(widget.width(), widget.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            widget.setPixmap(widget._pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            # ratio = widget.height() / widget.width()
+            # widget.setMinimumHeight(widget.width() * ratio + 2)
             return True
         return QMainWindow.eventFilter(self, widget, event)
