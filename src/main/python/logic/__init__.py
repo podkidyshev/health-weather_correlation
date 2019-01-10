@@ -1,15 +1,19 @@
 import os
 import sys
 
-from PIL.ImageQt import ImageQt
-
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QFrame, QFileDialog
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel
 
 
 root = os.path.dirname(sys.argv[0])
+main_window = None
 samples = os.path.join(root, "science", "samples")
+
+
+def set_main_window(window):
+    global main_window
+    main_window = window
 
 
 def dialog_open(parent, title, path=samples):
@@ -34,24 +38,29 @@ class QFrameBase(QFrame):
         self.setMinimumSize(QSize(500, 250))
         self.layout().setContentsMargins(0, 0, 0, 0)
 
-    def add_image(self, img_obj, img_label, canvas_name, **kwargs):
+    def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
         """
         принимает PIL-изображение и рисует на img-label картинку:
         добавляет необходимые объекты в корневой объект и конфигурирует лейбл
+        ВАЖНО!
+        label.sizePolicy: Expanding, Maximum
+        label_layout.layoutSizeConstraint.SetDefaultSizeConstraint
+        ВАЖНО!
         :param img_obj: PIL-изображение для рисование
         :param img_label: лейбл, на котором рисовать
-        :param canvas_name: имя объекта канваса - должно быть уникальным
-        :param kwargs: на всякий случай
+        :param img_name: имя объекта изображения - должно быть уникальным в self.__dict__
         :return: None
         """
-        img_name = canvas_name + 'img'
+        if img_name in self.__dict__:
+            raise QFrameBase.QFrameBaseException('img_name должно быть уникальным')
 
-        if img_name in self.__dict__ or canvas_name in self.__dict__:
-            raise QFrameBase.QFrameBaseException('img_name и canvas_name должны быть уникальны')
+        pixmap = QPixmap()
+        pixmap.loadFromData(img_obj)
+        self.__dict__[img_name] = pixmap
 
-        self.__dict__[img_name] = QImage(ImageQt(img_obj))
-        self.__dict__[canvas_name] = QPixmap.fromImage(self.__dict__[img_name])
-
-        img_label.setPixmap(self.__dict__[canvas_name])
-        img_label.setScaledContents(True)
+        img_label.installEventFilter(main_window)
+        img_label._pixmap = pixmap
+        # img_label.setPixmap(pixmap)
+        img_label._updating = False
+        img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(200, 200))
