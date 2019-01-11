@@ -1,8 +1,17 @@
 """
+len_ampl(x) - вычисление числа ненулевых элементов временного ряда
+index(x) -  вычисление индексов ненулевых элементов временного ряда
 sequence_max(x) - вычисление максимумов временного ряда x
+sequence_max0(x) -  вычисление индикаторов 1 максимумов временного ряда
+sequence_max1(x,v) - вычисление максимумов временного ряда с ограничением амплитуды
+sequence_max_ampl(x,v) - вычисление индикаторов 1 максимумов временного ряда с ограничением амплитуды
 sequence_distance(x, y, insert_zero) - вычисление расстояний от максимумов образца x до ближайшего максимума эталона y (c добавлением 0 в начало списка x или без)
-(-)func(x, y) - Суммирование элементов двух разных списков
+# sequence_distance(x, y) - вычисление расстояний от максимумов образца x до ближайшего максимума эталона y
+norm_serie(x) - Нормализация временного ряда
+delta_serie(x) - Приращения временного ряда
+(-)func(x, y) - Суммирование почленное элементов двух разных списков
 sum_list(x) - Почленное суммирование списков списка
+sum_max_lists(x) -  Почленное суммирование индикаторов 1 максимумов списков списка
 concat_list(x) - Конкатенация списков списка x
 stat_analysis_distances(x,y) - Статистический анализ ряда распределений расстояний от x до y
 stat_analysis(z) - Статистический анализ ряда распределений z
@@ -40,11 +49,63 @@ def distrib(x):
     return y
 
 
+def len_ampl(x):
+    """вычисление числа ненулевых элементов временного ряда"""
+    y = 0
+    for i in range(len(x)):
+        if x[i] != 0:
+            y +=1
+    return y
+
+
+def index(x):
+    """вычисление индексов ненулевых элементов временного ряда"""
+    y = []
+    for i in range(len(x)):
+        if x[i] != 0:
+            y.append(i)
+    return y
+
+
+
 def sequence_max(x):
     """Вычисление максимумов временного ряда"""
     y = []
     for i in range(1, len(x) - 1):
         if x[i - 1] <= x[i] and x[i + 1] <= x[i]:
+            y.append(1)
+        else:
+            y.append(0)
+    return y
+
+
+def sequence_max0(x):
+    """вычисление индикаторов 1 максимумов временного ряда"""
+    y = []
+    for i in range(1, len(x) - 1):
+        if x[i - 1] <= x[i] and x[i + 1] <= x[i]:
+            y.append(1)
+        else:
+            y.append(0)
+    return y
+
+
+def sequence_max1(x,v):
+    """вычисление максимумов временного ряда с ограничением амплитуды"""
+    y = []
+    for i in range(1, len(x) - 1):
+        if x[i - 1] <= x[i] and x[i + 1] <= x[i] and x[i] > v:
+            y.append(x[i])
+        else:
+            y.append(0)
+    return y
+
+
+def sequence_max_ampl(x,v):
+    """вычисление индикаторов 1 максимумов временного ряда с ограничением амплитуды"""
+    y = []
+    for i in range(1, len(x) - 1):
+        if x[i - 1] <= x[i] and x[i + 1] <= x[i] and x[i] > v:
             y.append(1)
         else:
             y.append(0)
@@ -78,11 +139,63 @@ def sequence_distance(x, y, *, insert_zero):
     return u
 
 
+# #"-" максимум эталона находится слева, "+" максимум эталона находится справа
+# def sequence_distance(x, y):
+#     """вычисление расстояний от максимумов образца до ближайшего максимума эталона"""
+#     u = []
+#     for i in range(len(x)):
+#         if x[i] != 0:
+#             for j in range(len(y)):
+#                 if (i - j >= 0 and y[i - j] != 0) and (i + j < len(y) and y[i + j] != 0):
+#                     if j == 0:
+#                         u.append(j)
+#                     else:
+#                         u.append(j)
+#                         u.append(-j)
+#                     break
+#                 elif (i - j >= 0 and y[i - j] != 0) :
+#                     u.append(j)
+#                     break
+#                 elif (i + j < len(y)  and y[i + j] != 0):
+#                     u.append(-j)
+#                     break
+#     return u
+
+
+def norm_serie(x):
+    """Нормализация временного ряда"""
+    y = []
+    for i in range(len(x)):
+        y.append((x[i] - min(x))/(max(x) - min(x)))
+    return y
+
+
+def delta_serie(x):
+    """Приращения временного ряда"""
+    y = []
+    for i in range(1, len(x)):
+        y.append((x[i] - x[i - 1]))
+    return y
+
+
+def func(x, y):
+    """ Суммирование почленное элементов двух разных списков """
+    return x + y
+
+
 def sum_list(x):
     """Почленное суммирование списков списка"""
     y = [0] * len(x[0])
     for i in range(len(x)):
         y = list(map(add, y, x[i]))
+    return y
+
+
+def sum_max_lists(x):
+    """Почленное суммирование индикаторов 1 максимумов списков списка"""
+    y = sequence_max0(x[0])
+    for i in range(1, len(x)):
+        y = list(map(func, y, sequence_max0(x[i])))
     return y
 
 
