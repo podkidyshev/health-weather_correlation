@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
+    <width>1003</width>
     <height>491</height>
    </rect>
   </property>
@@ -229,12 +229,12 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
      <item>
-      <layout class="QHBoxLayout" name="common_layout" stretch="0,0,0,0">
+      <layout class="QHBoxLayout" name="common_layout" stretch="0,0,0,0,0,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
        </property>
        <item>
-        <widget class="QLabel" name="slave_label">
+        <widget class="QLabel" name="lead_label">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -255,10 +255,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="slave_box"/>
+        <widget class="QComboBox" name="lead_box"/>
        </item>
        <item>
-        <widget class="QLabel" name="lead_label">
+        <widget class="QLabel" name="slave_label">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -279,7 +279,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="lead_box">
+        <widget class="QComboBox" name="slave_box">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -287,6 +287,24 @@
           </sizepolicy>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="factor_label">
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Фактор</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="factor_box"/>
        </item>
       </layout>
      </item>
