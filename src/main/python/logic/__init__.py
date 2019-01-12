@@ -35,7 +35,7 @@ class QFrameBase(QFrame):
         QFrame.__init__(self, parent=parent)
         child_frame_class.setupUi(self, self)
         self.resize(500, 500)
-        self.setMinimumSize(QSize(500, 250))
+        self.setMinimumSize(QSize(500, 500))
         self.layout().setContentsMargins(0, 0, 0, 0)
 
     def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
@@ -58,9 +58,24 @@ class QFrameBase(QFrame):
         pixmap.loadFromData(img_obj)
         self.__dict__[img_name] = pixmap
 
-        img_label.installEventFilter(main_window)
         img_label._pixmap = pixmap
         img_label.setPixmap(pixmap.scaled(img_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         img_label._updating = False
         img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(200, 200))
+
+        img_label.installEventFilter(main_window)
+        img_label.updateGeometry()
+
+    def add_text(self, text: str, text_edit):
+        # scroll area: лейаут, ей содержащий - layoutSizeConstraint->SetMinimumSize
+        # у самого лейаута scroll area то же самое
+        text_edit.setFontPointSize(13)
+        text_edit.insertPlainText(text)
+        text_edit.verticalScrollBar().setEnabled(False)
+
+        text_edit._custom = True
+        text_edit._updating = False
+
+        text_edit.installEventFilter(main_window)
+        text_edit.setMinimumHeight(200)

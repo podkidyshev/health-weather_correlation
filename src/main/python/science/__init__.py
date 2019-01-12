@@ -1,8 +1,9 @@
 import os
+import types
+from io import BytesIO
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5 import FigureCanvasQT
-
-from io import BytesIO
 
 from docx import Document
 from docx.shared import Cm
@@ -20,8 +21,9 @@ class XLSXParseError(ValueError):
     pass
 
 
+# noinspection PyTypeChecker,PyUnresolvedReferences
 class Printer:
-    def __init__(self, destination):
+    def __init__(self, destination, func, *args):
         self.destination = destination
         if self.destination == 'doc':
             self.doc = Document()
@@ -29,18 +31,24 @@ class Printer:
             self.doc = ''
         else:
             raise ValueError("Неизвестное назначение")
+        func(*args, self)
 
-    def save(self, filename):
-        if self.destination == 'doc':
-            save_docx(self.doc, filename)
-        else:
-            raise ValueError("Нельзя сохранить не docx документ")
-        return True
-
-    def print(self):
+    def print(self, destination_obj=None):
         if self.destination == 'ui':
             return self.doc
-        raise ValueError("Нелья вернуть docx документ для ui'ая")
+            # destination_obj.setFontPointSize(14)
+            # destination_obj.insertPlainText(self.doc)
+            #
+            # destination_obj.installEventFilter
+            # # destination_obj.resizeEvent = types.MethodType(resizeEvent, destination_obj)
+            # # line_count = destination_obj.document().lineCount() + 2
+            # # metrics = QFontMetrics(destination_obj.currentFont())
+            # # line_spacing = metrics.lineSpacing()
+            # # height = line_count * line_spacing
+            # # destination_obj.setFixedHeight(height)
+        else:
+            save_docx(self.doc, destination_obj)
+            return True
 
     def add_heading(self, s, size):
         if self.destination == 'doc':
@@ -57,6 +65,10 @@ class Printer:
     def add_picture(self, pic):
         if self.destination == 'doc':
             self.doc.add_picture(pic)
+
+
+def print_report(destination, func, *args):
+    return Printer(destination, func, *args).print()
 
 
 def is_float(s: str):

@@ -1,8 +1,5 @@
 import numpy as np
 import scipy.stats as stats
-import matplotlib.pyplot as plt
-
-from docx import Document
 
 import science
 
