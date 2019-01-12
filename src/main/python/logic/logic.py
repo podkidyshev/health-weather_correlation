@@ -47,9 +47,6 @@ class Main(Ui_MainBaseForm):
     def startup(self):
         self.add_sample(r'src/main/python/science/samples/1_1.xlsx')
         self.add_std(r'src/main/python/science/samples/BX_62.txt')
-        self.lead_box.addItems([' ', '1_1', 'BX_62'])
-        self.slave_box.addItems([' ', '1_1', 'BX_62'])
-        self.factor_box.addItem(' ')
 
         self.sample_list.setCurrentRow(0)
         self.std_list.setCurrentRow(0)
@@ -62,11 +59,21 @@ class Main(Ui_MainBaseForm):
             print(e.args[0])
             return
         self.sample_list.addItem(sample.name)
+        self.add_to_box()
 
     def add_std(self, fname):
         std = fname[fname.rfind('/') + 1:fname.rfind('.')]
         Standard.from_file(fname, std)
         self.std_list.addItem(std)
+        self.add_to_box()
+
+    def add_to_box(self):
+        self.lead_box.clear()
+        self.slave_box.clear()
+        std_items = ['Погода: ' + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
+        sample_items = ['Образец: ' + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+        self.lead_box.addItems([' '] + std_items + sample_items)
+        self.slave_box.addItems([' '] + std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
