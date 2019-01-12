@@ -129,4 +129,5 @@ class Main(Ui_MainBaseForm):
                 ratio = widget._pixmap.height() / widget._pixmap.width()
                 widget.setMinimumHeight(widget.width() * ratio + 2)
             return True
+        # noinspection PyCallByClass,PyTypeChecker
         return QMainWindow.eventFilter(self, widget, event)

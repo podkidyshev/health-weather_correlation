@@ -20,10 +20,43 @@ class XLSXParseError(ValueError):
     pass
 
 
-def nnone(arr):
-    for idx, el in enumerate(arr):
-        if el is not None:
-            yield idx, el
+class Printer:
+    def __init__(self, destination):
+        self.destination = destination
+        if self.destination == 'doc':
+            self.doc = Document()
+        elif self.destination == 'ui':
+            self.doc = ''
+        else:
+            raise ValueError("Неизвестное назначение")
+
+    def save(self, filename):
+        if self.destination == 'doc':
+            save_docx(self.doc, filename)
+        else:
+            raise ValueError("Нельзя сохранить не docx документ")
+        return True
+
+    def print(self):
+        if self.destination == 'ui':
+            return self.doc
+        raise ValueError("Нелья вернуть docx документ для ui'ая")
+
+    def add_heading(self, s, size):
+        if self.destination == 'doc':
+            self.doc.add_heading(s, size)
+        else:
+            self.doc += '\n-- {} --\n'.format(s)
+
+    def add_paragraph(self, s):
+        if self.destination == 'doc':
+            self.doc.add_paragraph(s)
+        else:
+            self.doc += s + '\n'
+
+    def add_picture(self, pic):
+        if self.destination == 'doc':
+            self.doc.add_picture(pic)
 
 
 def is_float(s: str):

@@ -60,7 +60,7 @@ class QFrameBase(QFrame):
 
         img_label.installEventFilter(main_window)
         img_label._pixmap = pixmap
-        # img_label.setPixmap(pixmap)
+        img_label.setPixmap(pixmap.scaled(img_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         img_label._updating = False
         img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(200, 200))

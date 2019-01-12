@@ -57,7 +57,7 @@ def test_normal(x: list, *, qq: bool):
     return report
 
 
-def get_report(report, doc: Document):
+def get_report(report, doc: science.Printer):
     res_ok = "Образец выглядит гауссовским (не может отклонить гипотезу H0)"
     res_nok = "Образец не выглядит гауссовским (отклонить гипотезу H0)"
 
