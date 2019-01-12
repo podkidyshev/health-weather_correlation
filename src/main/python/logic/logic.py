@@ -1,8 +1,8 @@
+import os
 import matplotlib
 
 from PyQt5.QtWidgets import QHBoxLayout, QWidget, QLabel, QMainWindow, QTextEdit
 from PyQt5.QtCore import QEvent, Qt
-from PyQt5.QtGui import QResizeEvent
 
 from form import Ui_MainBaseForm
 
@@ -35,13 +35,8 @@ class Main(Ui_MainBaseForm):
         self.add_sample_btn.clicked.connect(self.add_sample_btn_clicked)
         self.del_sample_btn.clicked.connect(self.del_sample_btn_clicked)
         # Кастомные фреймы
-        self.lead_box.activated.connect(self.choose_data_frame)
+        self.lead_box.activated.connect(self.lead_box_activated)
         self.slave_box.activated.connect(self.choose_data_frame)
-        self.factor_box.activated.connect(self.choose_data_frame)
-        """""
-        self.sample_list.itemClicked.connect(self.choose_data_frame)
-        self.std_list.itemClicked.connect(self.choose_data_frame)
-        """""
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
 
@@ -51,11 +46,13 @@ class Main(Ui_MainBaseForm):
         self.startup()
 
     def startup(self):
-        self.add_sample(r'src/main/python/science/samples/1_1.xlsx')
-        self.add_std(r'src/main/python/science/samples/BX_60.txt')
-
-        self.sample_list.setCurrentRow(0)
-        self.std_list.setCurrentRow(0)
+        if os.path.exists(r'src/main/python/science/samples/'):
+            for group in '123':
+                for idx in '123456':
+                    self.add_sample(r'src/main/python/science/samples/{}_{}.xlsx'.format(group, idx))
+            for entry in os.listdir(r'src/main/python/science/samples/'):
+                if entry[-3:] == 'txt':
+                    self.add_std(r'src/main/python/science/samples/{}'.format(entry))
 
     def add_sample(self, fname):
         try:
@@ -65,24 +62,20 @@ class Main(Ui_MainBaseForm):
             print(e.args[0])
             return
         self.sample_list.addItem(sample.name)
-        self.add_to_box()
+        self.update_boxes()
 
     def add_std(self, fname):
         std = fname[fname.rfind('/') + 1:fname.rfind('.')]
         Standard.from_file(fname, std)
         self.std_list.addItem(std)
-        self.add_to_box()
+        self.update_boxes()
 
-    def add_to_box(self):
+    def update_boxes(self):
         self.lead_box.clear()
         self.slave_box.clear()
-        self.factor_box.clear()
-        self.factor_box.addItems([" ", "Без нагрузки", "С физической нагрузкой", "С эмоциональной нагрузкой",
-                                  "После отдыха"])
         std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
-        self.lead_box.addItems([" "] + std_items + sample_items)
-        self.slave_box.addItems([" "] + std_items + sample_items)
+        self.lead_box.addItems(std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
@@ -93,25 +86,32 @@ class Main(Ui_MainBaseForm):
         self.data_layout.insertWidget(0, self.data_frame)
 
     def choose_data_frame(self):
-        #selected_std = self.std_list.currentItem()
-        #selected_sample = self.sample_list.currentItem()
-        selected_std = self.lead_box.currentText().split(' ')[1]
-        selected_sample = self.slave_box.currentText().split(' ')[1]
-        selected_factor = self.factor_box.currentText()
-        if selected_std is None or selected_std == "":
-            # TODO: всплывающее окно
-            print('Выберите эталон!')
-        elif selected_sample is None or selected_sample == "":
-            # TODO: выберите образец
-            print('Выберите образец!')
-        elif selected_factor is None:
-            # TODO: выберите фактор
-            print('Выберите фактор!')
+        lead = self.lead_box.currentText().split(' ')[1]
+        slave = self.slave_box.currentText().split(' ')[1]
+
+        if lead in Standard.standards and slave in Sample.samples:
+            self.set_data_frame(QFrameSample, lead, slave)
+        elif lead in Standard.standards and slave == 'Образец: --Групповой--':
+            self.set_data_frame(QFrameSample, lead, Sample.group)
+        elif lead in Standard.standards and slave == 'Образец: --Все образцы--':
+            print('фрейм для MulStandardsMulSamples')
+        elif lead in Sample.samples and slave in Standard.standards:
+            print('ведущий ряд - образец, ведомый ряд - погода')
         else:
-            self.set_data_frame(QFrameSample, selected_sample, selected_std, selected_factor)
-            #self.set_data_frame(QFrameSample, selected_sample.text(), selected_std.text())
+            raise ValueError('Неизвестный случай')
 
     # КНОПКИ
+    def lead_box_activated(self):
+        lead_type = self.lead_box.currentText().split(' ')[0]
+        if lead_type == 'Образец:':
+            items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
+        elif lead_type == 'Погода:':
+            items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+        else:
+            raise ValueError('Неизвестный тип данных')
+        self.slave_box.clear()
+        self.slave_box.addItems(items)
+
     def add_std_btn_clicked(self):
         fname = dialog_open(self, " Выбрать эталон")
         self.add_std(fname)
@@ -125,6 +125,7 @@ class Main(Ui_MainBaseForm):
         self.std_list.takeItem(self.std_list.currentRow())
         Standard.delete(Standard.standards[std])
         self.set_data_frame(QFrameDefault)
+        self.update_boxes()
 
     def add_sample_btn_clicked(self):
         fname = dialog_open(self, "Выбрать файл пациента")
@@ -140,6 +141,7 @@ class Main(Ui_MainBaseForm):
         self.sample_list.takeItem(self.sample_list.currentRow())
         Sample.delete(Sample.samples[sample])
         self.set_data_frame(QFrameDefault)
+        self.update_boxes()
 
     def report_btn_clicked(self):
         if hasattr(self.data_frame, "save_report"):

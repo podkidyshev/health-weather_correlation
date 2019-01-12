@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\form.ui'
+# Form implementation generated from reading ui file 'src/main\python/ui/form.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -154,16 +154,6 @@ class Ui_MainBaseForm(object):
         self.slave_box.setSizePolicy(sizePolicy)
         self.slave_box.setObjectName("slave_box")
         self.common_layout.addWidget(self.slave_box)
-        self.factor_label = QtWidgets.QLabel(MainBaseForm)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        self.factor_label.setFont(font)
-        self.factor_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.factor_label.setObjectName("factor_label")
-        self.common_layout.addWidget(self.factor_label)
-        self.factor_box = QtWidgets.QComboBox(MainBaseForm)
-        self.factor_box.setObjectName("factor_box")
-        self.common_layout.addWidget(self.factor_box)
         self.verticalLayout.addLayout(self.common_layout)
         self.data_layout = QtWidgets.QVBoxLayout()
         self.data_layout.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
@@ -196,6 +186,5 @@ class Ui_MainBaseForm(object):
         self.add_sample_btn.setText(_translate("MainBaseForm", "Добавить"))
         self.lead_label.setText(_translate("MainBaseForm", "Ведущий ряд"))
         self.slave_label.setText(_translate("MainBaseForm", "Ведомый ряд"))
-        self.factor_label.setText(_translate("MainBaseForm", "Фактор"))
         self.report_btn.setText(_translate("MainBaseForm", "Сформировать отчёт"))
 

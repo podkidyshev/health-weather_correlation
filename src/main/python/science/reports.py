@@ -10,7 +10,7 @@ class FactorSampleStandard:
         self.factor = factor
         self.std = std
 
-        self.distance = sequence_distance(sample.seq_max[factor], std.seq_max)
+        self.distance = sequence_distance_1(sample.seq_max[factor], std.seq_max)
         self.va = plot_image(visual_analysis, self.distance)
         self.ntest = test_normal(self.distance, qq=False)
         self.stat = stat_analysis(self.distance)
@@ -23,7 +23,7 @@ class FactorSampleStandard:
         doc.add_heading("Образец {}, фактор {}. Эталон {}"
                         .format(self.sample.name, factor_name, self.std.name), 0)
 
-        if doc.destination == 'docx':
+        if doc.destination == 'doc':
             doc.add_heading("Список значений эталона", 1)
             doc.add_paragraph("Количество значений равно = {}".format(len(y)))
             doc.add_paragraph(str(y))
@@ -51,7 +51,7 @@ class FactorSampleStandard:
         doc.add_heading("Результаты тестирования нлрмальности распределения расстояний фактор-образца", 1)
         get_report(self.ntest, doc)
 
-        if doc.destination == 'docx':
+        if doc.destination == 'doc':
             doc.add_heading("Результат визуального анализа распределения расстояний фактор-образца", 1)
             doc.add_picture(self.va)
 
@@ -61,7 +61,7 @@ class SampleStandard:
         self.sample = sample
         self.std = std
 
-        self.distance = [sequence_distance(sample.seq_max[factor], std.seq_max) for factor in range(4)]
+        self.distance = [sequence_distance_1(seq_max, std.seq_max) for seq_max in sample.seq_max]
         self.kde = plot_image(graph_kde, self.distance)
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
@@ -72,47 +72,78 @@ class SampleStandard:
         self.stat3 = [stat_analysis(xr) for xr in self.distance3]
         self.ntest3 = [test_normal(xr, qq=False) for xr in self.distance3]
 
-    def get_report(self):
-        """
-print("Построение кривой Гаусса и 4-х ядерных оценок плотности 4-х фактор-образцов для первого пациента и первого эталона")
-graph_kde(sequence_distance(sequence_max(sample[0]), sequence_max(standart[0])), sequence_distance(sequence_max(sample_n[0]), sequence_max(standart[0])), sequence_distance(sequence_max(sample_o[0]), sequence_max(standart[0])), sequence_distance(sequence_max(sample_e[0]), sequence_max(standart[0])))
+    def get_report(self, doc: Printer):
+        doc.add_heading("Пациент {}. Эталон {}".format(self.sample.name, self.std.name), 0)
 
-print("Результаты  визуального анализа и тестирования нормальности для фактор-образца без нагрузки для всех пациентов и всех эталонов")
+        doc.add_heading("Список значений эталона", 1)
+        doc.add_paragraph("Количество значений равно = {}".format(len(self.std.data)))
+        doc.add_paragraph(str(self.std.data))
 
-for i in range(n_standart):
-    for j in range(n_sample): print("Результаты визуального анализа распределения фактор-образца без нагрузки пациента", j, "для эталона ", i, "\n",visual_analysis(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
-    for j in range(n_sample): print("Результаты тестирования нормальности распределения фактор-образца без нагрузки пациента", j, "для эталона ", i, "\n", test_normal(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
+        doc.add_heading("Список максимумов эталона:", 1)
+        doc.add_paragraph("Количество значений равно = {}".format(str(len(self.std.seq_max))))
+        doc.add_paragraph(str(self.std.seq_max))
+        doc.add_paragraph('')
 
+        for factor, x, x_seq_max in zip(range(4), self.sample.data, self.sample.seq_max):
+            doc.add_paragraph("Список значений образца {}:".format(FACTORS[factor]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(x)))
+            doc.add_paragraph(str(x))
 
-print("Результаты статистического  анализа распределения фактор-образца без нагрузки  для всех пациентов и всех эталонов")
+            doc.add_paragraph("Список максимумов значений образца {}:".format(FACTORS[factor]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(x_seq_max)))
+            doc.add_paragraph(str(x_seq_max))
+            doc.add_paragraph('')
 
-for i in range(n_standart):
-    for j in range(n_sample): print("Результаты статистического о анализа распределения фактор-образца без нагрузки пациента", j, "для эталона ", i, "\n", "[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] =  ", "\n", stat_analys(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
+        doc.add_heading(
+            "Ряды расстояний и распределения расстояний от максимумов образца до ближайшего максимума эталона", 1)
+        for factor, xr in zip(FACTORS, self.distance):
+            doc.add_paragraph(
+                "Ряд расстояний от максимумов образца {} до ближайшего максимума эталона:".format(factor.lower()))
+            doc.add_paragraph(str(xr))
+            doc.add_paragraph('')
 
-print("Построение 3-х ядерных оценок плотности и кривой Гаусса для сравнения распределения расстояний от фактор-образцов (с физ.нагрузкой, после отдыха, с эмоц.нагрузкой) до исходного стандарта - фактор-образца (без нагрузки) для первого образца")
+        doc.add_heading("Построение кривой Гаусса и 4-х ядерных оценок плотности 4-х "
+                        "фактор-образцов для первого пациента и первого эталона", 1)
+        doc.add_picture(self.kde)
 
-graph_kde3(sequence_distance1(sequence_max(sample_n[0]), sequence_max(sample[0])), sequence_distance1(sequence_max(sample_o[0]), sequence_max(sample[0])), sequence_distance1(sequence_max(sample_e[0]), sequence_max(sample[0])))
+        doc.add_heading("Результаты визуального анализа и тестирования нормальности", 1)
+        for factor, va, ntest in zip(FACTORS, self.va, self.ntest):
+            doc.add_paragraph("Результаты визуального анализа образца {}".format(factor.lower()))
+            doc.add_picture(va)
+            get_report(ntest, doc)
 
-print("Результаты статистического группового анализа распределения расстояний от фактор-образцов (с физ.нагрузкой, после отдыха, с эмоц.нагрузкой) до исходного стандарта - фактор-образца (без нагрузки)  для первого образца")
+        doc.add_heading("Результаты статистического анализа распределения образца", 1)
+        for factor, stat in zip(FACTORS, self.stat):
+            doc.add_paragraph("Результаты статистического анализа распределения образца {}".format(factor.lower()))
+            doc.add_paragraph("\tвыборочное среднее = {:.4f}".format(stat[0]))
+            doc.add_paragraph("\tстандартное отклонение = {:.4f}".format(stat[1]))
+            doc.add_paragraph("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*stat[2]))
 
-print("С физической нагрузкой - без нагрузки: [Выборочное среднее, Стандартное отклонение,  Доверительный интервал] = ", "\n", stat_analys(sequence_distance1(sequence_max(sample_n[0]), sequence_max(sample[0]))), "\n", "После отдыха - без нагрузки: [Выборочное среднее, Стандартное отклонение,  Доверительный интервал] = ", "\n", stat_analys(sequence_distance1(sequence_max(sample_o[0]), sequence_max(sample[0]))), "\n", "С эмоциональной нагрузкой - без нагрузки: [Выборочное среднее, Стандартное отклонение,  Доверительный интервал] = ", "\n", stat_analys(sequence_distance1(sequence_max(sample_e[0]), sequence_max(sample[0]))))
+        doc.add_heading("Построение 3-х ядерных оценок плотности и кривой Гаусса для сравнения распределения "
+                        "расстояний от фактор-образцов (с физ.нагрузкой, после отдыха, с эмоц.нагрузкой) до "
+                        "исходного стандарта – фактор-образца (без нагрузки)", 1)
+        doc.add_picture(self.kde3)
 
-"Результаты статистического анализа распределения расстояний от фактор-образцов (с физ.нагрузкой, после отдыха, с эмоц.нагрузкой) до исходного стандарта - фактор-образца (без нагрузки)   для всех образцов"
+        self.get_report_stat3(doc)
+        self.get_report_ntest3(doc)
 
-for i in range(len(sample)):
-    print("С физической нагрузкой - без нагрузки образца ", i, "\n", "[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] = ", "\n", stat_analys(sequence_distance1(sequence_max(sample_n[i]), sequence_max(sample[i]))), "\n", "После отдыха - без нагрузки образца ", i, "\n", " [Выборочное среднее, Стандартное отклонение,  Доверительный интервал] = ", "\n", stat_analys(sequence_distance1(sequence_max(sample_o[i]), sequence_max(sample[i]))), "\n", "С эмоциональной нагрузкой - без нагрузки образца ", i, "\n", " [Выборочное среднее, Стандартное отклонение,  Доверительный интервал] = ", "\n", stat_analys(sequence_distance1(sequence_max(sample_e[i]), sequence_max(sample[i]))))
+    def get_report_stat3(self, doc: Printer):
+        doc.add_heading("Результаты статистического группового анализа распределения расстояний от фактор-образцов "
+                        "(с физ.нагрузкой, после отдыха, с эмоц.нагрузкой) до исходного стандарта – фактор-образца "
+                        "(без нагрузки)", 1)
+        for factor, stat in zip(FACTORS, self.stat3):
+            doc.add_paragraph("Результаты статистического группового анализа распределения расстояний от "
+                              "фактора {}".format(factor.lower()))
+            doc.add_paragraph("\tвыборочное среднее = {:.4f}".format(stat[0]))
+            doc.add_paragraph("\tстандартное отклонение = {:.4f}".format(stat[1]))
+            doc.add_paragraph("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*stat[2]))
 
-"Тестирование нормальности распределения расстояний от факторов (с физ.нагрузкой, после отдыха, с эмоц.нагрузкой) до исходного стандарта - фактор-образца (без нагрузки) для всех образцов"
-
-for i in range(len(sample)):
-    print("Результаты тестирования нормальности распределения с физической нагрузкой - без нагрузки образца", i)
-    print(test_normal(sequence_distance1(sequence_max(sample_n[0]), sequence_max(sample[0]))))
-    print("Результаты тестирования нормальности распределения после отдыха - без нагрузки образца", i)
-    print(test_normal(sequence_distance1(sequence_max(sample_o[0]), sequence_max(sample[0]))))
-    print("Результаты тестирования нормальности распределения с эмоциональной нагрузкой - без нагрузки образца", i)
-    print(test_normal(sequence_distance1(sequence_max(sample_e[0]), sequence_max(sample[0]))))
-
-        """
+    def get_report_ntest3(self, doc: Printer):
+        doc.add_heading("Тестирование нормальности распределения расстояний от факторов (с физ.нагрузкой, после отдыха,"
+                        " с эмоц.нагрузкой) до исходного стандарта – фактор-образца (без нагрузки)", 1)
+        for factor, ntest in zip(FACTORS, self.ntest3):
+            doc.add_paragraph("Тестирование нормальности распределения расстояний от фактора {}".format(factor.lower()))
+            get_report(ntest, doc)
 
 
 class MulSamplesStandard:

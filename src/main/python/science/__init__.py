@@ -1,5 +1,4 @@
 import os
-import types
 from io import BytesIO
 
 from matplotlib.figure import Figure
@@ -36,16 +35,6 @@ class Printer:
     def print(self, destination_obj=None):
         if self.destination == 'ui':
             return self.doc
-            # destination_obj.setFontPointSize(14)
-            # destination_obj.insertPlainText(self.doc)
-            #
-            # destination_obj.installEventFilter
-            # # destination_obj.resizeEvent = types.MethodType(resizeEvent, destination_obj)
-            # # line_count = destination_obj.document().lineCount() + 2
-            # # metrics = QFontMetrics(destination_obj.currentFont())
-            # # line_spacing = metrics.lineSpacing()
-            # # height = line_count * line_spacing
-            # # destination_obj.setFixedHeight(height)
         else:
             save_docx(self.doc, destination_obj)
             return True
@@ -54,7 +43,7 @@ class Printer:
         if self.destination == 'doc':
             self.doc.add_heading(s, size)
         else:
-            self.doc += '\n-- {} --\n'.format(s)
+            self.doc += '-- {} --\n\n'.format(s)
 
     def add_paragraph(self, s):
         if self.destination == 'doc':
@@ -62,9 +51,9 @@ class Printer:
         else:
             self.doc += s + '\n'
 
-    def add_picture(self, pic):
+    def add_picture(self, pic: bytes or bytearray):
         if self.destination == 'doc':
-            self.doc.add_picture(pic)
+            self.doc.add_picture(BytesIO(pic))
 
 
 def print_report(destination, func, *args):

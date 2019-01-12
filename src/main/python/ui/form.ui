@@ -229,7 +229,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
      <item>
-      <layout class="QHBoxLayout" name="common_layout" stretch="0,0,0,0,0,0">
+      <layout class="QHBoxLayout" name="common_layout" stretch="0,0,0,0">
        <property name="sizeConstraint">
         <enum>QLayout::SetMinimumSize</enum>
        </property>
@@ -287,24 +287,6 @@
           </sizepolicy>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="factor_label">
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Фактор</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="factor_box"/>
        </item>
       </layout>
      </item>

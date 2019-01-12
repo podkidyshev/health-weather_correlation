@@ -61,18 +61,18 @@ def get_report(report, doc: science.Printer):
     shapiro = report["shapiro"]
     doc.add_heading("Тест нормальности Шапиро-Вилка", 2)
     doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(shapiro["stat"], shapiro["p"]))
-    doc.add_paragraph(res_ok if shapiro["res"] else res_nok)
+    doc.add_paragraph((res_ok if shapiro["res"] else res_nok) + '\n')
 
     agostino = report["agostino"]
     doc.add_heading("D'Agostino and Pearson's Test", 2)
     doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(agostino["stat"], agostino["p"]))
-    doc.add_paragraph(res_ok if agostino["res"] else res_nok)
+    doc.add_paragraph((res_ok if agostino["res"] else res_nok) + '\n')
 
     anderson = report["anderson"]
     doc.add_heading("Тест нормальности Андерсона-Дарлинга", 2)
     doc.add_paragraph("Statistic = {:.3f}".format(anderson["statistic"]))
     for res, cv, sl in zip(anderson["res"], anderson["critical"], anderson["sig_level"]):
-        doc.add_paragraph("{:.3f}: {:.3f}, {}".format(sl, cv, res_ok if res else res_nok))
+        doc.add_paragraph("{:.3f}: {:.3f}, {}\n".format(sl, cv, res_ok if res else res_nok))
 
     ks = report["ks"]
     doc.add_heading("Тест нормальности Колмогорова-Смирнова", 2)
@@ -82,7 +82,7 @@ def get_report(report, doc: science.Printer):
     alpha = ks["alpha"]
     doc.add_paragraph(
         "Результаты теста Колмогорова-Смирнова: "
-        "из {} прогонов доля {}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}".format(
+        "из {} прогонов доля {}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}\n".format(
             num_tests, num_rejects, num_tests, ratio, alpha))
 
     if report['qq']:

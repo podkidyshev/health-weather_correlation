@@ -89,6 +89,19 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="label_kde3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>label_kde3</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QTextEdit" name="text_main_1">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -115,19 +128,6 @@
              </property>
              <property name="placeholderText">
               <string>Lol kek cheburek</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_kde3">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>label_kde3</string>
              </property>
             </widget>
            </item>
