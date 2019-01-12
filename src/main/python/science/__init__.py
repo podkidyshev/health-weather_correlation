@@ -83,14 +83,18 @@ def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
 
 
-def plot_image(plot_func, *args):
+def plot_image(plot_func, *args, **kwargs):
     figure = Figure(dpi=100)
     canvas = FigureCanvasQT(figure)
     plot_func(*args, figure)
 
     buffer = BytesIO()
     canvas.print_figure(buffer)
-    return buffer.getvalue()
+    if kwargs.get('io', False):
+        buffer.seek(0)
+        return buffer
+    else:
+        return buffer.getvalue()
 
 
 def create_docx():

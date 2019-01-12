@@ -46,7 +46,7 @@ class Main(Ui_MainBaseForm):
 
     def startup(self):
         self.add_sample(r'src/main/python/science/samples/1_1.xlsx')
-        self.add_std(r'src/main/python/science/samples/BX_62.txt')
+        self.add_std(r'src/main/python/science/samples/BX_60.txt')
 
         self.sample_list.setCurrentRow(0)
         self.std_list.setCurrentRow(0)
