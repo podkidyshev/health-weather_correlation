@@ -34,8 +34,8 @@ if __name__ == '__main__':
 # https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
 # https://tproger.ru/translations/python-gui-pyqt/
 r"""
-pyuic5 src\main\python\ui\form.ui -o src\main\python\form.py
-pyuic5 src\main\python\ui\frame_default.ui -o src\main\python\frames\default.py
+pyuic5 src/main\python/ui/form.ui -o src/main/python/form.py
+pyuic5 src/main\python/ui/frame_default.ui -o src/main/python/frames/default.py
 pyuic5 src/main/python/ui/frame_sample.ui -o src/main/python/frames/sample.py
-
+pyuic5 src/main/python/ui/frame_factor.ui -o src/main/python/frames/factor.py
 """

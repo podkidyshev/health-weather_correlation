@@ -1,16 +1,12 @@
 import numpy as np
 import scipy.stats as stats
-import matplotlib.pyplot as plt
-
-from docx import Document
 
 import science
-import science.funcs as funcs
 
 
 def test_normal(x: list, *, qq: bool):
     """Тестирование распределения на нормальность"""
-    report = {"x": x[:]}
+    report = {"x": x[:], "qq": qq}
     alpha = 0.05
 
     stat, p = stats.shapiro(x)
@@ -58,7 +54,7 @@ def test_normal(x: list, *, qq: bool):
     return report
 
 
-def get_report(report, doc: Document):
+def get_report(report, doc: science.Printer):
     res_ok = "Образец выглядит гауссовским (не может отклонить гипотезу H0)"
     res_nok = "Образец не выглядит гауссовским (отклонить гипотезу H0)"
 
@@ -88,9 +84,10 @@ def get_report(report, doc: Document):
         "Результаты теста Колмогорова-Смирнова: "
         "из {} прогонов доля {}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}".format(
             num_tests, num_rejects, num_tests, ratio, alpha))
-    base = plt.figure()
-    get_plot(report, base)
-    doc.add_picture(science.plot_to_stream(base))
+
+    if report['qq']:
+        img = science.plot_image(get_plot, report, io=True)
+        doc.add_picture(img)
 
 
 def get_plot(report, base):

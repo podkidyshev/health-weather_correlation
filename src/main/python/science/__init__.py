@@ -1,8 +1,9 @@
 import os
+import types
+from io import BytesIO
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5 import FigureCanvasQT
-
-from io import BytesIO
 
 from docx import Document
 from docx.shared import Cm
@@ -20,10 +21,54 @@ class XLSXParseError(ValueError):
     pass
 
 
-def nnone(arr):
-    for idx, el in enumerate(arr):
-        if el is not None:
-            yield idx, el
+# noinspection PyTypeChecker,PyUnresolvedReferences
+class Printer:
+    def __init__(self, destination, func, *args):
+        self.destination = destination
+        if self.destination == 'doc':
+            self.doc = Document()
+        elif self.destination == 'ui':
+            self.doc = ''
+        else:
+            raise ValueError("Неизвестное назначение")
+        func(*args, self)
+
+    def print(self, destination_obj=None):
+        if self.destination == 'ui':
+            return self.doc
+            # destination_obj.setFontPointSize(14)
+            # destination_obj.insertPlainText(self.doc)
+            #
+            # destination_obj.installEventFilter
+            # # destination_obj.resizeEvent = types.MethodType(resizeEvent, destination_obj)
+            # # line_count = destination_obj.document().lineCount() + 2
+            # # metrics = QFontMetrics(destination_obj.currentFont())
+            # # line_spacing = metrics.lineSpacing()
+            # # height = line_count * line_spacing
+            # # destination_obj.setFixedHeight(height)
+        else:
+            save_docx(self.doc, destination_obj)
+            return True
+
+    def add_heading(self, s, size):
+        if self.destination == 'doc':
+            self.doc.add_heading(s, size)
+        else:
+            self.doc += '\n-- {} --\n'.format(s)
+
+    def add_paragraph(self, s):
+        if self.destination == 'doc':
+            self.doc.add_paragraph(s)
+        else:
+            self.doc += s + '\n'
+
+    def add_picture(self, pic):
+        if self.destination == 'doc':
+            self.doc.add_picture(pic)
+
+
+def print_report(destination, func, *args):
+    return Printer(destination, func, *args).print()
 
 
 def is_float(s: str):
@@ -83,14 +128,18 @@ def patient_suffix(filename: str, suffix):
     return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
 
 
-def plot_image(plot_func, *args):
+def plot_image(plot_func, *args, **kwargs):
     figure = Figure(dpi=100)
     canvas = FigureCanvasQT(figure)
     plot_func(*args, figure)
 
     buffer = BytesIO()
     canvas.print_figure(buffer)
-    return buffer.getvalue()
+    if kwargs.get('io', False):
+        buffer.seek(0)
+        return buffer
+    else:
+        return buffer.getvalue()
 
 
 def create_docx():

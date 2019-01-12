@@ -1,7 +1,8 @@
 import matplotlib
 
-from PyQt5.QtWidgets import QHBoxLayout, QWidget, QLabel, QMainWindow
-from PyQt5.QtCore import QEvent, Qt, QSize
+from PyQt5.QtWidgets import QHBoxLayout, QWidget, QLabel, QMainWindow, QTextEdit
+from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtGui import QResizeEvent
 
 from form import Ui_MainBaseForm
 
@@ -51,7 +52,7 @@ class Main(Ui_MainBaseForm):
 
     def startup(self):
         self.add_sample(r'src/main/python/science/samples/1_1.xlsx')
-        self.add_std(r'src/main/python/science/samples/BX_62.txt')
+        self.add_std(r'src/main/python/science/samples/BX_60.txt')
 
         self.sample_list.setCurrentRow(0)
         self.std_list.setCurrentRow(0)
@@ -154,4 +155,12 @@ class Main(Ui_MainBaseForm):
                 ratio = widget._pixmap.height() / widget._pixmap.width()
                 widget.setMinimumHeight(widget.width() * ratio + 2)
             return True
+        if event.type() == QEvent.Resize and isinstance(widget, QTextEdit) and hasattr(widget, '_custom'):
+            if widget._updating:
+                widget._updating = False
+            else:
+                widget._updating = True
+                doc_height = widget.document().size().toSize().height()
+                widget.setMinimumHeight(doc_height)
+        # noinspection PyCallByClass,PyTypeChecker
         return QMainWindow.eventFilter(self, widget, event)
