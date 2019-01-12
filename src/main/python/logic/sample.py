@@ -9,11 +9,12 @@ import science.test_normal as ntest
 
 
 class QFrameSample(QFrameBase, Ui_FramePatient):
-    def __init__(self, parent, sample_name, std_name):
+    def __init__(self, parent, sample_name, std_name, factor_name):
         QFrameBase.__init__(self, parent, Ui_FramePatient)
 
         self.std = Standard.standards[std_name]
         self.sample = Sample.samples[sample_name]
+
         self.report = SampleStandard(self.sample, self.std)
 
         self.title_label.setText("Образец {}".format(self.sample.name))

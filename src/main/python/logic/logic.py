@@ -35,8 +35,13 @@ class Main(Ui_MainBaseForm):
         self.add_sample_btn.clicked.connect(self.add_sample_btn_clicked)
         self.del_sample_btn.clicked.connect(self.del_sample_btn_clicked)
         # Кастомные фреймы
+        self.lead_box.activated.connect(self.choose_data_frame)
+        self.slave_box.activated.connect(self.choose_data_frame)
+        self.factor_box.activated.connect(self.choose_data_frame)
+        """""
         self.sample_list.itemClicked.connect(self.choose_data_frame)
         self.std_list.itemClicked.connect(self.choose_data_frame)
+        """""
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
 
@@ -60,11 +65,24 @@ class Main(Ui_MainBaseForm):
             print(e.args[0])
             return
         self.sample_list.addItem(sample.name)
+        self.add_to_box()
 
     def add_std(self, fname):
         std = fname[fname.rfind('/') + 1:fname.rfind('.')]
         Standard.from_file(fname, std)
         self.std_list.addItem(std)
+        self.add_to_box()
+
+    def add_to_box(self):
+        self.lead_box.clear()
+        self.slave_box.clear()
+        self.factor_box.clear()
+        self.factor_box.addItems([" ", "Без нагрузки", "С физической нагрузкой", "С эмоциональной нагрузкой",
+                                  "После отдыха"])
+        std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
+        sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+        self.lead_box.addItems([" "] + std_items + sample_items)
+        self.slave_box.addItems([" "] + std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):
         if self.data_frame is not None:
@@ -75,16 +93,23 @@ class Main(Ui_MainBaseForm):
         self.data_layout.insertWidget(0, self.data_frame)
 
     def choose_data_frame(self):
-        selected_std = self.std_list.currentItem()
-        selected_sample = self.sample_list.currentItem()
-        if selected_std is None:
+        #selected_std = self.std_list.currentItem()
+        #selected_sample = self.sample_list.currentItem()
+        selected_std = self.lead_box.currentText().split(' ')[1]
+        selected_sample = self.slave_box.currentText().split(' ')[1]
+        selected_factor = self.factor_box.currentText()
+        if selected_std is None or selected_std == "":
             # TODO: всплывающее окно
             print('Выберите эталон!')
-        elif selected_sample is None:
-            # TODO: выберите пациента
-            print('Выберите пациента!')
+        elif selected_sample is None or selected_sample == "":
+            # TODO: выберите образец
+            print('Выберите образец!')
+        elif selected_factor is None:
+            # TODO: выберите фактор
+            print('Выберите фактор!')
         else:
-            self.set_data_frame(QFrameSample, selected_sample.text(), selected_std.text())
+            self.set_data_frame(QFrameSample, selected_sample, selected_std, selected_factor)
+            #self.set_data_frame(QFrameSample, selected_sample.text(), selected_std.text())
 
     # КНОПКИ
     def add_std_btn_clicked(self):
