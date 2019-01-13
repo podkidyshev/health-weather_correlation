@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/main/python/ui/frame_sample.ui'
+# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\frame_sample.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -119,7 +119,7 @@ class Ui_FramePatient(object):
         self.verticalLayout.addWidget(self.tabs)
 
         self.retranslateUi(FramePatient)
-        self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(FramePatient)
 
     def retranslateUi(self, FramePatient):
@@ -132,7 +132,7 @@ class Ui_FramePatient(object):
         self.text_main_2.setPlaceholderText(_translate("FramePatient", "Lol kek cheburek"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_factors), _translate("FramePatient", "Все факторы"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_0), _translate("FramePatient", "Без нагрузки"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_1), _translate("FramePatient", "После физической"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_2), _translate("FramePatient", "После эмоциональной"))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_1), _translate("FramePatient", "С физической"))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_2), _translate("FramePatient", "С эмоциональной"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_3), _translate("FramePatient", "После отдыха"))
 

@@ -48,7 +48,7 @@ class FactorSampleStandard:
         doc.add_paragraph("\tСтандартное отклонение = {:.3f}".format(self.stat[1]))
         doc.add_paragraph("\tДоверительный интервал = ({:.3f}, {:.3f})".format(*self.stat[2]))
 
-        doc.add_heading("Результаты тестирования нлрмальности распределения расстояний фактор-образца", 1)
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний фактор-образца", 1)
         get_report(self.ntest, doc)
 
         if doc.destination == 'doc':
@@ -134,9 +134,9 @@ class SampleStandard:
         for factor, stat in zip(FACTORS, self.stat3):
             doc.add_paragraph("Результаты статистического группового анализа распределения расстояний от "
                               "фактора {}".format(factor.lower()))
-            doc.add_paragraph("\tвыборочное среднее = {:.4f}".format(stat[0]))
-            doc.add_paragraph("\tстандартное отклонение = {:.4f}".format(stat[1]))
-            doc.add_paragraph("\tдоверительный интервал = ({:.4f}, {:.4f})".format(*stat[2]))
+            doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(stat[0]))
+            doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(stat[1]))
+            doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*stat[2]))
 
     def get_report_ntest3(self, doc: Printer):
         doc.add_heading("Тестирование нормальности распределения расстояний от факторов (с физ.нагрузкой, после отдыха,"
@@ -217,7 +217,7 @@ for i in range(n_standart):
     for j in range(len(sample)):
         print("Результаты визуального анализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, visual_analysis(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
 
-print("Результаты тестирования нлрмальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
+print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
 
 for i in range(n_standart):
     for j in range(len(sample)): print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",
@@ -229,6 +229,113 @@ for i in range(n_standart):
     for j in range(len(sample)): print("Результат статистическогоанализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",  "[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] =  ", "\n" , stat_analys(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
 
         """
+
+
+class StandardFactorSample:
+    def __init__(self, std: Standard, factor: int, sample: Sample):
+        self.std = std
+        self.factor = factor
+        self.sample = sample
+
+        self.distance = sequence_distance_1(std.seq_max, sample.seq_max[factor])
+        self.va = plot_image(visual_analysis, self.distance)
+        self.ntest = test_normal(self.distance, qq=False)
+        self.stat = stat_analysis(self.distance)
+
+    def get_report(self, doc: Printer):
+        factor_name = FACTORS[self.factor]
+        x, x_seq_max = self.std.data, self.std.seq_max
+        y, y_seq_max = self.sample.data[self.factor], self.sample.seq_max[self.factor]
+
+        doc.add_heading("Образец {}. Эталон {}, фактор {}"
+                        .format(self.std.name, self.sample.name, factor_name), 0)
+
+        if doc.destination == 'doc':
+            doc.add_heading("Список значений эталона", 1)
+            doc.add_paragraph("Количество значений равно = {}".format(len(y)))
+            doc.add_paragraph(str(y))
+            doc.add_heading("Список максимумов эталона:", 1)
+            doc.add_paragraph("Количество значений равно = {}".format(len(y_seq_max)))
+            doc.add_paragraph(str(y_seq_max))
+
+            doc.add_paragraph("Список значений образца:")
+            doc.add_paragraph("Количество значений равно = {}".format(len(x)))
+            doc.add_paragraph(str(x))
+
+            doc.add_paragraph("Список максимумов значений образца:")
+            doc.add_paragraph("Количество значений равно = {}".format(len(x_seq_max)))
+            doc.add_paragraph(str(x))
+            doc.add_paragraph('')
+
+            doc.add_heading("Последовательность расстояний от максимумов образца до ближайшего максимума эталона", 1)
+            doc.add_paragraph(str(self.distance))
+
+        doc.add_heading("Результат статистического анализа распределения расстояний образца", 1)
+        doc.add_paragraph("\tВыборочное среднее = {:.3f}".format(self.stat[0]))
+        doc.add_paragraph("\tСтандартное отклонение = {:.3f}".format(self.stat[1]))
+        doc.add_paragraph("\tДоверительный интервал = ({:.3f}, {:.3f})".format(*self.stat[2]))
+
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний образца", 1)
+        get_report(self.ntest, doc)
+
+        if doc.destination == 'doc':
+            doc.add_heading("Результат визуального анализа распределения расстояний образца", 1)
+            doc.add_picture(self.va)
+
+
+class StandardSample:
+    def __init__(self, std: Standard, sample: Sample):
+        self.std = std
+        self.sample = sample
+
+        self.distance = [sequence_distance_1(std.seq_max, seq_max) for seq_max in sample.seq_max]
+        self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
+        self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
+        self.stat = [stat_analysis(xr) for xr in self.distance]
+
+    def get_report(self, doc: Printer):
+        doc.add_heading("Образец {}. Эталон {}".format(self.std.name, self.sample.name), 0)
+
+        doc.add_heading("Список значений образца", 1)
+        doc.add_paragraph("Количество значений равно = {}".format(len(self.std.data)))
+        doc.add_paragraph(str(self.std.data))
+
+        doc.add_heading("Список максимумов образца:", 1)
+        doc.add_paragraph("Количество значений равно = {}".format(str(len(self.std.seq_max))))
+        doc.add_paragraph(str(self.std.seq_max))
+        doc.add_paragraph('')
+
+        for factor, y, y_seq_max in zip(range(4), self.sample.data, self.sample.seq_max):
+            doc.add_paragraph("Список значений эталона {}:".format(FACTORS[factor]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(y)))
+            doc.add_paragraph(str(y))
+
+            doc.add_paragraph("Список максимумов значений эталона {}:".format(FACTORS[factor]))
+            doc.add_paragraph("Количество значений равно = {}".format(len(y_seq_max)))
+            doc.add_paragraph(str(y_seq_max))
+            doc.add_paragraph('')
+
+        doc.add_heading(
+            "Ряды расстояний и распределения расстояний от максимума образца до ближайшего максимума эталонов", 1)
+        for factor, xr in zip(FACTORS, self.distance):
+            doc.add_paragraph(
+                "Ряд расстояний от максимумов образца до ближайшего максимума эталона {}:".format(factor.lower()))
+            doc.add_paragraph(str(xr))
+            doc.add_paragraph('')
+
+        doc.add_heading("Результаты визуального анализа и тестирования нормальности", 1)
+        for factor, va, ntest in zip(FACTORS, self.va, self.ntest):
+            doc.add_paragraph("Результаты визуального анализа образца для эталона {}".format(factor.lower()))
+            doc.add_picture(va)
+            get_report(ntest, doc)
+
+        doc.add_heading("Результаты статистического анализа распределения образца", 1)
+        for factor, stat in zip(FACTORS, self.stat):
+            doc.add_paragraph("Результаты статистического анализа распределения образца для эталона {}".format(factor.lower()))
+            doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(stat[0]))
+            doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(stat[1]))
+            doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*stat[2]))
+
 
 
 class SampleMulStandards:
@@ -257,7 +364,7 @@ for i in range(n_standart):
     for j in range(len(sample)):
         print("Результаты визуального анализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, visual_analysis(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
 
-print("Результаты тестирования нлрмальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
+print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
 
 for i in range(n_standart):
     for j in range(len(sample)): print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",
@@ -298,7 +405,7 @@ for i in range(n_standart):
     for j in range(len(sample)):
         print("Результаты визуального анализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, visual_analysis(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
 
-print("Результаты тестирования нлрмальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
+print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
 
 for i in range(n_standart):
     for j in range(len(sample)): print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",

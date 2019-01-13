@@ -11,6 +11,7 @@ from science.classes import *
 from logic import dialog_open, set_main_window
 from logic.default import QFrameDefault
 from logic.sample import QFrameSample
+from logic.standard import QFrameStandard
 
 matplotlib.use("Qt5Agg")
 
@@ -95,7 +96,8 @@ class Main(Ui_MainBaseForm):
         elif lead in Standard.standards and slave == 'Образец: --Все образцы--':
             print('фрейм для MulStandardsMulSamples')
         elif lead in Sample.samples and slave in Standard.standards:
-            print('ведущий ряд - образец, ведомый ряд - погода')
+            self.set_data_frame(QFrameStandard, lead, slave)
+            #print('ведущий ряд - образец, ведомый ряд - погода')
         else:
             raise ValueError('Неизвестный случай')
 
