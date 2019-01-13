@@ -7,3 +7,4 @@ pyqt5==5.11.3
 pyinstaller==3.4
 python-docx==0.8.7
 openpyxl==2.5.12
+pypiwin32==223

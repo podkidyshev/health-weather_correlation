@@ -72,6 +72,7 @@ class QFrameBase(QFrame):
         # у самого лейаута scroll area то же самое
         text_edit.setFontPointSize(13)
         text_edit.insertPlainText(text)
+        text_edit.document().adjustSize()
         text_edit.verticalScrollBar().setEnabled(False)
 
         text_edit._custom = True

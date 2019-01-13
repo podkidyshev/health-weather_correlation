@@ -1,7 +1,27 @@
-from fbs_runtime.application_context import ApplicationContext
-from PyQt5.QtWidgets import QMainWindow
-
 import sys
+
+from fbs_runtime.application_context import ApplicationContext
+import PyQt5.QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QTabWidget
+
+
+class MyTabWidget(QTabWidget):
+    def __init__(self, *args, **kwargs):
+        super(MyTabWidget, self).__init__(*args, **kwargs)
+        # noinspection PyUnresolvedReferences
+        self.currentChanged.connect(self.on_change)
+
+    def on_change(self, index):
+        tab = self.widget(index)
+        if tab.layout() is not None:
+            for child in range(tab.layout().count()):
+                widget = tab.layout().itemAt(child).widget()
+                widget.update()
+
+
+QTabWidgetOriginal = PyQt5.QtWidgets.QTabWidget
+PyQt5.QtWidgets.QTabWidget = MyTabWidget
+
 
 import logic.logic as logic
 
