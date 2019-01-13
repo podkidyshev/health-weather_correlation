@@ -1,5 +1,5 @@
 from logic import QFrameBase, dialog_save
-from logic.factor import QFrameFactor
+from logic.standard_factor import QFrameStandardFactor
 from frames.standard import Ui_FrameStandard
 
 from science import Printer
@@ -14,15 +14,15 @@ class QFrameStandard(QFrameBase, Ui_FrameStandard):
         self.std = Standard.standards[std_name]
         self.sample = Sample.samples[sample_name]
 
-        self.title_label.setText("Погода {}".format(std_name))
-
         self.report = StandardSample(self.std, self.sample)
+
+        self.title_label.setText("Погода {}".format(std_name))
 
         self.reports = []
         self.frames = []
         for factor in range(4):
             self.reports.append(StandardFactorSample(self.std, factor, self.sample))
-            self.frames.append(QFrameFactor(self, self.reports[-1]))
+            self.frames.append(QFrameStandardFactor(self, self.reports[-1]))
             self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
 
     def save_report(self):

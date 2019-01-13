@@ -1,6 +1,8 @@
 import science
 import science.funcs as funcs
 
+import numpy as np
+
 DATA_LENGTH_DEFAULT = -1
 DATA_LENGTH = DATA_LENGTH_DEFAULT
 GROUP_SAMPLE_NAME = 'group'
@@ -18,10 +20,11 @@ class Sample:
         Sample.handle_init(name, datas)
         # инициализация атрибутов
         self.name = name
-        self.data, self.seq_max = [], []
+        self.data, self.seq_max, self.seq_max0 = [], [], []
         for data in datas:
             self.data.append(data)
             self.seq_max.append(data if data is None else funcs.sequence_max(data))
+            self.seq_max0.append(data if data is None else funcs.sequence_max0(data))
         # добавление образца в глобальный список
         if name != GROUP_SAMPLE_NAME:
             Sample.samples[name] = self
@@ -42,6 +45,8 @@ class Sample:
     def from_file(filename, name: str = ""):
         if not name:
             name = science.file_base_name(filename)
+            if name == "":
+                return None
         datas = science.read_xlsx_sample(filename)
         return Sample(name, datas)
 
@@ -70,6 +75,9 @@ class Sample:
         for factor in range(4):
             for idx in range(DATA_LENGTH):
                 Sample.group.data[factor][idx] += self.data[factor][idx]
+        Sample.group.seq_max = [funcs.sequence_max(data) for data in Sample.group.data]
+        Sample.group.seq_max0 = [funcs.sequence_max0(data) for data in Sample.group.data]
+        Sample.samples[GROUP_SAMPLE_NAME] = Sample.group
 
 
 class Standard:
@@ -85,6 +93,7 @@ class Standard:
         self.name = name
         self.data = data
         self.seq_max = funcs.sequence_max(self.data)
+        self.seq_max_apl = funcs.sequence_max_ampl(self.data, np.mean(self.data))
         # добавление эталона в глобальный список
         Standard.standards[name] = self
 

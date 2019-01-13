@@ -119,7 +119,7 @@ class Ui_FramePatient(object):
         self.verticalLayout.addWidget(self.tabs)
 
         self.retranslateUi(FramePatient)
-        self.tabs.setCurrentIndex(3)
+        self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(FramePatient)
 
     def retranslateUi(self, FramePatient):
