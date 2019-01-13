@@ -132,7 +132,7 @@ class Ui_FramePatient(object):
         self.text_main_2.setPlaceholderText(_translate("FramePatient", "Lol kek cheburek"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_factors), _translate("FramePatient", "Все факторы"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_0), _translate("FramePatient", "Без нагрузки"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_1), _translate("FramePatient", "После физической"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_2), _translate("FramePatient", "После эмоциональной"))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_1), _translate("FramePatient", "С физической"))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_2), _translate("FramePatient", "С эмоциональной"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_factor_3), _translate("FramePatient", "После отдыха"))
 

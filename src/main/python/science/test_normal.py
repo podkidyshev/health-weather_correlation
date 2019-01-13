@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.stats as stats
+from random import choice
 
 import science
 
@@ -18,7 +19,14 @@ def test_normal(x: list, *, qq: bool):
         "res": p > alpha
     }
 
-    stat, p = stats.normaltest(x)
+    if len(x) > 7:
+        x1 = x
+    else:
+        x1 = []
+        for i in range(8):
+            x1.append(choice(x))
+
+    stat, p = stats.normaltest(x1)
     report["agostino"] = {
         "name": "D'Agostino and Pearson's Test",
         "alpha": alpha,

@@ -16,7 +16,7 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
 
         self.report = SampleStandard(self.sample, self.std)
 
-        self.title_label.setText("Образец {}".format(self.sample.name))
+        self.title_label.setText("{}".format(self.report.sample_name))
 
         self.reports = []
         self.frames = []

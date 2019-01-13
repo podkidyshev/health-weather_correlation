@@ -11,6 +11,7 @@ from science.classes import *
 from logic import dialog_open, set_main_window
 from logic.default import QFrameDefault
 from logic.sample import QFrameSample
+from logic.standard import QFrameStandard
 
 matplotlib.use("Qt5Agg")
 
@@ -56,6 +57,8 @@ class Main(Ui_MainBaseForm):
     def add_sample(self, fname):
         try:
             sample = Sample.from_file(fname)
+            if sample is None:
+                return
         except Sample.SampleError as e:
             # TODO: всплывающее окно
             print(e.args[0])
@@ -65,6 +68,8 @@ class Main(Ui_MainBaseForm):
 
     def add_std(self, fname):
         std = fname[fname.rfind('/') + 1:fname.rfind('.')]
+        if std == "":
+            return None
         Standard.from_file(fname, std)
         self.std_list.addItem(std)
         self.update_boxes()
@@ -74,6 +79,8 @@ class Main(Ui_MainBaseForm):
         self.slave_box.clear()
         std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+        if len(sample_items):
+            sample_items.append("Образец: --Групповой--")
         self.lead_box.addItems(std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):
@@ -90,12 +97,14 @@ class Main(Ui_MainBaseForm):
 
         if lead in Standard.standards and slave in Sample.samples:
             self.set_data_frame(QFrameSample, lead, slave)
-        elif lead in Standard.standards and slave == 'Образец: --Групповой--':
-            self.set_data_frame(QFrameSample, lead, Sample.group)
+        elif lead in Standard.standards and slave == "--Групповой--":
+            self.set_data_frame(QFrameSample, lead, Sample.group.name)
         elif lead in Standard.standards and slave == 'Образец: --Все образцы--':
             print('фрейм для MulStandardsMulSamples')
         elif lead in Sample.samples and slave in Standard.standards:
-            print('ведущий ряд - образец, ведомый ряд - погода')
+            self.set_data_frame(QFrameStandard, lead, slave)
+        elif lead == "--Групповой--" and slave in Standard.standards:
+            self.set_data_frame(QFrameStandard, Sample.group.name, slave)
         else:
             raise ValueError('Неизвестный случай')
 
@@ -106,6 +115,8 @@ class Main(Ui_MainBaseForm):
             items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         elif lead_type == 'Погода:':
             items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+            if len(items):
+                items.append("Образец: --Групповой--")
         else:
             raise ValueError('Неизвестный тип данных')
         self.slave_box.clear()
