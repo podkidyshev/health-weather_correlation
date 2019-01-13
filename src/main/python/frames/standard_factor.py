@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\frame_standard_factor.ui'
+# Form implementation generated from reading ui file 'src/main/python/ui/frame_standard_factor.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
