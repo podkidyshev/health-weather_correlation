@@ -27,6 +27,7 @@ class Main(Ui_MainBaseForm):
         # для автоскейлинга графиков
         set_main_window(self)
 
+    # noinspection PyUnresolvedReferences
     def start(self):
         # Создание/удаление эталона
         self.add_std_btn.clicked.connect(self.add_std_btn_clicked)
@@ -50,7 +51,7 @@ class Main(Ui_MainBaseForm):
             for group in '123':
                 for idx in '123456':
                     self.add_sample(r'src/main/python/science/samples/{}_{}.xlsx'.format(group, idx))
-            for entry in os.listdir(r'src/main/python/science/samples/'):
+            for entry in sorted(os.listdir(r'src/main/python/science/samples/')):
                 if entry[-3:] == 'txt':
                     self.add_std(r'src/main/python/science/samples/{}'.format(entry))
 
@@ -63,6 +64,8 @@ class Main(Ui_MainBaseForm):
             # TODO: всплывающее окно
             print(e.args[0])
             return
+        if self.sample_list.count() == 0:
+            self.sample_list.addItem("--Групповой--")
         self.sample_list.addItem(sample.name)
         self.update_boxes()
 
@@ -79,8 +82,6 @@ class Main(Ui_MainBaseForm):
         self.slave_box.clear()
         std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
-        if len(sample_items):
-            sample_items.append("Образец: --Групповой--")
         self.lead_box.addItems(std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):
@@ -115,8 +116,6 @@ class Main(Ui_MainBaseForm):
             items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         elif lead_type == 'Погода:':
             items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
-            if len(items):
-                items.append("Образец: --Групповой--")
         else:
             raise ValueError('Неизвестный тип данных')
         self.slave_box.clear()
@@ -149,6 +148,8 @@ class Main(Ui_MainBaseForm):
             return
         sample = sample.text()
         self.sample_list.takeItem(self.sample_list.currentRow())
+        if self.sample_list.count() == 1:
+            self.sample_list.clear()
         Sample.delete(Sample.samples[sample])
         self.set_data_frame(QFrameDefault)
         self.update_boxes()

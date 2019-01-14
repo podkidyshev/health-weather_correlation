@@ -16,14 +16,46 @@ def set_main_window(window):
     main_window = window
 
 
-def dialog_open(parent, title, path=samples):
-    fname, _ = QFileDialog.getOpenFileName(parent, title, path, options=QFileDialog.Options())
-    return fname
+def get_file_filter(formats):
+    file_filter = ""
+    for f in formats:
+        if f == "":
+            file_filter += "Все файлы (*);;"
+        elif f == "txt":
+            file_filter = "Текстовые файлы (*.txt);;"
+        elif f == "xlsx":
+            file_filter = "Файлы таблиц xlsx (*.xlsx, *xls);;"
+        else:
+            raise ValueError("Неизвестный формат файла")
 
 
-def dialog_save(parent, title, path=root):
-    fname, _ = QFileDialog.getSaveFileName(parent, title, path, options=QFileDialog.Options())
-    return fname
+def dialog_open(parent, title, path=samples, *formats):
+    # TODO: разобраться с диалогами
+    dialog = QFileDialog(main_window)
+    dialog.setLabelText(QFileDialog.Accept, "Добавить")
+    dialog.setLabelText(QFileDialog.Reject, "Отмена")
+    dialog.setDirectory(path)
+    dialog.setWindowTitle(title)
+
+    if dialog.exec():
+        fname = dialog.selectedFiles()[0]
+        if fname and not os.path.exists(fname):
+            raise ValueError("Выбранный файл не существует")
+        return fname
+    else:
+        return ""
+
+
+def dialog_save(parent, title, path=root, file_format=''):
+    dialog = QFileDialog(main_window)
+    dialog.setLabelText(QFileDialog.Accept, "Добавить")
+
+    dialog.setLabelText(QFileDialog.Reject, "Отмена")
+    dialog.setDirectory(path)
+    dialog.setWindowTitle(title)
+
+    dialog.setAcceptMode(QFileDialog.AcceptSave)
+    return dialog.selectedFiles()[0] if dialog.exec() else ""
 
 
 class QFrameBase(QFrame):
