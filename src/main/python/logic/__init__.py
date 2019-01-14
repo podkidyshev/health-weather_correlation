@@ -2,8 +2,8 @@ import os
 import sys
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel
+from PyQt5.QtGui import QPixmap, QTextCursor
+from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit
 
 
 root = os.path.dirname(sys.argv[0])
@@ -67,7 +67,7 @@ class QFrameBase(QFrame):
         img_label.installEventFilter(main_window)
         img_label.updateGeometry()
 
-    def add_text(self, text: str, text_edit):
+    def add_text(self, text: str, text_edit: QTextEdit):
         # scroll area: лейаут, ей содержащий - layoutSizeConstraint->SetMinimumSize
         # у самого лейаута scroll area то же самое
         text_edit.setFontPointSize(13)
@@ -75,8 +75,11 @@ class QFrameBase(QFrame):
         text_edit.document().adjustSize()
         text_edit.verticalScrollBar().setEnabled(False)
 
+        cursor = QTextCursor()
+        cursor.movePosition(QTextCursor.Start)
+        text_edit.setTextCursor(cursor)
+
         text_edit._custom = True
         text_edit._updating = False
 
         text_edit.installEventFilter(main_window)
-        text_edit.setMinimumHeight(200)

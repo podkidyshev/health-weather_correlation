@@ -168,7 +168,6 @@ class Main(Ui_MainBaseForm):
                 widget._updating = True
                 ratio = widget._pixmap.height() / widget._pixmap.width()
                 widget.setMinimumHeight(widget.width() * ratio + 2)
-            return True
         if event.type() in event_types and isinstance(widget, QTextEdit) and hasattr(widget, '_custom'):
             if widget._updating:
                 widget._updating = False
