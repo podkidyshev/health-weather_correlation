@@ -2,7 +2,8 @@ import sys
 
 from fbs_runtime.application_context import ApplicationContext
 import PyQt5.QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QTabWidget
+from PyQt5.QtWidgets import QMainWindow, QTabWidget, QTextEdit
+from PyQt5.QtGui import QWheelEvent
 
 
 class MyTabWidget(QTabWidget):
@@ -19,8 +20,20 @@ class MyTabWidget(QTabWidget):
                 widget.update()
 
 
+class MyTextEdit(QTextEdit):
+    def __init__(self, *args):
+        super(MyTextEdit, self).__init__(*args)
+
+    def wheelEvent(self, event: QWheelEvent):
+        if hasattr(self, '_custom'):
+            event.ignore()
+
+
 QTabWidgetOriginal = PyQt5.QtWidgets.QTabWidget
 PyQt5.QtWidgets.QTabWidget = MyTabWidget
+
+QTextEditOriginal = PyQt5.QtWidgets.QTextEdit
+PyQt5.QtWidgets.QTextEdit = MyTextEdit
 
 
 import logic.logic as logic
