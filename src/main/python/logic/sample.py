@@ -1,5 +1,5 @@
 from logic import QFrameBase, dialog_save
-from logic.factor import QFrameFactor
+from logic.info import QFrameInfo
 from frames.sample import Ui_FramePatient
 
 from science import print_report, Printer
@@ -22,7 +22,7 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
         self.frames = []
         for factor in range(4):
             self.reports.append(FactorSampleStandard(self.sample, factor, self.std))
-            self.frames.append(QFrameFactor(self, self.reports[-1]))
+            self.frames.append(QFrameInfo(self, self.reports[-1]))
             self.tabs.widget(1 + factor).layout().insertWidget(0, self.frames[-1])
 
         self.add_image(self.report.kde, self.label_kde, 'lable_kde_img')
