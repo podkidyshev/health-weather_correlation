@@ -70,11 +70,8 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def add_std(self, fname):
-        std = fname[fname.rfind('/') + 1:fname.rfind('.')]
-        if std == "":
-            return None
-        Standard.from_file(fname, std)
-        self.std_list.addItem(std)
+        std = Standard.from_file(fname)
+        self.std_list.addItem(std.name)
         self.update_boxes()
 
     def update_boxes(self):
@@ -122,8 +119,9 @@ class Main(Ui_MainBaseForm):
         self.slave_box.addItems(items)
 
     def add_std_btn_clicked(self):
-        fname = dialog_open(self, " Выбрать эталон")
-        self.add_std(fname)
+        fname = dialog_open("Выбрать эталон", "txt")
+        if fname:
+            self.add_std(fname)
 
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
@@ -137,8 +135,9 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def add_sample_btn_clicked(self):
-        fname = dialog_open(self, "Выбрать файл пациента")
-        self.add_sample(fname)
+        fname = dialog_open("Выбрать файл пациента", "xlsx")
+        if fname:
+            self.add_sample(fname)
 
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()
