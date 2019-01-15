@@ -71,4 +71,6 @@ pyuic5 src/main\python/ui/form.ui -o src/main/python/form.py
 pyuic5 src/main\python/ui/frame_default.ui -o src/main/python/frames/default.py
 pyuic5 src/main/python/ui/frame_sample.ui -o src/main/python/frames/sample.py
 pyuic5 src/main/python/ui/frame_factor.ui -o src/main/python/frames/factor.py
+pyuic5 src/main/python/ui/frame_group.ui -o src/main/python/frames/group.py
+pyuic5 src/main/python/ui/frame_std_mul_samples.ui -o src/main/python/frames/std_mul_samples.py
 """

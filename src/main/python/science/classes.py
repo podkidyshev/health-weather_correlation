@@ -44,11 +44,8 @@ class Sample:
         del Sample.samples[self.name]
 
     @staticmethod
-    def from_file(filename, name: str = ""):
-        if not name:
-            name = science.file_base_name(filename)
-            if name == "":
-                return None
+    def from_file(filename):
+        name = science.file_base_name(filename)
         datas = science.read_xlsx_sample(filename)
         return Sample(name, datas)
 
@@ -103,9 +100,8 @@ class Standard:
         del Standard.standards[self.name]
 
     @staticmethod
-    def from_file(filename: str, name: str = ""):
-        if not name:
-            name = science.file_base_name(filename)
+    def from_file(filename: str):
+        name = science.file_base_name(filename)
         data = science.read_sample(filename)
         return Standard(name, data)
 

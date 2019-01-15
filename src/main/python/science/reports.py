@@ -155,7 +155,7 @@ class MulSamplesStandard:
         self.samples = samples[:]
         self.std = std
 
-        self.distance = [[sequence_distance(sample.seq_max[factor], std.seq_max) for factor in range(4)]
+        self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
                          for sample in samples]
 
         self.max_list = []
@@ -456,7 +456,6 @@ for i in range(n_standart):
     for j in range(len(sample)): print("Результат статистическогоанализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",  "[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] =  ", "\n" , stat_analys(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
 
         """
-
 
 class MulSamplesMulStandards:
     def __init__(self, samples: list, stds: list):
