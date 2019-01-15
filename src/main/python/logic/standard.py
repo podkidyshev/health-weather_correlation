@@ -1,5 +1,6 @@
 from logic import QFrameBase, dialog_save
-from logic.standard_type import QFrameStandardType
+from logic.tab_type import QFrameStandardType
+
 from frames.standard import Ui_FrameStandard
 
 from science import Printer

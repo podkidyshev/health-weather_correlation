@@ -1,5 +1,6 @@
 from logic import QFrameBase, dialog_save
-from logic.info import QFrameInfo
+from logic.info import QFrameInfo, QFrameInfoKde
+
 from frames.sample import Ui_FramePatient
 
 from science import print_report, Printer
@@ -25,11 +26,7 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
             self.frames.append(QFrameInfo(self, self.reports[-1]))
             self.tabs.widget(1 + factor).layout().insertWidget(0, self.frames[-1])
 
-        self.add_image(self.report.kde, self.label_kde, 'lable_kde_img')
-        self.add_image(self.report.kde3, self.label_kde3, 'label_kde3_img')
-
-        self.add_text(print_report('ui', self.report.get_report_stat3), self.text_main_1)
-        self.add_text(print_report('ui', self.report.get_report_ntest3), self.text_main_2)
+        self.tabs.widget(0).layout().insertWidget(0, QFrameInfoKde(self, self.report, "kde"))
 
     def save_report(self):
         fname = dialog_save(self, "Сохранить отчет")
