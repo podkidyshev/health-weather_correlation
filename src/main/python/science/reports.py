@@ -457,12 +457,13 @@ for i in range(n_standart):
 
         """
 
+
 class MulSamplesMulStandards:
     def __init__(self, samples: list, stds: list):
         self.samples = samples[:]
         self.stds = stds[:]
 
-        self.distance = [[[sequence_distance(factor, std.seq_max) for factor in sample.seq_max]
+        self.distance = [[[sequence_distance_1(factor, std.seq_max) for factor in sample.seq_max]
                           for sample in samples] for std in stds]
         self.va = [[[plot_image(visual_analysis, factor) for factor in sample] for sample in xr]
                    for xr in self.distance]
@@ -502,9 +503,9 @@ if __name__ == '__main__':
     # тест всех отчетов
     import os
 
-    for group in '123':
-        for idx in '123456':
-            Sample.from_file('samples/{}_{}.xlsx'.format(group, idx))
+    for _group in '123':
+        for _idx in '123456':
+            Sample.from_file('samples/{}_{}.xlsx'.format(_group, _idx))
     _samples = list(Sample.samples.values())
 
     for entry in os.listdir('samples'):

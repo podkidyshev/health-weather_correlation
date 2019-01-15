@@ -12,7 +12,7 @@ from logic import dialog_open, set_main_window
 from logic.default import QFrameDefault
 from logic.sample import QFrameSample
 from logic.standard import QFrameStandard
-from logic.std_mul_samples import QFrameStdMulSamples
+from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdMulSamples
 
 matplotlib.use("Qt5Agg")
 
@@ -65,7 +65,7 @@ class Main(Ui_MainBaseForm):
             return
         if self.sample_list.count() == 0:
             self.sample_list.addItem("--Групповой--")
-        self.sample_list.addItem(sample.name)
+        self.sample_list.insertItem(self.sample_list.count() - 1, sample.name)
         self.update_boxes()
 
     def add_std(self, fname):
@@ -91,21 +91,28 @@ class Main(Ui_MainBaseForm):
         self.data_layout.insertWidget(0, self.data_frame)
 
     def choose_data_frame(self):
+        orientation = self.lead_box.currentText().split(' ')[0] == "Погода:"
         lead = self.lead_box.currentText().split(' ')[1]
         slave = self.slave_box.currentText().split(' ')[1]
 
         # Погода - образец
-        if lead in Standard.standards and (slave in Sample.samples or slave == "--Групповой--"):
-            self.set_data_frame(QFrameSample, lead, slave)
-        elif lead in Standard.standards and slave == "--Группа--":
-            self.set_data_frame(QFrameStdMulSamples, lead)
-        elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
-            print("Фрейм для MulStandardsMulSamples")
+        if orientation:
+            if lead in Standard.standards and (slave in Sample.samples or slave == "--Групповой--"):
+                self.set_data_frame(QFrameSample, lead, slave)
+            elif lead in Standard.standards and slave == "--Группа--":
+                self.set_data_frame(QFrameStdMulSamples, lead)
+            elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
+                print("Фрейм для MulStandardsSamples")
+            elif lead == "--Группа--" and slave == "--Группа--":
+                self.set_data_frame(QFrameMulStdMulSamples)
+            else:
+                raise ValueError("Неизвестный случай")
         # Образец - погода
-        elif (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
-            self.set_data_frame(QFrameStandard, lead, slave)
         else:
-            raise ValueError('Неизвестный случай')
+            if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
+                self.set_data_frame(QFrameStandard, lead, slave)
+            else:
+                raise ValueError('Неизвестный случай')
 
     # КНОПКИ
     def lead_box_activated(self):
@@ -159,6 +166,8 @@ class Main(Ui_MainBaseForm):
     def report_btn_clicked(self):
         if hasattr(self.data_frame, "save_report"):
             self.data_frame.save_report()
+        else:
+            print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show]
