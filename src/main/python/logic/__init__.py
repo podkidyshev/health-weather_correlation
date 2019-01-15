@@ -8,7 +8,9 @@ from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit
 
 root = os.path.dirname(sys.argv[0])
 main_window = None
-samples = os.path.join(root, "science", "samples")
+
+_samples = os.path.join(root, "science", "samples")
+samples = _samples if os.path.exists(_samples) else root
 
 
 def set_main_window(window):
@@ -16,14 +18,52 @@ def set_main_window(window):
     main_window = window
 
 
-def dialog_open(parent, title, path=samples):
-    fname, _ = QFileDialog.getOpenFileName(parent, title, path, options=QFileDialog.Options())
-    return fname
+def get_file_filter(formats: tuple):
+    file_filter = ""
+    if "" not in formats:
+        formats += ("",)
+    for f in formats:
+        if f == "":
+            file_filter += "Все файлы (*);;"
+        elif f == "txt":
+            file_filter += "Текстовые файлы (*.txt);;"
+        elif f == "xlsx":
+            file_filter += "Файлы таблиц xlsx (*.xlsx);;"
+        elif f == "docx":
+            file_filter += "Текстовые документы (*.docx);;"
+        else:
+            raise ValueError("Неизвестный формат файла")
+    return file_filter[:-2]
 
 
-def dialog_save(parent, title, path=root):
-    fname, _ = QFileDialog.getSaveFileName(parent, title, path, options=QFileDialog.Options())
-    return fname
+def dialog_open(title, *formats):
+    # TODO: разобраться с диалогами
+    dialog = QFileDialog(main_window, title, samples, get_file_filter(formats))
+    dialog.setLabelText(QFileDialog.Accept, "Добавить")
+    dialog.setLabelText(QFileDialog.Reject, "Отмена")
+    dialog.setAcceptMode(QFileDialog.AcceptOpen)
+    dialog.setFileMode(QFileDialog.ExistingFile)
+
+    if dialog.exec():
+        fname = dialog.selectedFiles()[0]
+        if fname and not os.path.exists(fname):
+            raise ValueError("Выбранный файл не существует")
+        return fname
+    else:
+        return ""
+
+
+def dialog_save(title, *formats, filename=''):
+    dialog = QFileDialog(main_window, title, root, get_file_filter(formats))
+    dialog.setLabelText(QFileDialog.Accept, "Сохранить")
+    dialog.setLabelText(QFileDialog.Reject, "Отмена")
+    dialog.setAcceptMode(QFileDialog.AcceptSave)
+    dialog.selectFile(filename)
+    return dialog.selectedFiles()[0] if dialog.exec() else ""
+
+
+def dialog_save_report(filename):
+    return dialog_save("Сохранить отчет", "docx", filename=filename)
 
 
 class QFrameBase(QFrame):

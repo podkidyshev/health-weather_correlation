@@ -1,4 +1,4 @@
-from logic import QFrameBase, dialog_save
+from logic import QFrameBase, dialog_save_report
 from logic.factor import QFrameFactor
 from frames.sample import Ui_FramePatient
 
@@ -32,5 +32,8 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
         self.add_text(print_report('ui', self.report.get_report_ntest3), self.text_main_2)
 
     def save_report(self):
-        fname = dialog_save(self, "Сохранить отчет")
-        Printer('doc', self.report.get_report).print(fname)
+        sample_name_pretty = "Образец {}".format(self.sample.name) if self.sample.name != "group" \
+            else self.report.sample_name
+        fname = dialog_save_report("{} Эталон {}".format(sample_name_pretty, self.std.name))
+        if fname:
+            Printer('doc', self.report.get_report).print(fname)
