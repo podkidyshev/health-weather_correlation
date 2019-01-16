@@ -169,7 +169,7 @@ class MulSamplesStandard:
         self.samples = samples[:]
         self.std = std
 
-        self.distance = [[sequence_distance(sample.seq_max[factor], std.seq_max) for factor in range(4)]
+        self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
                          for sample in samples]
 
         self.max_list = []
@@ -454,13 +454,13 @@ class SampleMulStandards:
         self.sample = sample
         self.stds = stds[:]
 
-        self.distance = [[sequence_distance(sample.seq_max[factor], std.seq_max) for factor in range(4)]
+        self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
                          for std in stds]
-        self.va = [[plot_image(visual_analysis, xr[factor]) for factor in range(4)] for xr in self.distance]
-        self.ntest = [[test_normal(xr[factor], qq=False) for factor in range(4)] for xr in self.distance]
-        self.stat = [[stat_analysis(xr[factor]) for factor in range(4)] for xr in self.distance]
+        self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.distance]
+        self.ntest = [[test_normal(factor, qq=False) for factor in xr] for xr in self.distance]
+        self.stat = [[stat_analysis(factor) for factor in xr] for xr in self.distance]
 
-    def get_report(self):
+    def get_report(self, doc: Printer):
         """
 print("Распределения максимумов и расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
 
@@ -494,7 +494,7 @@ class MulSamplesMulStandards:
         self.samples = samples[:]
         self.stds = stds[:]
 
-        self.distance = [[[sequence_distance(factor, std.seq_max) for factor in sample.seq_max]
+        self.distance = [[[sequence_distance_1(factor, std.seq_max) for factor in sample.seq_max]
                           for sample in samples] for std in stds]
         self.va = [[[plot_image(visual_analysis, factor) for factor in sample] for sample in xr]
                    for xr in self.distance]
@@ -534,9 +534,9 @@ if __name__ == '__main__':
     # тест всех отчетов
     import os
 
-    for group in '123':
-        for idx in '123456':
-            Sample.from_file('samples/{}_{}.xlsx'.format(group, idx))
+    for _group in '123':
+        for _idx in '123456':
+            Sample.from_file('samples/{}_{}.xlsx'.format(_group, _idx))
     _samples = list(Sample.samples.values())
 
     for entry in os.listdir('samples'):
