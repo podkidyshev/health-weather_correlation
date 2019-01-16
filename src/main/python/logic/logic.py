@@ -12,6 +12,7 @@ from logic import dialog_open, set_main_window
 from logic.default import QFrameDefault
 from logic.sample import QFrameSample
 from logic.standard import QFrameStandard
+from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdSample, QFrameMulStdMulSamples
 
 matplotlib.use("Qt5Agg")
 
@@ -58,15 +59,13 @@ class Main(Ui_MainBaseForm):
     def add_sample(self, fname):
         try:
             sample = Sample.from_file(fname)
-            if sample is None:
-                return
         except Sample.SampleError as e:
             # TODO: всплывающее окно
             print(e.args[0])
             return
         if self.sample_list.count() == 0:
             self.sample_list.addItem("--Групповой--")
-        self.sample_list.addItem(sample.name)
+        self.sample_list.insertItem(self.sample_list.count() - 1, sample.name)
         self.update_boxes()
 
     def add_std(self, fname):
@@ -77,8 +76,10 @@ class Main(Ui_MainBaseForm):
     def update_boxes(self):
         self.lead_box.clear()
         self.slave_box.clear()
-        std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
-        sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+        std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())] + \
+                    ["Погода: --Группа--"]
+        sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())] + \
+                       ["Образец: --Группа--"]
         self.lead_box.addItems(std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):
@@ -90,29 +91,38 @@ class Main(Ui_MainBaseForm):
         self.data_layout.insertWidget(0, self.data_frame)
 
     def choose_data_frame(self):
+        orientation = self.lead_box.currentText().split(' ')[0] == "Погода:"
         lead = self.lead_box.currentText().split(' ')[1]
         slave = self.slave_box.currentText().split(' ')[1]
 
-        if lead in Standard.standards and slave in Sample.samples:
-            self.set_data_frame(QFrameSample, lead, slave)
-        elif lead in Standard.standards and slave == "--Групповой--":
-            self.set_data_frame(QFrameSample, lead, Sample.group.name)
-        elif lead in Standard.standards and slave == 'Образец: --Все образцы--':
-            print('фрейм для MulStandardsMulSamples')
-        elif lead in Sample.samples and slave in Standard.standards:
-            self.set_data_frame(QFrameStandard, lead, slave)
-        elif lead == "--Групповой--" and slave in Standard.standards:
-            self.set_data_frame(QFrameStandard, Sample.group.name, slave)
+        # Погода - образец
+        if orientation:
+            if lead in Standard.standards and (slave in Sample.samples or slave == "--Групповой--"):
+                self.set_data_frame(QFrameSample, lead, slave)
+            elif lead in Standard.standards and slave == "--Группа--":
+                self.set_data_frame(QFrameStdMulSamples, lead)
+            elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
+                self.set_data_frame(QFrameMulStdSample, slave)
+            elif lead == "--Группа--" and slave == "--Группа--":
+                self.set_data_frame(QFrameMulStdMulSamples)
+            else:
+                raise ValueError("Неизвестный случай")
+        # Образец - погода
         else:
-            raise ValueError('Неизвестный случай')
+            if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
+                self.set_data_frame(QFrameStandard, lead, slave)
+            else:
+                raise ValueError('Неизвестный случай')
 
     # КНОПКИ
     def lead_box_activated(self):
         lead_type = self.lead_box.currentText().split(' ')[0]
         if lead_type == 'Образец:':
-            items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
+            items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())] + \
+                    ["Погода: --Группа--"]
         elif lead_type == 'Погода:':
-            items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
+            items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())] + \
+                    ["Образец: --Группа--"]
         else:
             raise ValueError('Неизвестный тип данных')
         self.slave_box.clear()
@@ -156,9 +166,11 @@ class Main(Ui_MainBaseForm):
     def report_btn_clicked(self):
         if hasattr(self.data_frame, "save_report"):
             self.data_frame.save_report()
+        else:
+            print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
 
     def eventFilter(self, widget, event):
-        event_types = [QEvent.Resize, QEvent.Show]
+        event_types = [QEvent.Resize, QEvent.Show, QEvent.Move]
 
         if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
             if widget._updating:
