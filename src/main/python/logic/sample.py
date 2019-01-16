@@ -13,7 +13,7 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
         QFrameBase.__init__(self, parent, Ui_FramePatient)
 
         self.std = Standard.standards[std_name]
-        self.sample = Sample.samples[sample_name]
+        self.sample = Sample.samples[sample_name] if sample_name != "--Групповой--" else Sample.group
 
         self.report = SampleStandard(self.sample, self.std)
 
