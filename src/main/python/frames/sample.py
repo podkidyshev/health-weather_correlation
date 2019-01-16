@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\frame_sample.ui'
+# Form implementation generated from reading ui file 'src/main/python/ui/frame_sample.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,7 +14,7 @@ class Ui_FramePatient(object):
         FramePatient.resize(620, 579)
         FramePatient.setMinimumSize(QtCore.QSize(620, 380))
         self.verticalLayout = QtWidgets.QVBoxLayout(FramePatient)
-        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
+        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayout.setObjectName("verticalLayout")
         self.title_label = QtWidgets.QLabel(FramePatient)
         font = QtGui.QFont()
@@ -28,11 +28,13 @@ class Ui_FramePatient(object):
         self.tab_factors = QtWidgets.QWidget()
         self.tab_factors.setObjectName("tab_factors")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.tab_factors)
+        self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.tabs.addTab(self.tab_factors, "")
         self.tab_factor_0 = QtWidgets.QWidget()
         self.tab_factor_0.setObjectName("tab_factor_0")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.tab_factor_0)
+        self.verticalLayout_7.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.tabs.addTab(self.tab_factor_0, "")
         self.tab_factor_1 = QtWidgets.QWidget()

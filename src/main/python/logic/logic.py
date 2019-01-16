@@ -16,6 +16,8 @@ from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdSample, QFrameMu
 
 matplotlib.use("Qt5Agg")
 
+# counter = 0
+
 
 class Main(Ui_MainBaseForm):
     # noinspection PyArgumentList,PyUnresolvedReferences
@@ -170,7 +172,13 @@ class Main(Ui_MainBaseForm):
             print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
 
     def eventFilter(self, widget, event):
-        event_types = [QEvent.Resize, QEvent.Show]
+        event_types = [QEvent.Resize, QEvent.Show, 24]
+        # discarded_types = event_types + [QEvent.Paint, QEvent.Enter, QEvent.Move, QEvent.Hide, 31, 11]
+        #
+        # if event.type() not in discarded_types and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
+        #     global counter
+        #     print(type(event), event.type(), counter)
+        #     counter += 1
 
         if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
             if widget._updating:
@@ -179,7 +187,7 @@ class Main(Ui_MainBaseForm):
             else:
                 widget._updating = True
                 ratio = widget._pixmap.height() / widget._pixmap.width()
-                widget.setMinimumHeight(widget.width() * ratio + 2)
+                widget.setMinimumHeight(widget.width() * ratio)
         if event.type() in event_types and isinstance(widget, QTextEdit) and hasattr(widget, '_custom'):
             if widget._updating:
                 widget._updating = False

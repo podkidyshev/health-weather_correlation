@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\frame_text.ui'
+# Form implementation generated from reading ui file 'src/main/python/ui/frame_text.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FrameText(object):
     def setupUi(self, FrameText):
         FrameText.setObjectName("FrameText")
-        FrameText.resize(581, 610)
+        FrameText.resize(274, 322)
         self.verticalLayout = QtWidgets.QVBoxLayout(FrameText)
         self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -25,7 +25,7 @@ class Ui_FrameText(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 561, 590))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 254, 302))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -36,7 +36,7 @@ class Ui_FrameText(object):
         self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.text_edit = QtWidgets.QTextEdit(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.text_edit.sizePolicy().hasHeightForWidth())

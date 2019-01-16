@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <property name="sizeConstraint">
-    <enum>QLayout::SetDefaultConstraint</enum>
+    <enum>QLayout::SetMinimumSize</enum>
    </property>
    <item>
     <widget class="QLabel" name="title_label">
@@ -47,13 +47,21 @@
       <attribute name="title">
        <string>Все факторы</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2"/>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_factor_0">
       <attribute name="title">
        <string>Без нагрузки</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7"/>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_factor_1">
       <attribute name="title">

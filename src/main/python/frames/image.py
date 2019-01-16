@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\frame_image.ui'
+# Form implementation generated from reading ui file 'src/main/python/ui/frame_image.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FrameImage(object):
     def setupUi(self, FrameImage):
         FrameImage.setObjectName("FrameImage")
-        FrameImage.resize(581, 610)
+        FrameImage.resize(300, 300)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(FrameImage.sizePolicy().hasHeightForWidth())
+        FrameImage.setSizePolicy(sizePolicy)
+        FrameImage.setMinimumSize(QtCore.QSize(300, 300))
         self.verticalLayout = QtWidgets.QVBoxLayout(FrameImage)
         self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -25,18 +31,18 @@ class Ui_FrameImage(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 561, 590))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 280, 280))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents.sizePolicy().hasHeightForWidth())
         self.scrollAreaWidgetContents.setSizePolicy(sizePolicy)
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
+        self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.image = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.image.sizePolicy().hasHeightForWidth())

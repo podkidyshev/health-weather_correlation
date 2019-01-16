@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>581</width>
-    <height>610</height>
+    <width>300</width>
+    <height>300</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>300</width>
+    <height>300</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Frame</string>
@@ -36,24 +48,24 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>561</width>
-        <height>590</height>
+        <width>280</width>
+        <height>280</height>
        </rect>
       </property>
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="sizeConstraint">
-        <enum>QLayout::SetMinimumSize</enum>
+        <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QLabel" name="image">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+          <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>

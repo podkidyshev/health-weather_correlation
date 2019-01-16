@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FrameCombo(object):
     def setupUi(self, FrameCombo):
         FrameCombo.setObjectName("FrameCombo")
-        FrameCombo.resize(482, 520)
+        FrameCombo.resize(253, 186)
         self.verticalLayout = QtWidgets.QVBoxLayout(FrameCombo)
         self.verticalLayout.setObjectName("verticalLayout")
         self.combo = QtWidgets.QComboBox(FrameCombo)

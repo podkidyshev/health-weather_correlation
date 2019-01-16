@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'D:\Github\health-weather_correlation\src\main\python\ui\frame_info.ui'
+# Form implementation generated from reading ui file 'src/main/python/ui/frame_info.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,13 +14,14 @@ class Ui_FrameInfo(object):
         FrameInfo.resize(620, 579)
         FrameInfo.setMinimumSize(QtCore.QSize(620, 380))
         self.verticalLayout = QtWidgets.QVBoxLayout(FrameInfo)
-        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
+        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tabs = QtWidgets.QTabWidget(FrameInfo)
         self.tabs.setObjectName("tabs")
         self.tab_info_0 = QtWidgets.QWidget()
         self.tab_info_0.setObjectName("tab_info_0")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.tab_info_0)
+        self.verticalLayout_7.setSizeConstraint(QtWidgets.QLayout.SetNoConstraint)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.tabs.addTab(self.tab_info_0, "")
         self.tab_info_1 = QtWidgets.QWidget()

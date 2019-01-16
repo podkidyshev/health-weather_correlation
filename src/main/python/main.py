@@ -78,4 +78,9 @@ pyuic5 src/main/python/ui/frame_combo.ui -o src/main/python/frames/combo.py
 pyuic5 src/main/python/ui/frame_mul_std.ui -o src/main/python/frames/mul_both.py
 pyuic5 src/main/python/ui/frame_mul_one.ui -o src/main/python/frames/mul_one.py
 pyuic5 src/main/python/ui/frame_mul_both.ui -o src/main/python/frames/mul_both.py
+
+pyuic5 src/main/python/ui/frame_image.ui -o src/main/python/frames/image.py
+pyuic5 src/main/python/ui/frame_kde.ui -o src/main/python/frames/kde.py
+pyuic5 src/main/python/ui/frame_info.ui -o src/main/python/frames/info.py
+pyuic5 src/main/python/ui/frame_text.ui -o src/main/python/frames/text.py
 """

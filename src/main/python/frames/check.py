@@ -11,8 +11,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FrameCheck(object):
     def setupUi(self, FrameCheck):
         FrameCheck.setObjectName("FrameCheck")
-        FrameCheck.resize(120, 519)
-        FrameCheck.setMinimumSize(QtCore.QSize(120, 0))
+        FrameCheck.resize(120, 200)
+        FrameCheck.setMinimumSize(QtCore.QSize(120, 200))
         FrameCheck.setMaximumSize(QtCore.QSize(120, 16777215))
         self.verticalLayout = QtWidgets.QVBoxLayout(FrameCheck)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -20,7 +20,7 @@ class Ui_FrameCheck(object):
         self.scroll.setWidgetResizable(True)
         self.scroll.setObjectName("scroll")
         self.scroll_contents = QtWidgets.QWidget()
-        self.scroll_contents.setGeometry(QtCore.QRect(0, 0, 100, 499))
+        self.scroll_contents.setGeometry(QtCore.QRect(0, 0, 100, 180))
         self.scroll_contents.setObjectName("scroll_contents")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scroll_contents)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
