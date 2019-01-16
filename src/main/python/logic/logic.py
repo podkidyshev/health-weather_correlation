@@ -170,7 +170,7 @@ class Main(Ui_MainBaseForm):
             print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
 
     def eventFilter(self, widget, event):
-        event_types = [QEvent.Resize, QEvent.Show, QEvent.Move]
+        event_types = [QEvent.Resize, QEvent.Show]
 
         if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
             if widget._updating:

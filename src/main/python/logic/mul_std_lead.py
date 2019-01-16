@@ -25,8 +25,9 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         self.group_changed(self.frame_group.get_turned())
 
     def group_changed(self, new_values):
-        self.report = MulSamplesStandard([Sample.samples[name] for name in new_values], self.std)
-        self.title_label.setText("Эталон: {}. {} значений".format(self.std.name, len(new_values)))
+        # self.report = MulSamplesStandard([Sample.samples[name] for name in new_values], self.std)
+        # self.title_label.setText("Эталон: {}. {} значений".format(self.std.name, len(new_values)))
+        pass
 
 
 class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
