@@ -1,5 +1,5 @@
 from logic import QFrameBase, dialog_save_report
-from logic.tab_type import QFrameStandardType
+from logic.utils import QFrameStandardType
 
 from frames.standard import Ui_FrameStandard
 

@@ -1,9 +1,14 @@
-from logic import QFrameBase, dialog_save
+from PyQt5.QtWidgets import QFrame, QCheckBox
 
-from frames.info import Ui_FrameInfo
-from frames.kde import Ui_FrameKde
-from frames.image import Ui_FrameImage
-from frames.text import Ui_FrameText
+from logic import QFrameBase
+
+from frames.utils.info import Ui_FrameInfo
+from frames.utils.kde import Ui_FrameKde
+from frames.utils.image import Ui_FrameImage
+from frames.utils.text import Ui_FrameText
+from frames.utils.combo import Ui_FrameCombo
+from frames.utils.check import Ui_FrameCheck
+from frames.utils.standard_type import Ui_FrameStandardType
 
 from science import print_report
 
@@ -14,7 +19,8 @@ class QFrameInfo(QFrameBase, Ui_FrameInfo):
         self.report = report
         self.val_type = val_type
 
-        self.frames = [QFrameImage(self, self.report, self.val_type), QFrameText(self, self.report, self.val_type, 'stat'),
+        self.frames = [QFrameImage(self, self.report, self.val_type),
+                       QFrameText(self, self.report, self.val_type, 'stat'),
                        QFrameText(self, self.report, self.val_type, 'ntest')]
 
         for info in range(3):
@@ -70,6 +76,17 @@ class QFrameImage(QFrameBase, Ui_FrameImage):
             return self.report.kde3, 'label_kde3_img'
 
 
+class QFrameStandardType(QFrameBase, Ui_FrameStandardType):
+    def __init__(self, parent, report):
+        QFrameBase.__init__(self, parent, Ui_FrameStandardType)
+        self.report = report
+
+        self.frames = [QFrameInfo(self, self.report, "val"), QFrameInfo(self, self.report, "apl")]
+
+        for info in range(2):
+            self.tabs.widget(info).layout().insertWidget(0, self.frames[info])
+
+
 class QFrameText(QFrameBase, Ui_FrameText):
     def __init__(self, parent, report, val_type: str, func_name: str):
         QFrameBase.__init__(self, parent, Ui_FrameText)
@@ -109,3 +126,60 @@ class QFrameText(QFrameBase, Ui_FrameText):
         else:
             return self.report.get_report_ntest3
 
+
+class QFrameCheck(QFrame, Ui_FrameCheck):
+    def __init__(self, parent, values):
+        # noinspection PyArgumentList
+        QFrame.__init__(self, parent=parent)
+        Ui_FrameCheck.setupUi(self, self)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.values = values
+        self.cbs = []
+        for idx, value in enumerate(values):
+            cb = QCheckBox(value, self)
+            cb.setChecked(1)
+            # noinspection PyUnresolvedReferences
+            cb.stateChanged.connect(self.state_changed)
+            self.cbs.append(cb)
+            self.scroll_contents.layout().insertWidget(idx, cb)
+
+        self.signal_func = None
+
+    def get_turned(self):
+        pressed = [cb.isChecked() for cb in self.cbs]
+        values_pressed = []
+        for p, v in zip(pressed, self.values):
+            if p:
+                values_pressed.append(v)
+        return values_pressed
+
+    def state_changed(self, *_):
+        if self.signal_func is not None:
+            self.signal_func(self.get_turned())
+
+
+class QFrameCombo(QFrame, Ui_FrameCombo):
+    def __init__(self, parent, values):
+        # noinspection PyArgumentList
+        QFrame.__init__(self, parent=parent)
+        Ui_FrameCombo.setupUi(self, self)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.update_values(values)
+        self.signal_func = None
+
+    def update_values(self, values):
+        try:
+            self.combo.currentIndexChanged.disconnect()
+        except TypeError:
+            pass
+        self.combo.clear()
+        for value in values:
+            self.combo.addItem(value)
+        self.combo.currentIndexChanged.connect(self.combo_changed)
+
+    def combo_changed(self, *_):
+        if self.signal_func is not None:
+            value = self.combo.currentText()
+            self.signal_func(value)

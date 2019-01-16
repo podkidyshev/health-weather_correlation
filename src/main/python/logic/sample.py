@@ -3,7 +3,7 @@ from logic.utils import QFrameInfo, QFrameInfoKde
 
 from frames.sample import Ui_FramePatient
 
-from science import print_report, Printer
+from science import Printer
 from science.classes import Standard, Sample
 from science.reports import FactorSampleStandard, SampleStandard
 

@@ -1,9 +1,8 @@
-from PyQt5.QtWidgets import QListWidget
-
 from science.classes import Sample, Standard
 from science.reports import MulSamplesStandard, MulSamplesMulStandards, SampleMulStandards, SampleStandard
 
-from logic import QFrameBase, QFrameCheck, QFrameCombo
+from logic import QFrameBase
+from logic.utils import QFrameCheck, QFrameCombo
 from logic.sample import QFrameSample
 from frames.mul_one import Ui_FrameMulOne
 from frames.mul_both import Ui_FrameMulBoth

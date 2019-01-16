@@ -3,10 +3,7 @@ import sys
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QTextCursor
-from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit, QCheckBox
-
-from frames.check import Ui_FrameCheck
-from frames.combo import Ui_FrameCombo
+from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit
 
 
 root = os.path.dirname(sys.argv[0])
@@ -127,61 +124,3 @@ class QFrameBase(QFrame):
         text_edit._updating = False
 
         text_edit.installEventFilter(main_window)
-
-
-class QFrameCheck(QFrame, Ui_FrameCheck):
-    def __init__(self, parent, values):
-        # noinspection PyArgumentList
-        QFrame.__init__(self, parent=parent)
-        Ui_FrameCheck.setupUi(self, self)
-        self.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.values = values
-        self.cbs = []
-        for idx, value in enumerate(values):
-            cb = QCheckBox(value, self)
-            cb.setChecked(1)
-            # noinspection PyUnresolvedReferences
-            cb.stateChanged.connect(self.state_changed)
-            self.cbs.append(cb)
-            self.scroll_contents.layout().insertWidget(idx, cb)
-
-        self.signal_func = None
-
-    def get_turned(self):
-        pressed = [cb.isChecked() for cb in self.cbs]
-        values_pressed = []
-        for p, v in zip(pressed, self.values):
-            if p:
-                values_pressed.append(v)
-        return values_pressed
-
-    def state_changed(self, *_):
-        if self.signal_func is not None:
-            self.signal_func(self.get_turned())
-
-
-class QFrameCombo(QFrame, Ui_FrameCombo):
-    def __init__(self, parent, values):
-        # noinspection PyArgumentList
-        QFrame.__init__(self, parent=parent)
-        Ui_FrameCombo.setupUi(self, self)
-        self.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.update_values(values)
-        self.signal_func = None
-
-    def update_values(self, values):
-        try:
-            self.combo.currentIndexChanged.disconnect()
-        except TypeError:
-            pass
-        self.combo.clear()
-        for value in values:
-            self.combo.addItem(value)
-        self.combo.currentIndexChanged.connect(self.combo_changed)
-
-    def combo_changed(self, *_):
-        if self.signal_func is not None:
-            value = self.combo.currentText()
-            self.signal_func(value)
