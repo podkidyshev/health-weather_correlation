@@ -1,5 +1,5 @@
 from logic import QFrameBase, dialog_save
-from logic.info import QFrameInfo, QFrameInfoKde
+from logic.utils import QFrameInfo, QFrameInfoKde
 
 from frames.sample import Ui_FramePatient
 
