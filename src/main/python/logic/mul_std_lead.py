@@ -1,10 +1,12 @@
-from science.classes import Sample, Standard
-from science.reports import MulSamplesStandard, MulSamplesMulStandards, SampleMulStandards
+from PyQt5.QtWidgets import QListWidget
 
-from logic import QFrameBase
+from science.classes import Sample, Standard
+from science.reports import MulSamplesStandard, MulSamplesMulStandards, SampleMulStandards, SampleStandard
+
+from logic import QFrameBase, QFrameCheck, QFrameCombo
+from logic.sample import QFrameSample
 from frames.mul_one import Ui_FrameMulOne
 from frames.mul_both import Ui_FrameMulBoth
-from logic.group import QFrameGroup
 
 
 class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
@@ -13,7 +15,7 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
 
         values = list(Sample.samples.keys())
         values.remove(Sample.group.name)
-        self.frame_group = QFrameGroup(self, values)
+        self.frame_group = QFrameCheck(self, values)
         self.frame_group.signal_func = self.group_changed
         self.layout().insertWidget(0, self.frame_group)
 
@@ -28,23 +30,41 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
 
 
 class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
+    class QFrameMulStds(QFrameBase):
+        def __init__(self, parent):
+            QFrameBase.__init__(self, parent, None)
+
     def __init__(self, parent, sample):
         QFrameBase.__init__(self, parent, Ui_FrameMulOne)
 
         values = list(Standard.standards.keys())
-        self.frame_group = QFrameGroup(self, values)
+        self.frame_group = QFrameCheck(self, values)
         self.frame_group.signal_func = self.group_changed
         self.layout().insertWidget(0, self.frame_group)
 
+        self.frame_combo = QFrameCombo(self, values)
+        self.layout_vertical.insertWidget(0, self.frame_combo)
+        self.frame_combo.signal_func = self.std_changed
+
         self.sample = Sample.samples[sample] if '--Групповой--' != sample else Sample.group
         self.report = None
+        self.report_frame = None
 
         self.group_changed(values)
 
     def group_changed(self, new_values):
-        self.report = SampleMulStandards(self.sample, [Standard.standards[std] for std in new_values])
-        sample_name = "Образец: {}".format(self.sample.name) if self.sample.name != "group" else "Групповой образец"
-        self.title_label.setText("{}. Значений {}".format(sample_name, len(new_values)))
+        # self.report = SampleMulStandards(self.sample, [Standard.standards[std] for std in new_values])
+        self.frame_combo.update_values(new_values)
+        self.frame_combo.combo.setCurrentIndex(0)
+        self.frame_combo.combo_changed()
+
+    def std_changed(self, std):
+        if self.report_frame is not None:
+            self.layout_vertical.removeWidget(self.report_frame)
+            self.report_frame.hide()
+            self.report_frame = None
+        self.report_frame = QFrameSample(self, std, self.sample.name)
+        self.layout_vertical.insertWidget(1, self.report_frame)
 
 
 class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulBoth):
@@ -57,11 +77,11 @@ class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulBoth):
         samples = list(Sample.samples.keys())
         samples.remove(Sample.group.name)
 
-        self.frame_group_stds = QFrameGroup(self, stds)
+        self.frame_group_stds = QFrameCheck(self, stds)
         self.frame_group_stds.signal_func = self.group_stds_changed
         layout.insertWidget(0, self.frame_group_stds)
 
-        self.frame_group_samples = QFrameGroup(self, samples)
+        self.frame_group_samples = QFrameCheck(self, samples)
         self.frame_group_samples.signal_func = self.group_samples_chanhed
         layout.insertWidget(1, self.frame_group_samples)
 

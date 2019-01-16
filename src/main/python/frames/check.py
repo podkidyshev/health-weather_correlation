@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/main/python/ui/frame_group.ui'
+# Form implementation generated from reading ui file 'src/main/python/ui/frame_check.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -8,15 +8,15 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_FrameGroup(object):
-    def setupUi(self, FrameGroup):
-        FrameGroup.setObjectName("FrameGroup")
-        FrameGroup.resize(120, 519)
-        FrameGroup.setMinimumSize(QtCore.QSize(120, 0))
-        FrameGroup.setMaximumSize(QtCore.QSize(120, 16777215))
-        self.verticalLayout = QtWidgets.QVBoxLayout(FrameGroup)
+class Ui_FrameCheck(object):
+    def setupUi(self, FrameCheck):
+        FrameCheck.setObjectName("FrameCheck")
+        FrameCheck.resize(120, 519)
+        FrameCheck.setMinimumSize(QtCore.QSize(120, 0))
+        FrameCheck.setMaximumSize(QtCore.QSize(120, 16777215))
+        self.verticalLayout = QtWidgets.QVBoxLayout(FrameCheck)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.scroll = QtWidgets.QScrollArea(FrameGroup)
+        self.scroll = QtWidgets.QScrollArea(FrameCheck)
         self.scroll.setWidgetResizable(True)
         self.scroll.setObjectName("scroll")
         self.scroll_contents = QtWidgets.QWidget()
@@ -27,10 +27,10 @@ class Ui_FrameGroup(object):
         self.scroll.setWidget(self.scroll_contents)
         self.verticalLayout.addWidget(self.scroll)
 
-        self.retranslateUi(FrameGroup)
-        QtCore.QMetaObject.connectSlotsByName(FrameGroup)
+        self.retranslateUi(FrameCheck)
+        QtCore.QMetaObject.connectSlotsByName(FrameCheck)
 
-    def retranslateUi(self, FrameGroup):
+    def retranslateUi(self, FrameCheck):
         _translate = QtCore.QCoreApplication.translate
-        FrameGroup.setWindowTitle(_translate("FrameGroup", "Frame"))
+        FrameCheck.setWindowTitle(_translate("FrameCheck", "Frame"))
 

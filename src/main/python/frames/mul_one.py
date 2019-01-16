@@ -16,31 +16,12 @@ class Ui_FrameMulOne(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.layout_vertical = QtWidgets.QVBoxLayout()
         self.layout_vertical.setObjectName("layout_vertical")
-        self.title_label = QtWidgets.QLabel(FrameMulOne)
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        self.title_label.setFont(font)
-        self.title_label.setObjectName("title_label")
-        self.layout_vertical.addWidget(self.title_label)
-        self.tabs = QtWidgets.QTabWidget(FrameMulOne)
-        self.tabs.setObjectName("tabs")
-        self.tab_main = QtWidgets.QWidget()
-        self.tab_main.setObjectName("tab_main")
-        self.tabs.addTab(self.tab_main, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.tabs.addTab(self.tab_2, "")
-        self.layout_vertical.addWidget(self.tabs)
         self.horizontalLayout.addLayout(self.layout_vertical)
 
         self.retranslateUi(FrameMulOne)
-        self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(FrameMulOne)
 
     def retranslateUi(self, FrameMulOne):
         _translate = QtCore.QCoreApplication.translate
         FrameMulOne.setWindowTitle(_translate("FrameMulOne", "Frame"))
-        self.title_label.setText(_translate("FrameMulOne", "Dolor amet"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_main), _translate("FrameMulOne", "Tab 1"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_2), _translate("FrameMulOne", "Tab 2"))
 

@@ -71,7 +71,11 @@ pyuic5 src/main\python/ui/form.ui -o src/main/python/form.py
 pyuic5 src/main\python/ui/frame_default.ui -o src/main/python/frames/default.py
 pyuic5 src/main/python/ui/frame_sample.ui -o src/main/python/frames/sample.py
 pyuic5 src/main/python/ui/frame_factor.ui -o src/main/python/frames/factor.py
-pyuic5 src/main/python/ui/frame_group.ui -o src/main/python/frames/group.py
+
+pyuic5 src/main/python/ui/frame_check.ui -o src/main/python/frames/check.py
+pyuic5 src/main/python/ui/frame_combo.ui -o src/main/python/frames/combo.py
+
+pyuic5 src/main/python/ui/frame_mul_std.ui -o src/main/python/frames/mul_both.py
 pyuic5 src/main/python/ui/frame_mul_one.ui -o src/main/python/frames/mul_one.py
 pyuic5 src/main/python/ui/frame_mul_both.ui -o src/main/python/frames/mul_both.py
 """
