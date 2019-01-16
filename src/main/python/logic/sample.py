@@ -1,4 +1,4 @@
-from logic import QFrameBase, dialog_save
+from logic import QFrameBase, dialog_save_report
 from logic.utils import QFrameInfo, QFrameInfoKde
 
 from frames.sample import Ui_FramePatient
@@ -29,5 +29,8 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
         self.tabs.widget(0).layout().insertWidget(0, QFrameInfoKde(self, self.report, "kde"))
 
     def save_report(self):
-        fname = dialog_save(self, "Сохранить отчет")
-        Printer('doc', self.report.get_report).print(fname)
+        sample_name_pretty = "Образец {}".format(self.sample.name) if self.sample.name != "group" \
+            else self.report.sample_name
+        fname = dialog_save_report("{} Эталон {}".format(sample_name_pretty, self.std.name))
+        if fname:
+            Printer('doc', self.report.get_report).print(fname)

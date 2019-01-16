@@ -1,4 +1,4 @@
-from logic import QFrameBase, dialog_save
+from logic import QFrameBase, dialog_save_report
 from logic.tab_type import QFrameStandardType
 
 from frames.standard import Ui_FrameStandard
@@ -27,5 +27,8 @@ class QFrameStandard(QFrameBase, Ui_FrameStandard):
             self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
 
     def save_report(self):
-        fname = dialog_save(self, "Сохранить отчет")
-        Printer('doc', self.report.get_report).print(fname)
+        sample_name_pretty = "Образец {}".format(self.sample.name) if self.sample.name != "group" \
+            else self.report.sample_name
+        fname = dialog_save_report("Эталон {} {}".format(self.std.name, sample_name_pretty))
+        if fname:
+            Printer('doc', self.report.get_report).print(fname)

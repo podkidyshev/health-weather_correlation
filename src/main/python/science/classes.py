@@ -38,6 +38,8 @@ class Sample:
         for factor in range(4):
             for idx in range(DATA_LENGTH):
                 Sample.group.data[factor][idx] -= self.data[factor][idx]
+        Sample.group.seq_max = [funcs.sequence_max(data) for data in Sample.group.data]
+        Sample.group.seq_max0 = [funcs.sequence_max0(data) for data in Sample.group.data]
         # удаляем образец из глобального списка
         del Sample.samples[self.name]
 
@@ -112,14 +114,14 @@ class Standard:
         # проверка дубликатов
         if name in Standard.standards:
             raise Standard.StandardError('Эталон с именем {} уже загружен'.format(name))
-        # # все данные должны быть одной длины
-        # global DATA_LENGTH
-        # if DATA_LENGTH == DATA_LENGTH_DEFAULT:
-        #     DATA_LENGTH = len(data)
-        #     print('DATA_LENGTH =', DATA_LENGTH)
-        # if len(data) != DATA_LENGTH:
-        #     raise Sample.SampleError('Для эталона {} переданы некорректные данные: '
-        #                              'проверьте количество данных'.format(name))
+        # все данные должны быть одной длины
+        global DATA_LENGTH
+        if DATA_LENGTH == DATA_LENGTH_DEFAULT:
+            DATA_LENGTH = len(data)
+            print('DATA_LENGTH =', DATA_LENGTH)
+        if len(data) != DATA_LENGTH:
+            raise Sample.SampleError('Для эталона {} переданы некорректные данные: '
+                                     'проверьте количество данных'.format(name))
 
 
 if __name__ == '__main__':
@@ -128,6 +130,3 @@ if __name__ == '__main__':
     s1.delete()
     assert Sample.group.data[0][0] == 3
     assert Sample.group.data[3][-1] == 0
-
-
-# TODO: в эталоне BX_62.txt - 62 элемента, а в образцах по 60 элементов: как контролировать?
