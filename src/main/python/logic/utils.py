@@ -10,7 +10,7 @@ from frames.utils.combo import Ui_FrameCombo
 from frames.utils.check import Ui_FrameCheck
 from frames.utils.standard_type import Ui_FrameStandardType
 
-from science import print_report
+from reports import print_report
 
 
 class QFrameInfo(QFrameBase, Ui_FrameInfo):

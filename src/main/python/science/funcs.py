@@ -26,6 +26,7 @@ graph_kde(xr1, xr2, xr3, xr4) - Построение 4-х ядерных оце�
 graph_kde3(xr1, xr2, xr3) - Построение 3-х ядерных оценок плотности и кривой Гаусса
 graph_kde_all(x, y, u, v, w) - Построение 4-х ядерных оценок плотности и кривой Гаусса для всех пациентов и эталона w
 """
+import random
 from operator import add
 
 import numpy as np
@@ -235,6 +236,68 @@ def graph_kde3(xr, base: Figure):
 #                                        sequence_distance(sequence_max(y[j]), sequence_max(w)),
 #                                        sequence_distance(sequence_max(u[j]), sequence_max(w)),
 #                                        sequence_distance(sequence_max(v[j]), sequence_max(w))], base)
+
+
+def test_normal(x: list, *, qq: bool):
+    """Тестирование распределения на нормальность"""
+    report = {"x": x[:], "qq": qq}
+    alpha = 0.05
+
+    stat, p = st.shapiro(x)
+    report["shapiro"] = {
+        "name": "Shapiro-Wilk Test",
+        "alpha": alpha,
+        "stat": stat,
+        "p": p,
+        "res": p > alpha
+    }
+
+    if len(x) > 7:
+        x1 = x
+    else:
+        x1 = []
+        for i in range(8):
+            x1.append(random.choice(x))
+
+    stat, p = st.normaltest(x1)
+    report["agostino"] = {
+        "name": "D'Agostino and Pearson's Test",
+        "alpha": alpha,
+        "stat": stat,
+        "p": p,
+        "res": p > alpha
+    }
+
+    statistic, critical_values, significance_level = st.anderson(x)
+    report["anderson"] = {
+        "name": "Anderson-Darling Test",
+        "statistic": statistic,
+        "critical": critical_values,
+        "sig_level": significance_level,
+        "res": [statistic < cv for cv in critical_values]
+    }
+
+    num_tests = 10 ** (3 if qq else 2)
+    num_rejects = 0
+    for i in range(num_tests):
+        normed_data = (x - np.mean(x)) / np.std(x)
+        d, pval = st.kstest(normed_data, 'norm')
+        if pval < alpha:
+            num_rejects += 1
+    ratio = float(num_rejects) / num_tests
+    report["ks"] = {
+        "name": "Kolmogorov-Smirnov Test",
+        "num_tests": num_tests,
+        "num_rejects": num_rejects,
+        "ratio": ratio,
+        "alpha": alpha
+    }
+    return report
+
+
+def test_normal_plot(report, base):
+    fig = base.subplots(1, 1)
+    st.probplot(report["x"], dist="norm", plot=fig)
 
 
 if __name__ == '__main__':

@@ -1,8 +1,8 @@
 from logic import QFrameBase, dialog_save
 from frames.standard_factor import Ui_FrameStandardFactor
 
-from science import print_report
-from science.reports import StandardFactorSample
+from reports import print_report
+from reports.std import StandardFactorSample
 
 
 class QFrameStandardFactor(QFrameBase, Ui_FrameStandardFactor):

@@ -3,9 +3,10 @@ from logic.utils import QFrameStandardType
 
 from frames.standard import Ui_FrameStandard
 
-from science import Printer
 from science.classes import Standard, Sample
-from science.reports import StandardFactorSample, StandardSample
+
+from reports import Printer
+from reports.sample import StandardFactorSample, StandardSample
 
 
 class QFrameStandard(QFrameBase, Ui_FrameStandard):

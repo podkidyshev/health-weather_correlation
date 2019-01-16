@@ -4,8 +4,6 @@ from io import BytesIO
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5 import FigureCanvasQT
 
-from docx import Document
-from docx.shared import Cm
 from openpyxl import load_workbook
 
 FACTORS = [
@@ -18,46 +16,6 @@ FACTORS = [
 
 class XLSXParseError(ValueError):
     pass
-
-
-# noinspection PyTypeChecker,PyUnresolvedReferences
-class Printer:
-    def __init__(self, destination, func, *args):
-        self.destination = destination
-        if self.destination == 'doc':
-            self.doc = Document()
-        elif self.destination == 'ui':
-            self.doc = ''
-        else:
-            raise ValueError("Неизвестное назначение")
-        func(*args, self)
-
-    def print(self, destination_obj=None):
-        if self.destination == 'ui':
-            return self.doc
-        else:
-            save_docx(self.doc, destination_obj)
-            return True
-
-    def add_heading(self, s, size):
-        if self.destination == 'doc':
-            self.doc.add_heading(s, size)
-        else:
-            self.doc += '-- {} --\n\n'.format(s)
-
-    def add_paragraph(self, s):
-        if self.destination == 'doc':
-            self.doc.add_paragraph(s)
-        else:
-            self.doc += s + '\n'
-
-    def add_picture(self, pic: bytes or bytearray):
-        if self.destination == 'doc':
-            self.doc.add_picture(BytesIO(pic))
-
-
-def print_report(destination, func, *args):
-    return Printer(destination, func, *args).print()
 
 
 def is_float(s: str):
@@ -129,21 +87,6 @@ def plot_image(plot_func, *args, **kwargs):
         return buffer
     else:
         return buffer.getvalue()
-
-
-def create_docx():
-    doc = Document()
-    doc.core_properties.author = "Молчанов В.А."
-    return doc
-
-
-def save_docx(doc, obj):
-    for section in doc.sections:
-        section.top_margin = Cm(2)
-        section.bottom_margin = Cm(2)
-        section.left_margin = Cm(2.5)
-        section.right_margin = Cm(1.5)
-    doc.save(obj)
 
 
 if __name__ == '__main__':
