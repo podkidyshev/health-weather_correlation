@@ -1,23 +1,21 @@
 from science.classes import Sample, Standard
-from science.reports import MulSamplesStandard, MulSamplesMulStandards
+from science.reports import MulSamplesStandard, MulSamplesMulStandards, SampleMulStandards
 
 from logic import QFrameBase
-from frames.std_mul_samples import Ui_FrameStdMulSamples
-from frames.mul_std_mul_samples import Ui_FrameMulStdMulSamples
+from frames.mul_one import Ui_FrameMulOne
+from frames.mul_both import Ui_FrameMulBoth
 from logic.group import QFrameGroup
 
 
-class QFrameStdMulSamples(QFrameBase, Ui_FrameStdMulSamples):
+class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
     def __init__(self, parent, std):
-        QFrameBase.__init__(self, parent, Ui_FrameStdMulSamples)
-
-        layout = self.layout()
+        QFrameBase.__init__(self, parent, Ui_FrameMulOne)
 
         values = list(Sample.samples.keys())
         values.remove(Sample.group.name)
         self.frame_group = QFrameGroup(self, values)
         self.frame_group.signal_func = self.group_changed
-        layout.insertWidget(0, self.frame_group)
+        self.layout().insertWidget(0, self.frame_group)
 
         self.std = Standard.standards[std]
         self.report = None
@@ -29,9 +27,29 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameStdMulSamples):
         self.title_label.setText("Эталон: {}. {} значений".format(self.std.name, len(new_values)))
 
 
-class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulStdMulSamples):
+class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
+    def __init__(self, parent, sample):
+        QFrameBase.__init__(self, parent, Ui_FrameMulOne)
+
+        values = list(Standard.standards.keys())
+        self.frame_group = QFrameGroup(self, values)
+        self.frame_group.signal_func = self.group_changed
+        self.layout().insertWidget(0, self.frame_group)
+
+        self.sample = Sample.samples[sample] if '--Групповой--' != sample else Sample.group
+        self.report = None
+
+        self.group_changed(values)
+
+    def group_changed(self, new_values):
+        self.report = SampleMulStandards(self.sample, [Standard.standards[std] for std in new_values])
+        sample_name = "Образец: {}".format(self.sample.name) if self.sample.name != "group" else "Групповой образец"
+        self.title_label.setText("{}. Значений {}".format(sample_name, len(new_values)))
+
+
+class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulBoth):
     def __init__(self, parent):
-        QFrameBase.__init__(self, parent, Ui_FrameMulStdMulSamples)
+        QFrameBase.__init__(self, parent, Ui_FrameMulBoth)
 
         layout = self.layout()
 

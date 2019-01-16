@@ -12,7 +12,7 @@ from logic import dialog_open, set_main_window
 from logic.default import QFrameDefault
 from logic.sample import QFrameSample
 from logic.standard import QFrameStandard
-from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdMulSamples
+from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdSample, QFrameMulStdMulSamples
 
 matplotlib.use("Qt5Agg")
 
@@ -102,7 +102,7 @@ class Main(Ui_MainBaseForm):
             elif lead in Standard.standards and slave == "--Группа--":
                 self.set_data_frame(QFrameStdMulSamples, lead)
             elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
-                print("Фрейм для MulStandardsSamples")
+                self.set_data_frame(QFrameMulStdSample, slave)
             elif lead == "--Группа--" and slave == "--Группа--":
                 self.set_data_frame(QFrameMulStdMulSamples)
             else:

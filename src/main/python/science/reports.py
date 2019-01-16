@@ -423,7 +423,7 @@ class SampleMulStandards:
         self.sample = sample
         self.stds = stds[:]
 
-        self.distance = [[sequence_distance(sample.seq_max[factor], std.seq_max) for factor in range(4)]
+        self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
                          for std in stds]
         self.va = [[plot_image(visual_analysis, xr[factor]) for factor in range(4)] for xr in self.distance]
         self.ntest = [[test_normal(xr[factor], qq=False) for factor in range(4)] for xr in self.distance]
