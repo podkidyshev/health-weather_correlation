@@ -1,4 +1,5 @@
-from reports import *
+from reports import Printer
+from reports.utils import report_ntest
 
 from science import plot_image, FACTORS
 from science.funcs import *
@@ -90,7 +91,7 @@ class StandardFactorSample:
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
-        ntest_report(self.ntest, doc)
+        report_ntest(self.ntest, doc)
 
     def get_report_info(self, doc: Printer):
         self.get_report_stat(doc)
@@ -112,7 +113,7 @@ class StandardFactorSample:
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результаты тестирования нормальности распределения расстояний амплитуд эталона", 1)
-        ntest_report(self.ntest_apl, doc)
+        report_ntest(self.ntest_apl, doc)
 
     def get_report_info_apl(self, doc: Printer):
         self.get_report_stat_apl(doc)
@@ -180,11 +181,11 @@ class StandardSample:
         for factor, va, ntest, va_apl, ntest_apl in zip(FACTORS, self.va, self.ntest, self.va_apl, self.ntest_apl):
             doc.add_paragraph("Результаты визуального анализа значений эталона для образца {}".format(factor.lower()))
             doc.add_picture(va)
-            ntest_report(ntest, doc)
+            report_ntest(ntest, doc)
 
             doc.add_paragraph("Результаты визуального анализа амплитуд эталона для образца {}".format(factor.lower()))
             doc.add_picture(va_apl)
-            ntest_report(ntest_apl, doc)
+            report_ntest(ntest_apl, doc)
 
         doc.add_heading("Результаты статистического анализа распределения образца", 1)
         for factor, stat, stat_apl in zip(FACTORS, self.stat, self.stat_apl):

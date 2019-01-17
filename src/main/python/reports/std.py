@@ -1,4 +1,5 @@
-from reports import *
+from reports import Printer, str_arr
+from reports.utils import report_ntest, report_std, report_sample, report_sample_factor
 
 from science import plot_image, FACTORS
 from science.funcs import *
@@ -20,28 +21,12 @@ class FactorSampleStandard:
         self.factor_name = FACTORS[self.factor]
 
     def get_report(self, doc: Printer):
-        x, x_seq_max = self.sample.data[self.factor], self.sample.seq_max[self.factor]
-        y, y_seq_max = self.std.data, self.std.seq_max
-
         doc.add_heading("{}, фактор {}. Эталон {}"
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         if doc.destination == 'doc':
-            doc.add_heading("Список значений эталона", 1)
-            doc.add_paragraph("Количество значений равно = {}".format(len(y)))
-            doc.add_paragraph(str(y))
-            doc.add_heading("Список максимумов эталона:", 1)
-            doc.add_paragraph("Количество значений равно = {}".format(len(y_seq_max)))
-            doc.add_paragraph(str(y_seq_max))
-
-            doc.add_paragraph("Список значений образца:")
-            doc.add_paragraph("Количество значений равно = {}".format(len(x)))
-            doc.add_paragraph(str(x))
-
-            doc.add_paragraph("Список максимумов значений образца:")
-            doc.add_paragraph("Количество значений равно = {}".format(len(x_seq_max)))
-            doc.add_paragraph(str(x_seq_max))
-            doc.add_paragraph('')
+            report_std(self.std, doc)
+            report_sample_factor(self.sample, self.factor, doc)
 
             doc.add_heading("Последовательность расстояний от максимумов образца до ближайшего максимума эталона", 1)
             doc.add_paragraph(str(self.distance))
@@ -52,7 +37,7 @@ class FactorSampleStandard:
         doc.add_paragraph("\tДоверительный интервал = ({:.3f}, {:.3f})".format(*self.stat[2]))
 
         doc.add_heading("Результаты тестирования нормальности распределения расстояний фактор-образца", 1)
-        ntest_report(self.ntest, doc)
+        report_ntest(self.ntest, doc)
 
         if doc.destination == 'doc':
             doc.add_heading("Результат визуального анализа распределения расстояний фактор-образца", 1)
@@ -70,7 +55,7 @@ class FactorSampleStandard:
         doc.add_heading("{}, фактор {}. Эталон {}"
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
-        ntest_report(self.ntest, doc)
+        report_ntest(self.ntest, doc)
 
 
 class SampleStandard:
@@ -129,7 +114,7 @@ class SampleStandard:
         for factor, va, ntest in zip(FACTORS, self.va, self.ntest):
             doc.add_paragraph("Результаты визуального анализа образца {}".format(factor.lower()))
             doc.add_picture(va)
-            ntest_report(ntest, doc)
+            report_ntest(ntest, doc)
 
         doc.add_heading("Результаты статистического анализа распределения образца", 1)
         for factor, stat in zip(FACTORS, self.stat):
@@ -162,4 +147,4 @@ class SampleStandard:
                         " с эмоц.нагрузкой) до исходного стандарта – фактор-образца (без нагрузки)", 1)
         for factor, ntest in zip(FACTORS, self.ntest3):
             doc.add_paragraph("Тестирование нормальности распределения расстояний от фактора {}".format(factor.lower()))
-            ntest_report(ntest, doc)
+            report_ntest(ntest, doc)
