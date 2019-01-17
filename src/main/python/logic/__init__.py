@@ -101,7 +101,6 @@ class QFrameBase(QFrame):
 
         img_label._pixmap = pixmap
         img_label.setPixmap(pixmap.scaled(img_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        img_label._updating = False
         img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(200, 200))
 
@@ -124,3 +123,9 @@ class QFrameBase(QFrame):
         text_edit._updating = False
 
         text_edit.installEventFilter(main_window)
+
+    @staticmethod
+    def get_custom(ui_class):
+        class QFrameCustom(QFrameBase, ui_class):
+            pass
+        return QFrameCustom

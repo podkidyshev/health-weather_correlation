@@ -1,8 +1,9 @@
-from reports import *
-
 from science import plot_image, FACTORS
 from science.funcs import *
 from science.classes import Standard, Sample
+
+from reports import Printer, str_arr
+from reports.utils import report_std, report_sample, report_sample_factor, report_ntest
 
 
 class FactorSampleMulStandards:
@@ -20,20 +21,13 @@ class FactorSampleMulStandards:
     def get_report(self, doc: Printer):
         doc.add_heading("{}, фактор {} и группа эталонов".format(self.sample_name, FACTORS[self.factor]), 0)
 
-        doc.add_heading("Образец {}, фактор-образец {}".format(self.sample_name, FACTORS[self.factor]), 1)
-        doc.add_paragraph("Количество значений равно = {}".format(len(self.sample.data[self.factor])))
-        doc.add_paragraph(str(self.sample.data[self.factor]))
-        doc.add_paragraph("Количество максимумов равно = {}".format(len(self.sample.seq_max[self.factor])))
-        doc.add_paragraph(str(self.sample.seq_max[self.factor]))
+        report_sample_factor(self.sample, self.factor, doc)
+
+        for idx, std in enumerate(self.stds):
+            report_std(std, doc)
 
         doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
-            doc.add_heading("Эталон {}".format(std.name), 2)
-            doc.add_paragraph("Количество значений равно = {}".format(len(std.data)))
-            doc.add_paragraph(str(std.data))
-            doc.add_paragraph("Количество максимумов равно = {}".format(len(std.seq_max)))
-            doc.add_paragraph(str(std.seq_max))
-
             doc.add_paragraph("Последовательность расстояний для эталона {}. Количество значений равно = {}"
                               .format(std.name, len(self.distance[idx])))
             doc.add_paragraph(str(self.distance[idx]))
@@ -42,7 +36,7 @@ class FactorSampleMulStandards:
             doc.add_picture(self.va[idx])
             doc.add_heading("\nРезультаты тестирования нормальности распределения расстояний для эталона {}"
                             .format(std.name), 2)
-            ntest_report(self.ntest[idx], doc)
+            report_ntest(self.ntest[idx], doc)
             doc.add_heading("\nРезультаты статистического анализа распределения расстояний для эталона {}"
                             .format(std.name), 2)
             doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(self.stat[idx][0]))
@@ -65,21 +59,13 @@ class SampleMulStandards:
     def get_report(self, doc: Printer):
         doc.add_heading("{} и группа эталонов".format(self.sample_name), 0)
 
-        for factor in range(4):
-            doc.add_heading("Фактор {}".format(FACTORS[factor]), 2)
-            doc.add_paragraph("Количество значений равно = {}".format(len(self.sample.data[factor])))
-            doc.add_paragraph(str(self.sample.data[factor]))
-            doc.add_paragraph("Количество максимумов равно = {}".format(len(self.sample.seq_max[factor])))
-            doc.add_paragraph(str(self.sample.seq_max[factor]))
+        report_sample(self.sample, doc)
+
+        for idx, std in enumerate(self.stds):
+            report_std(std, doc)
 
         doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
-            doc.add_heading("Эталон {}".format(std.name), 2)
-            doc.add_paragraph("Количество значений равно = {}".format(len(std.data)))
-            doc.add_paragraph(str(std.data))
-            doc.add_paragraph("Количество максимумов равно = {}".format(len(std.seq_max)))
-            doc.add_paragraph(str(std.seq_max))
-
             for factor in range(4):
                 doc.add_heading("\nАнализ фактор-образца {}".format(FACTORS[factor]), 2)
                 doc.add_paragraph("Последовательность расстояний для образца {} и эталона {}. "
@@ -91,12 +77,66 @@ class SampleMulStandards:
                 doc.add_picture(self.va[idx][factor])
                 doc.add_heading("\nРезультаты тестирования нормальности распределения расстояний "
                                 "фактор-образца {} и эталона {}".format(FACTORS[factor], std.name), 2)
-                ntest_report(self.ntest[idx][factor], doc)
+                report_ntest(self.ntest[idx][factor], doc)
                 doc.add_heading("\nРезультаты статистического анализа распределения расстояний "
                                 "фактор-образца {} и эталона {}".format(FACTORS[factor], std.name), 2)
                 doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(self.stat[idx][factor][0]))
                 doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(self.stat[idx][factor][1]))
                 doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*self.stat[idx][factor][2]))
+
+
+class MulFactorSamplesStandard:
+    def __init__(self, samples: list, factor: int, std: Standard):
+        self.samples = samples[:]
+        self.factor = factor
+        self.std = std
+
+        self.distance = [sequence_distance_1(sample.seq_max[factor], std.seq_max) for sample in samples]
+
+        self.max_list = []
+        for sample_num in range(len(samples)):
+            self.max_list.append(np.mean(self.distance[sample_num][factor]))
+
+        self.va = plot_image(visual_analysis, self.max_list)
+        self.ntest = test_normal(self.max_list, qq=False)
+        self.stat = stat_analysis(self.max_list)
+
+    def get_report(self, doc: Printer):
+        doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
+
+        report_std(self.std, doc)
+        for sample in self.samples:
+            report_sample_factor(sample, self.factor, doc)
+
+        factor_name = FACTORS[self.factor].lower()
+        doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
+        doc.add_paragraph(str_arr(self.max_list))
+        doc.add_heading("Результаты  визуального  анализа распределений средних значений фактор-образцов {}"
+                        .format(factor_name), 2)
+        doc.add_picture(self.va)
+        doc.add_heading("Результаты тестирования нормальности распределений средних значений фактор-образцов {}"
+                        .format(factor_name), 2)
+        report_ntest(self.ntest, doc)
+        doc.add_heading("Результаты статистического анализа распределений средних значений фактор-образцов {}"
+                        .format(factor_name), 2)
+        doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(self.stat[0]))
+        doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(self.stat[1]))
+        doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*self.stat[2]))
+
+    def get_report_stat(self, doc: Printer):
+        # TODO: Костыль 2, стоит от этого избавиться
+        doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
+
+        doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
+        doc.add_paragraph("\tВыборочное среднее = {:.3f}".format(self.stat[0]))
+        doc.add_paragraph("\tСтандартное отклонение = {:.3f}".format(self.stat[1]))
+        doc.add_paragraph("\tДоверительный интервал = ({:.3f}, {:.3f})".format(*self.stat[2]))
+
+    def get_report_ntest(self, doc: Printer):
+        # TODO: Костыль 3, стоит от этого избавиться
+        doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
+        report_ntest(self.ntest, doc)
 
 
 class MulSamplesStandard:
@@ -114,43 +154,35 @@ class MulSamplesStandard:
                 max_list_factor.append(np.mean(self.distance[sample_num][factor]))
             self.max_list.append(max_list_factor)
 
-        self.max_graph_kde = plot_image(graph_kde, self.max_list)
-        self.max_va = [plot_image(visual_analysis, xr) for xr in self.max_list]
-        self.max_list_ntest = [test_normal(max_list_factor, qq=False) for max_list_factor in self.max_list]
+        self.distance3 = [sequence_distance_1(self.max_list[factor], self.max_list[0]) for factor in range(1, 4)]
+        self.kde3 = plot_image(graph_kde3, self.distance3)
+
+        self.kde = plot_image(graph_kde, self.max_list)
+        self.va = [plot_image(visual_analysis, xr) for xr in self.max_list]
+        self.ntest = [test_normal(max_list_factor, qq=False) for max_list_factor in self.max_list]
         self.stat = [stat_analysis(max_list_factor) for max_list_factor in self.max_list]
 
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
 
-        doc.add_heading("Эталон {}".format(self.std.name), 1)
-        doc.add_paragraph("Количество значений равно = {}".format(len(self.std.data)))
-        doc.add_paragraph(str(self.std.data))
-        doc.add_paragraph("Количество максимумов равно = {}".format(len(self.std.seq_max)))
-        doc.add_paragraph(str(self.std.seq_max))
-
+        report_std(self.std, doc)
         for sample in self.samples:
-            doc.add_heading("Образец {}".format(sample.name), 1)
-            for factor in range(4):
-                doc.add_heading("Фактор-образец {}".format(FACTORS[factor]), 2)
-                doc.add_paragraph("Количество значений равно = {}".format(len(sample.data[factor])))
-                doc.add_paragraph(str(sample.data))
-                doc.add_paragraph("Количество максимумов равно = {}".format(len(sample.seq_max[factor])))
-                doc.add_paragraph(str(sample.seq_max[factor]))
+            report_sample(sample, doc)
 
         doc.add_heading("Результаты визуального анализа распределений средних значений образцов по всем факторам", 1)
-        doc.add_picture(self.max_graph_kde)
+        doc.add_picture(self.kde)
 
         for factor in range(4):
             factor_name = FACTORS[factor].lower()
             doc.add_heading("Для фактора {}".format(factor_name), 1)
             doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
-            doc.add_paragraph(str(self.max_list[factor]))
+            doc.add_paragraph(str_arr(self.max_list[factor]))
             doc.add_heading("Результаты  визуального  анализа распределений средних значений фактор-образцов {}"
                             .format(factor_name), 2)
-            doc.add_picture(self.max_va[factor])
+            doc.add_picture(self.va[factor])
             doc.add_heading("Результаты тестирования нормальности распределений средних значений фактор-образцов {}"
                             .format(factor_name), 2)
-            ntest_report(self.max_list_ntest[factor], doc)
+            report_ntest(self.ntest[factor], doc)
             doc.add_heading("Результаты статистического анализа распределений средних значений фактор-образцов {}"
                             .format(factor_name), 2)
             doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(self.stat[factor][0]))
@@ -165,35 +197,44 @@ class MulSamplesMulStandards:
 
         self.distance = [[[sequence_distance_1(factor, std.seq_max) for factor in sample.seq_max]
                           for sample in samples] for std in stds]
-        self.va = [[[plot_image(visual_analysis, factor) for factor in sample] for sample in xr]
-                   for xr in self.distance]
-        self.ntest = [[[test_normal(factor, qq=False) for factor in sample] for sample in xr] for xr in self.distance]
-        self.stat = [[[stat_analysis(factor) for factor in sample] for sample in xr] for xr in self.distance]
+
+        self.max_list = [[[np.mean(std[sample_num][factor]) for sample_num in range(len(self.samples))]
+                          for factor in range(4)] for std in self.distance]
+
+        self.kde = [plot_image(graph_kde, std) for std in self.max_list]
+        self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.max_list]
+        self.ntest = [[test_normal(factor, qq=False) for factor in std] for std in self.max_list]
+        self.stat = [[stat_analysis(factor) for factor in std] for std in self.max_list]
 
     def get_report(self, doc: Printer):
-        """
-print("Распределения максимумов и расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
+        doc.add_heading("Группа образцов. Группа эталонов", 0)
 
-for i in range(n_standart):
-    for j in range(len(sample)):
-        print("Последовательность максимумов образца  ", j, "  и эталона  ", i, sequence_max(sample[j]), len_ampl(sequence_max(sample[j])))
-        print("Последовательность расстояний для образца  ", j, "  и эталона  ", i, sequence_distance(sequence_max(sample[j]), sequence_max(standart[i])), len(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
+        for std in self.stds:
+            report_std(std, doc)
 
-print("Результаты визуального анализа распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
+        for sample in self.samples:
+            report_sample(sample, doc)
 
-for i in range(n_standart):
-    for j in range(len(sample)):
-        print("Результаты визуального анализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, visual_analysis(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
+        doc.add_heading("Результаты визуального анализа распределений средних значений образцов по всем факторам "
+                        "и всем эталонам", 1)
+        for std, kde in zip(self.stds, self.kde):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_picture(kde)
 
-print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
-
-for i in range(n_standart):
-    for j in range(len(sample)): print("Результаты тестирования нормальности распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",
-    test_normal(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
-
-print("Результаты статистического анализа распределения расстояний фактор-образца без нагрузки для всех образцов и всех эталонов")
-
-for i in range(n_standart):
-    for j in range(len(sample)): print("Результат статистическогоанализа распределения расстояний фактор-образца без нагрузки для образца  ", j, "  и эталона  ", i, "\n",  "[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] =  ", "\n" , stat_analys(sequence_distance(sequence_max(sample[j]), sequence_max(standart[i]))))
-
-        """
+        for idx, std in enumerate(self.stds):
+            for factor in range(4):
+                factor_name = FACTORS[factor].lower()
+                doc.add_heading("Для эталона {} и фактора {}".format(std.name, factor_name), 1)
+                doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
+                doc.add_paragraph(str(self.max_list[idx][factor]))
+                doc.add_heading("Результаты  визуального  анализа распределений средних значений фактор-образцов {}"
+                                .format(factor_name), 2)
+                doc.add_picture(self.va[idx][factor])
+                doc.add_heading("Результаты тестирования нормальности распределений средних значений фактор-образцов {}"
+                                .format(factor_name), 2)
+                report_ntest(self.ntest[idx][factor], doc)
+                doc.add_heading("Результаты статистического анализа распределений средних значений фактор-образцов {}"
+                                .format(factor_name), 2)
+                doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(self.stat[idx][factor][0]))
+                doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(self.stat[idx][factor][1]))
+                doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*self.stat[idx][factor][2]))

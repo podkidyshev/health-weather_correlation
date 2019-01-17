@@ -3,8 +3,9 @@ from io import BytesIO
 from docx import Document
 from docx.shared import Cm
 
-import science
-import science.funcs
+
+def str_arr(arr):
+    return "[" + ", ".join(map(lambda x: "{:.2f}".format(x), arr)) + "]"
 
 
 # noinspection PyUnresolvedReferences,PyTypeChecker
@@ -61,39 +62,3 @@ class Printer:
 
 def print_report(destination, func, *args):
     return Printer(destination, func, *args).print()
-
-
-def ntest_report(report, doc: Printer):
-    res_ok = "Образец выглядит гауссовским (не может отклонить гипотезу H0)"
-    res_nok = "Образец не выглядит гауссовским (отклонить гипотезу H0)"
-
-    shapiro = report["shapiro"]
-    doc.add_heading("Тест нормальности Шапиро-Вилка", 2)
-    doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(shapiro["stat"], shapiro["p"]))
-    doc.add_paragraph((res_ok if shapiro["res"] else res_nok) + '\n')
-
-    agostino = report["agostino"]
-    doc.add_heading("D'Agostino and Pearson's Test", 2)
-    doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(agostino["stat"], agostino["p"]))
-    doc.add_paragraph((res_ok if agostino["res"] else res_nok) + '\n')
-
-    anderson = report["anderson"]
-    doc.add_heading("Тест нормальности Андерсона-Дарлинга", 2)
-    doc.add_paragraph("Statistic = {:.3f}".format(anderson["statistic"]))
-    for res, cv, sl in zip(anderson["res"], anderson["critical"], anderson["sig_level"]):
-        doc.add_paragraph("{:.3f}: {:.3f}, {}\n".format(sl, cv, res_ok if res else res_nok))
-
-    ks = report["ks"]
-    doc.add_heading("Тест нормальности Колмогорова-Смирнова", 2)
-    num_tests = ks["num_tests"]
-    num_rejects = ks["num_rejects"]
-    ratio = ks["ratio"]
-    alpha = ks["alpha"]
-    doc.add_paragraph(
-        "Результаты теста Колмогорова-Смирнова: "
-        "из {} прогонов доля {}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}\n".format(
-            num_tests, num_rejects, num_tests, ratio, alpha))
-
-    if report['qq']:
-        img = science.plot_image(science.funcs.test_normal_plot, report, io=True)
-        doc.add_picture(img)

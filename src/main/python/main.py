@@ -68,19 +68,18 @@ if __name__ == '__main__':
 # https://tproger.ru/translations/python-gui-pyqt/
 r"""
 pyuic5 src/main\python/ui/form.ui -o src/main/python/form.py
-pyuic5 src/main\python/ui/frame_default.ui -o src/main/python/frames/default.py
-pyuic5 src/main/python/ui/frame_sample.ui -o src/main/python/frames/sample.py
-pyuic5 src/main/python/ui/frame_factor.ui -o src/main/python/frames/factor.py
+pyuic5 src/main\python/ui/default.ui -o src/main/python/frames/default.py
+pyuic5 src/main/python/ui/sample.ui -o src/main/python/frames/sample.py
+pyuic5 src/main/python/ui/factor.ui -o src/main/python/frames/factor.py
 
-pyuic5 src/main/python/ui/frame_check.ui -o src/main/python/frames/check.py
-pyuic5 src/main/python/ui/frame_combo.ui -o src/main/python/frames/combo.py
+pyuic5 src/main/python/ui/mul_std.ui -o src/main/python/frames/mul_both.py
+pyuic5 src/main/python/ui/mul_one.ui -o src/main/python/frames/mul_one.py
+pyuic5 src/main/python/ui/mul_both.ui -o src/main/python/frames/mul_both.py
 
-pyuic5 src/main/python/ui/frame_mul_std.ui -o src/main/python/frames/mul_both.py
-pyuic5 src/main/python/ui/frame_mul_one.ui -o src/main/python/frames/mul_one.py
-pyuic5 src/main/python/ui/frame_mul_both.ui -o src/main/python/frames/mul_both.py
-
-pyuic5 src/main/python/ui/frame_image.ui -o src/main/python/frames/image.py
-pyuic5 src/main/python/ui/frame_kde.ui -o src/main/python/frames/kde.py
-pyuic5 src/main/python/ui/frame_info.ui -o src/main/python/frames/info.py
-pyuic5 src/main/python/ui/frame_text.ui -o src/main/python/frames/text.py
+pyuic5 src/main/python/ui/utils/check.ui -o src/main/python/frames/utils/check.py
+pyuic5 src/main/python/ui/utils/combo.ui -o src/main/python/frames/utils/combo.py
+pyuic5 src/main/python/ui/utils/image.ui -o src/main/python/frames/utils/image.py
+pyuic5 src/main/python/ui/utils/kde.ui -o src/main/python/frames/utils/kde.py
+pyuic5 src/main/python/ui/utils/info.ui -o src/main/python/frames/utils/info.py
+pyuic5 src/main/python/ui/utils/text.ui -o src/main/python/frames/utils/text.py
 """

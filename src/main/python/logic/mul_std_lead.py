@@ -1,12 +1,16 @@
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtCore import Qt
 
-from science.classes import Sample, Standard
+from science.classes import Sample, Standard, FACTORS
 
-from logic import QFrameBase
-from logic.utils import QFrameCheck, QFrameCombo
+from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard, SampleMulStandards, FactorSampleMulStandards
+from reports.utils import Printer
+
+from logic import QFrameBase, dialog_save_report
+from logic.utils import QFrameCheck, QFrameCombo, QFrameInfo, QFrameImage
 from logic.sample import QFrameSample
 
+from frames.sample import Ui_FramePatient
 from frames.mul_one import Ui_FrameMulOne
 from frames.mul_both import Ui_FrameMulBoth
 
@@ -29,8 +33,9 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         self.frame_combo.signal_func = self.sample_changed
 
         self.std = Standard.standards[std]
-        self.report = None
-        self.report_frame = None
+
+        self.reports, self.frames = [], []
+        self.report, self.report_frame = None, None
 
         self.group_changed(self.frame_group.get_turned())
 
@@ -39,13 +44,37 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         self.frame_combo.combo.setCurrentIndex(0)
         self.frame_combo.combo_changed()
 
-    def sample_changed(self, sample):
         if self.report_frame is not None:
             self.layout_vertical.removeWidget(self.report_frame)
             self.report_frame.hide()
             self.report_frame = None
-        self.report_frame = QFrameSample(self, self.std.name, sample)
+
+        self.report_frame = QFrameBase.get_custom(Ui_FramePatient)(self, Ui_FramePatient)
+        self.report_frame.title_label.setText("Эталон {} и группа образцов".format(self.std.name))
+
+        samples = [Sample.samples[name] for name in new_values]
+
+        self.reports, self.frames = [], []
+        for factor in range(4):
+            self.reports.append(MulFactorSamplesStandard(samples, factor, self.std))
+            self.frames.append(QFrameInfo(self.report_frame, self.reports[-1]))
+            self.report_frame.tabs.widget(1 + factor).layout().insertWidget(0, self.frames[-1])
+
+        self.report = MulSamplesStandard(samples, self.std)
+        self.report_frame.tabs.setTabText(0, "Kde")
+        self.report_frame.tabs.widget(0).layout().insertWidget(0, QFrameImage(self, self.report, "kde"))
         self.layout_vertical.insertWidget(1, self.report_frame)
+
+    def save_report(self):
+        idx = self.report_frame.tabs.currentIndex()
+        if idx == 0:
+            fname = dialog_save_report("Группа образцов. Эталон {}".format(self.std.name))
+            if fname:
+                Printer('doc', self.report.get_report).print(fname)
+        else:
+            fname = dialog_save_report("Группа фактор-образцов {}. Эталон {}".format(FACTORS[idx - 1], self.std.name))
+            if fname:
+                Printer('doc', self.reports[idx - 1].get_report).print(fname)
 
 
 class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
@@ -67,7 +96,6 @@ class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
         self.frame_combo.signal_func = self.std_changed
 
         self.sample = Sample.samples[sample] if '--Групповой--' != sample else Sample.group
-        self.report = None
         self.report_frame = None
 
         self.group_changed(values)
@@ -84,6 +112,21 @@ class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
             self.report_frame = None
         self.report_frame = QFrameSample(self, std, self.sample.name)
         self.layout_vertical.insertWidget(1, self.report_frame)
+
+    def save_report(self):
+        idx = self.report_frame.tabs.currentIndex()
+        if idx == 0:
+            fname = dialog_save_report("Группа эталонов. Образец {}".format(self.sample.name))
+            if fname:
+                report = SampleMulStandards(self.sample, [Standard.standards[std]
+                                                          for std in self.frame_group.get_turned()])
+                Printer('doc', report.get_report).print(fname)
+        else:
+            fname = dialog_save_report("Группа эталонов. Образец {}".format(FACTORS[idx - 1], self.sample.name))
+            if fname:
+                report = FactorSampleMulStandards(self.sample, idx - 1,
+                                                  [Standard.standards[std] for std in self.frame_group.get_turned()])
+                Printer('doc', report.get_report).print(fname)
 
 
 class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulOne):
