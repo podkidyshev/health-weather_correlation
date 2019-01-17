@@ -3,7 +3,7 @@ from science.funcs import *
 from science.classes import Standard, Sample
 
 from reports import Printer, str_arr
-from reports.utils import report_std, report_sample, report_sample_factor, report_ntest
+from reports.utils import report_ntest
 
 
 class FactorSampleMulStandards:
@@ -20,11 +20,6 @@ class FactorSampleMulStandards:
 
     def get_report(self, doc: Printer):
         doc.add_heading("{}, фактор {} и группа эталонов".format(self.sample_name, FACTORS[self.factor]), 0)
-
-        report_sample_factor(self.sample, self.factor, doc)
-
-        for idx, std in enumerate(self.stds):
-            report_std(std, doc)
 
         doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
@@ -58,11 +53,6 @@ class SampleMulStandards:
 
     def get_report(self, doc: Printer):
         doc.add_heading("{} и группа эталонов".format(self.sample_name), 0)
-
-        report_sample(self.sample, doc)
-
-        for idx, std in enumerate(self.stds):
-            report_std(std, doc)
 
         doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
@@ -103,10 +93,6 @@ class MulFactorSamplesStandard:
 
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
-
-        report_std(self.std, doc)
-        for sample in self.samples:
-            report_sample_factor(sample, self.factor, doc)
 
         factor_name = FACTORS[self.factor].lower()
         doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
@@ -154,23 +140,12 @@ class MulSamplesStandard:
                 max_list_factor.append(np.mean(self.distance[sample_num][factor]))
             self.max_list.append(max_list_factor)
 
-        self.distance3 = [sequence_distance_1(self.max_list[factor], self.max_list[0]) for factor in range(1, 4)]
-        self.kde3 = plot_image(graph_kde3, self.distance3)
-
-        self.kde = plot_image(graph_kde, self.max_list)
         self.va = [plot_image(visual_analysis, xr) for xr in self.max_list]
         self.ntest = [test_normal(max_list_factor, qq=False) for max_list_factor in self.max_list]
         self.stat = [stat_analysis(max_list_factor) for max_list_factor in self.max_list]
 
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
-
-        report_std(self.std, doc)
-        for sample in self.samples:
-            report_sample(sample, doc)
-
-        doc.add_heading("Результаты визуального анализа распределений средних значений образцов по всем факторам", 1)
-        doc.add_picture(self.kde)
 
         for factor in range(4):
             factor_name = FACTORS[factor].lower()
@@ -201,25 +176,12 @@ class MulSamplesMulStandards:
         self.max_list = [[[np.mean(std[sample_num][factor]) for sample_num in range(len(self.samples))]
                           for factor in range(4)] for std in self.distance]
 
-        self.kde = [plot_image(graph_kde, std) for std in self.max_list]
         self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.max_list]
         self.ntest = [[test_normal(factor, qq=False) for factor in std] for std in self.max_list]
         self.stat = [[stat_analysis(factor) for factor in std] for std in self.max_list]
 
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Группа эталонов", 0)
-
-        for std in self.stds:
-            report_std(std, doc)
-
-        for sample in self.samples:
-            report_sample(sample, doc)
-
-        doc.add_heading("Результаты визуального анализа распределений средних значений образцов по всем факторам "
-                        "и всем эталонам", 1)
-        for std, kde in zip(self.stds, self.kde):
-            doc.add_heading("Для эталона {}".format(std.name), 2)
-            doc.add_picture(kde)
 
         for idx, std in enumerate(self.stds):
             for factor in range(4):
