@@ -13,7 +13,7 @@ from logic.default import QFrameDefault
 from logic.sample import QFrameSample
 from logic.standard import QFrameStandard
 from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdSample, QFrameMulStdMulSamples
-from logic.mul_sample_lead import QFrameSampleMulStd, QFrameMulSampleStd
+from logic.mul_sample_lead import QFrameSampleMulStd, QFrameMulSamplesStd, QFrameMulSamplesMulStd
 
 matplotlib.use("Qt5Agg")
 
@@ -121,9 +121,10 @@ class Main(Ui_MainBaseForm):
                 self.set_data_frame(QFrameSampleMulStd, lead)
             elif lead == "--Группа--" and slave in Standard.standards:
                 print("DO THIS")
-                self.set_data_frame(QFrameMulSampleStd, slave)
+                self.set_data_frame(QFrameMulSamplesStd, slave)
             elif lead == "--Группа--" and slave == "--Группа--":
                 print("DO THIS")
+                self.set_data_frame(QFrameMulSamplesMulStd)
             else:
                 raise ValueError('Неизвестный случай')
 
