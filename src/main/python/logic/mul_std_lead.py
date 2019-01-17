@@ -1,9 +1,12 @@
 from science.classes import Sample, Standard
 
+from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard
+
 from logic import QFrameBase
-from logic.utils import QFrameCheck, QFrameCombo
+from logic.utils import QFrameCheck, QFrameCombo, QFrameInfo, QFrameImage
 from logic.sample import QFrameSample
 
+from frames.sample import Ui_FramePatient
 from frames.mul_one import Ui_FrameMulOne
 from frames.mul_both import Ui_FrameMulBoth
 
@@ -19,14 +22,33 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         self.layout().insertWidget(0, self.frame_group)
 
         self.std = Standard.standards[std]
-        self.report = None
+
+        self.reports, self.frames = [], []
+        self.report, self.report_frame = None, None
 
         self.group_changed(self.frame_group.get_turned())
 
     def group_changed(self, new_values):
-        # self.report = MulSamplesStandard([Sample.samples[name] for name in new_values], self.std)
-        # self.title_label.setText("Эталон: {}. {} значений".format(self.std.name, len(new_values)))
-        pass
+        if self.report_frame is not None:
+            self.layout_vertical.removeWidget(self.report_frame)
+            self.report_frame.hide()
+            self.report_frame = None
+
+        self.report_frame = QFrameBase.get_custom(Ui_FramePatient)(self, Ui_FramePatient)
+        self.report_frame.title_label.setText("Эталон {} и группа образцов".format(self.std.name))
+
+        samples = [Sample.samples[name] for name in new_values]
+
+        self.reports, self.frames = [], []
+        for factor in range(4):
+            self.reports.append(MulFactorSamplesStandard(samples, factor, self.std))
+            self.frames.append(QFrameInfo(self.report_frame, self.reports[-1]))
+            self.report_frame.tabs.widget(1 + factor).layout().insertWidget(0, self.frames[-1])
+
+        self.report = MulSamplesStandard(samples, self.std)
+        self.report_frame.tabs.setTabText(0, "Kde")
+        self.report_frame.tabs.widget(0).layout().insertWidget(0, QFrameImage(self, self.report, "kde"))
+        self.layout_vertical.insertWidget(1, self.report_frame)
 
 
 class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):

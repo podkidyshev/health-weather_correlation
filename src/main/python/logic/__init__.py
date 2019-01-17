@@ -123,3 +123,9 @@ class QFrameBase(QFrame):
         text_edit._updating = False
 
         text_edit.installEventFilter(main_window)
+
+    @staticmethod
+    def get_custom(ui_class):
+        class QFrameCustom(QFrameBase, ui_class):
+            pass
+        return QFrameCustom
