@@ -3,10 +3,6 @@ from io import BytesIO
 from docx import Document
 from docx.shared import Cm
 
-import science
-import science.funcs
-import science.classes
-
 
 def str_arr(arr):
     return "[" + ", ".join(map(lambda x: "{:.2f}".format(x), arr)) + "]"

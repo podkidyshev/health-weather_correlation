@@ -44,7 +44,7 @@ def report_ntest(report, doc: Printer):
 def report_sample_factor(sample: Sample, factor: int, doc: Printer):
     doc.add_heading("Фактор-образец {}".format(FACTORS[factor].lower()), 2)
     doc.add_paragraph("Количество значений равно = {}".format(len(sample.data[factor])))
-    doc.add_paragraph(str_arr(sample.data))
+    doc.add_paragraph(str_arr(sample.data[factor]))
     doc.add_paragraph("Количество максимумов равно = {}".format(len(sample.seq_max[factor])))
     doc.add_paragraph(str_arr(sample.seq_max[factor]))
 

@@ -23,10 +23,11 @@ class FactorSampleMulStandards:
 
         report_sample_factor(self.sample, self.factor, doc)
 
-        doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
             report_std(std, doc)
 
+        doc.add_heading("Отчеты по эталонам", 1)
+        for idx, std in enumerate(self.stds):
             doc.add_paragraph("Последовательность расстояний для эталона {}. Количество значений равно = {}"
                               .format(std.name, len(self.distance[idx])))
             doc.add_paragraph(str(self.distance[idx]))
@@ -60,10 +61,11 @@ class SampleMulStandards:
 
         report_sample(self.sample, doc)
 
-        doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
             report_std(std, doc)
 
+        doc.add_heading("Отчеты по эталонам", 1)
+        for idx, std in enumerate(self.stds):
             for factor in range(4):
                 doc.add_heading("\nАнализ фактор-образца {}".format(FACTORS[factor]), 2)
                 doc.add_paragraph("Последовательность расстояний для образца {} и эталона {}. "

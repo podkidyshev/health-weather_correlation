@@ -1,8 +1,10 @@
+from science import FACTORS
 from science.classes import Sample, Standard
 
-from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard
+from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard, SampleMulStandards, FactorSampleMulStandards
+from reports.utils import Printer
 
-from logic import QFrameBase
+from logic import QFrameBase, dialog_save_report
 from logic.utils import QFrameCheck, QFrameCombo, QFrameInfo, QFrameImage
 from logic.sample import QFrameSample
 
@@ -50,6 +52,17 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         self.report_frame.tabs.widget(0).layout().insertWidget(0, QFrameImage(self, self.report, "kde"))
         self.layout_vertical.insertWidget(1, self.report_frame)
 
+    def save_report(self):
+        idx = self.report_frame.tabs.currentIndex()
+        if idx == 0:
+            fname = dialog_save_report("Группа образцов. Эталон {}".format(self.std.name))
+            if fname:
+                Printer('doc', self.report.get_report).print(fname)
+        else:
+            fname = dialog_save_report("Группа фактор-образцов {}. Эталон {}".format(FACTORS[idx - 1], self.std.name))
+            if fname:
+                Printer('doc', self.reports[idx - 1].get_report).print(fname)
+
 
 class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
     class QFrameMulStds(QFrameBase):
@@ -69,7 +82,6 @@ class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
         self.frame_combo.signal_func = self.std_changed
 
         self.sample = Sample.samples[sample] if '--Групповой--' != sample else Sample.group
-        self.report = None
         self.report_frame = None
 
         self.group_changed(values)
@@ -87,6 +99,21 @@ class QFrameMulStdSample(QFrameBase, Ui_FrameMulOne):
             self.report_frame = None
         self.report_frame = QFrameSample(self, std, self.sample.name)
         self.layout_vertical.insertWidget(1, self.report_frame)
+
+    def save_report(self):
+        idx = self.report_frame.tabs.currentIndex()
+        if idx == 0:
+            fname = dialog_save_report("Группа эталонов. Образец {}".format(self.sample.name))
+            if fname:
+                report = SampleMulStandards(self.sample, [Standard.standards[std]
+                                                          for std in self.frame_group.get_turned()])
+                Printer('doc', report.get_report).print(fname)
+        else:
+            fname = dialog_save_report("Группа эталонов. Образец {}".format(FACTORS[idx - 1], self.sample.name))
+            if fname:
+                report = FactorSampleMulStandards(self.sample, idx - 1,
+                                                  [Standard.standards[std] for std in self.frame_group.get_turned()])
+                Printer('doc', report.get_report).print(fname)
 
 
 class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulBoth):
