@@ -38,7 +38,7 @@ class Ui_FrameKde(object):
         self.verticalLayout.addWidget(self.tabs)
 
         self.retranslateUi(FrameKde)
-        self.tabs.setCurrentIndex(1)
+        self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(FrameKde)
 
     def retranslateUi(self, FrameKde):
