@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtCore import Qt
 
-from science.classes import Sample, Standard, FACTORS
+from science import FACTORS
+from science.classes import Sample, Standard
 
 from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard, SampleMulStandards, FactorSampleMulStandards
 from reports.utils import Printer
@@ -20,17 +21,10 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         QFrameBase.__init__(self, parent, Ui_FrameMulOne)
 
         values = list(Sample.samples.keys())
-        # Преобразовать имя группового образца из group в --Групповой--
         values.remove(Sample.group.name)
-        values.append("--Групповой--")
-
         self.frame_group = QFrameCheck(self, values)
         self.frame_group.signal_func = self.group_changed
         self.layout().insertWidget(0, self.frame_group)
-
-        self.frame_combo = QFrameCombo(self, values)
-        self.layout_vertical.insertWidget(0, self.frame_combo)
-        self.frame_combo.signal_func = self.sample_changed
 
         self.std = Standard.standards[std]
 
@@ -40,10 +34,6 @@ class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
         self.group_changed(self.frame_group.get_turned())
 
     def group_changed(self, new_values):
-        self.frame_combo.update_values(new_values)
-        self.frame_combo.combo.setCurrentIndex(0)
-        self.frame_combo.combo_changed()
-
         if self.report_frame is not None:
             self.layout_vertical.removeWidget(self.report_frame)
             self.report_frame.hide()

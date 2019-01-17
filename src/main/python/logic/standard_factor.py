@@ -2,7 +2,7 @@ from logic import QFrameBase, dialog_save
 from frames.standard_factor import Ui_FrameStandardFactor
 
 from reports import print_report
-from reports.std import StandardFactorSample
+from reports.sample import StandardFactorSample
 
 
 class QFrameStandardFactor(QFrameBase, Ui_FrameStandardFactor):
