@@ -3,12 +3,32 @@ from PyQt5.QtCore import Qt
 
 from science.classes import Sample, Standard
 
-from logic import QFrameBase
-from logic.utils import QFrameCheck, QFrameCombo
+from reports.sample_mul import MulStandardsSample, StandardMulSamples, StandardMulFactorSamples
+from reports.utils import Printer
+
+from logic import QFrameBase, dialog_save_report
+from logic.utils import QFrameCheck, QFrameCombo, QFrameInfo, QFrameStandardType
 from logic.standard import QFrameStandard
 
+from frames.standard import Ui_FrameStandard
 from frames.mul_one import Ui_FrameMulOne
-from frames.mul_both import Ui_FrameMulBoth
+
+
+class QFrameMulSamples(QFrameBase, Ui_FrameStandard):
+    def __init__(self, parent, std, samples):
+        QFrameBase.__init__(self, parent, Ui_FrameStandard)
+        self.std = Standard.standards[std]
+        self.samples = [Sample.samples[name] for name in samples]
+
+        self.report = StandardMulSamples(self.std, self.samples)
+        self.reports, self.frames = [], []
+
+        for factor in range(4):
+            self.reports.append(StandardMulFactorSamples(self.std, self.samples, factor))
+            self.frames.append(QFrameStandardType(self, self.reports[-1]))
+            self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
+
+        self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
 
 
 class QFrameSampleMulStd(QFrameBase, Ui_FrameMulOne):
@@ -44,6 +64,13 @@ class QFrameSampleMulStd(QFrameBase, Ui_FrameMulOne):
         self.report_frame = QFrameStandard(self, self.sample.name, std)
         self.layout_vertical.insertWidget(1, self.report_frame)
 
+    def save_report(self):
+        fname = dialog_save_report("Группа эталонов. Образец {}".format(self.sample.name))
+        if fname:
+            report = MulStandardsSample([Standard.standards[std]
+                                                      for std in self.frame_group.get_turned()], self.sample)
+            Printer('doc', report.get_report).print(fname)
+
 
 class QFrameMulSamplesStd(QFrameBase, Ui_FrameMulOne):
     class QFrameMulStds(QFrameBase):
@@ -54,36 +81,30 @@ class QFrameMulSamplesStd(QFrameBase, Ui_FrameMulOne):
         QFrameBase.__init__(self, parent, Ui_FrameMulOne)
 
         values = list(Sample.samples.keys())
-        # Преобразовать имя группового образца из group в --Групповой--
         values.remove(Sample.group.name)
-        values.append("--Групповой--")
 
         self.frame_group = QFrameCheck(self, values)
         self.frame_group.signal_func = self.group_changed
         self.layout().insertWidget(0, self.frame_group)
 
-        self.frame_combo = QFrameCombo(self, values)
-        self.layout_vertical.insertWidget(0, self.frame_combo)
-        self.frame_combo.signal_func = self.sample_changed
-
         self.std = Standard.standards[std]
         self.report = None
         self.report_frame = None
 
-        self.group_changed(values)
+        self.group_changed(self.frame_group.get_turned())
 
-    def group_changed(self, new_values):
-        self.frame_combo.update_values(new_values)
-        self.frame_combo.combo.setCurrentIndex(0)
-        self.frame_combo.combo_changed()
-
-    def sample_changed(self, sample):
+    def group_changed(self, new_samples):
         if self.report_frame is not None:
             self.layout_vertical.removeWidget(self.report_frame)
             self.report_frame.hide()
             self.report_frame = None
-        self.report_frame = QFrameStandard(self, sample, self.std.name)
+        self.report_frame = QFrameMulSamples(self, self.std.name, new_samples)
         self.layout_vertical.insertWidget(1, self.report_frame)
+
+    def save_report(self):
+        fname = dialog_save_report("Эталон {}. Группа образцов".format(self.std.name))
+        if fname:
+            Printer('doc', self.report_frame.report.get_report).print(fname)
 
 
 class QFrameMulSamplesMulStd(QFrameBase, Ui_FrameMulOne):
@@ -93,9 +114,7 @@ class QFrameMulSamplesMulStd(QFrameBase, Ui_FrameMulOne):
         layout = self.layout()
 
         samples = list(Sample.samples.keys())
-        # Преобразовать имя групповго образца из group в --Групповой--
         samples.remove(Sample.group.name)
-        samples.append("--Групповой--")
         stds = list(Standard.standards.keys())
 
         self.horizontalLayout = QHBoxLayout()
