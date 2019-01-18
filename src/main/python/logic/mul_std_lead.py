@@ -1,6 +1,3 @@
-from PyQt5.QtWidgets import QHBoxLayout
-from PyQt5.QtCore import Qt
-
 from science import FACTORS
 from science.classes import Sample, Standard
 
@@ -75,22 +72,17 @@ class QFrameMulStdMulSamples(QFrameBase, Ui_FrameMulOne):
         samples = list(Sample.samples.keys())
         samples.remove(Sample.group.name)
 
-        self.horizontalLayout = QHBoxLayout()
-
         self.frame_group_stds = QFrameCheck(self, stds)
         self.frame_group_stds.signal_func = self.group_stds_changed
         layout.insertWidget(0, self.frame_group_stds)
 
         self.std_frame_combo = QFrameCombo(self, stds)
-        self.horizontalLayout.insertWidget(0, self.std_frame_combo, alignment=Qt.AlignCenter)
+        self.layout_vertical.insertWidget(0, self.std_frame_combo)
         self.std_frame_combo.signal_func = self.std_changed
 
         self.frame_group_samples = QFrameCheck(self, samples)
         self.frame_group_samples.signal_func = self.group_samples_changed
         layout.insertWidget(1, self.frame_group_samples)
-
-        # Layout для боксов выбора
-        self.layout_vertical.addLayout(self.horizontalLayout)
 
         self.report_frame = None
 

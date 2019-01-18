@@ -103,12 +103,10 @@ class Main(Ui_MainBaseForm):
             if lead in Standard.standards and (slave in Sample.samples or slave == "--Групповой--"):
                 self.set_data_frame(QFrameSample, lead, slave)
             elif lead in Standard.standards and slave == "--Группа--":
-                print("DO THIS")
                 self.set_data_frame(QFrameStdMulSamples, lead)
             elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
                 self.set_data_frame(QFrameMulStdSample, slave)
             elif lead == "--Группа--" and slave == "--Группа--":
-                print("DO THIS")
                 self.set_data_frame(QFrameMulStdMulSamples)
             else:
                 raise ValueError("Неизвестный случай")
@@ -117,13 +115,10 @@ class Main(Ui_MainBaseForm):
             if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
                 self.set_data_frame(QFrameStandard, lead, slave)
             elif (lead in Sample.samples or lead == "--Групповой--") and slave == "--Группа--":
-                print("DO THIS")
                 self.set_data_frame(QFrameSampleMulStd, lead)
             elif lead == "--Группа--" and slave in Standard.standards:
-                print("DO THIS")
                 self.set_data_frame(QFrameMulSamplesStd, slave)
             elif lead == "--Группа--" and slave == "--Группа--":
-                print("DO THIS")
                 self.set_data_frame(QFrameMulSamplesMulStd)
             else:
                 raise ValueError('Неизвестный случай')
