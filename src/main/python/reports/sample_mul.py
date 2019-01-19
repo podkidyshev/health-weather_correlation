@@ -231,3 +231,72 @@ class StandardMulSamples:
             doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[factor][0]))
             doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[factor][1]))
             doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[factor][2]))
+
+
+class MulStandardsMulSamples:
+    def __init__(self, stds: list, samples: list):
+        self.stds = stds[:]
+        self.samples = samples[:]
+
+        self.distance = [[[sequence_distance_1(std.seq_max, factor) for factor in sample.seq_max]
+                          for sample in samples] for std in stds]
+
+        self.max_list = [[[np.mean(std[sample_num][factor]) for sample_num in range(len(self.samples))]
+                          for factor in range(4)] for std in self.distance]
+
+        self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.max_list]
+        self.ntest = [[test_normal(factor, qq=False) for factor in std] for std in self.max_list]
+        self.stat = [[stat_analysis(factor) for factor in std] for std in self.max_list]
+
+        self.distance_apl = [[[sequence_distance_1(std.seq_max_apl, factor) for factor in sample.seq_max0]
+                              for sample in samples] for std in stds]
+
+        self.max_list_apl = [[[np.mean(std[sample_num][factor]) for sample_num in range(len(self.samples))]
+                              for factor in range(4)] for std in self.distance_apl]
+
+        self.va_apl = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.max_list_apl]
+        self.ntest_apl = [[test_normal(factor, qq=False) for factor in std] for std in self.max_list_apl]
+        self.stat_apl = [[stat_analysis(factor) for factor in std] for std in self.max_list_apl]
+
+    def get_report(self, doc: Printer):
+        doc.add_heading("Группа эталонов. Группа образцов", 0)
+
+        for idx, std in enumerate(self.stds):
+            for factor in range(4):
+                factor_name = FACTORS[factor].lower()
+                doc.add_heading("Для эталона {} и фактора {}".format(std.name, factor_name), 1)
+                doc.add_heading(
+                    "Распределение средних значений эталона {} для фактора {}".format(std.name, factor_name), 2)
+                doc.add_paragraph(str_arr(self.max_list[idx][factor]))
+                doc.add_heading(
+                    "Результаты  визуального  анализа распределений средних значений эталона {} для фактор-образцов {}"
+                    .format(std.name, factor_name), 2)
+                doc.add_picture(self.va[idx][factor])
+                doc.add_heading(
+                    "Результаты тестирования нормальности распределений средних значений эталона {} для фактор-образцов {}"
+                    .format(std.name, factor_name), 2)
+                report_ntest(self.ntest[idx][factor], doc)
+                doc.add_heading(
+                    "Результаты статистического анализа распределений средних значений эталона {} для фактор-образцов {}"
+                    .format(std.name, factor_name), 2)
+                doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[idx][factor][0]))
+                doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[idx][factor][1]))
+                doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[idx][factor][2]))
+
+                doc.add_heading(
+                    "Распределение средних амплитуд эталона {} для фактора {}".format(std.name, factor_name), 2)
+                doc.add_paragraph(str_arr(self.max_list_apl[idx][factor]))
+                doc.add_heading(
+                    "Результаты  визуального  анализа распределений средних амплитуд эталона {} для фактор-образцов {}"
+                    .format(std.name, factor_name), 2)
+                doc.add_picture(self.va_apl[idx][factor])
+                doc.add_heading(
+                    "Результаты тестирования нормальности распределений средних амплитуд эталона {} для фактор-образцов {}"
+                    .format(std.name, factor_name), 2)
+                report_ntest(self.ntest_apl[idx][factor], doc)
+                doc.add_heading(
+                    "Результаты статистического анализа распределений средних амплитуд эталона {} для фактор-образцов {}"
+                    .format(std.name, factor_name), 2)
+                doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[idx][factor][0]))
+                doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[idx][factor][1]))
+                doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[idx][factor][2]))
