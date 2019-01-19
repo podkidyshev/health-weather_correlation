@@ -17,8 +17,6 @@ from logic.mul_sample_lead import QFrameSampleMulStd, QFrameMulSamplesStd, QFram
 
 matplotlib.use("Qt5Agg")
 
-# counter = 0
-
 
 class Main(Ui_MainBaseForm):
     # noinspection PyArgumentList,PyUnresolvedReferences
@@ -81,8 +79,7 @@ class Main(Ui_MainBaseForm):
         self.slave_box.clear()
         std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())] + \
                     ["Погода: --Группа--"]
-        sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())] + \
-                       ["Образец: --Группа--"]
+        sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
         self.lead_box.addItems(std_items + sample_items)
 
     def set_data_frame(self, frame_class, *args):

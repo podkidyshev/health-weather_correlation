@@ -1,4 +1,4 @@
-from reports import Printer
+from reports import Printer, str_arr
 from reports.utils import report_ntest
 
 from science import plot_image, FACTORS
@@ -37,33 +37,33 @@ class StandardFactorSample:
         if doc.destination == 'doc':
             doc.add_heading("Список значений эталона", 1)
             doc.add_paragraph("Количество значений равно = {}".format(len(y)))
-            doc.add_paragraph(str(y))
+            doc.add_paragraph(str_arr(y))
 
             doc.add_heading("Список максимумов значений эталона:", 1)
             doc.add_paragraph("Количество значений равно = {}".format(len(y_seq_max)))
-            doc.add_paragraph(str(y_seq_max))
+            doc.add_paragraph(str_arr(y_seq_max))
 
             doc.add_heading("Список максимумов амплитуд эталона:", 1)
             doc.add_paragraph("Количество амлитуд равно = {}".format(len_ampl(y_seq_max_apl)))
-            doc.add_paragraph(str(y_seq_max_apl))
+            doc.add_paragraph(str_arr(y_seq_max_apl))
             doc.add_paragraph('')
 
             doc.add_paragraph("Список значений фактор-образца {}:".format(self.factor_name))
             doc.add_paragraph("Количество значений равно = {}".format(len(x)))
-            doc.add_paragraph(str(x))
+            doc.add_paragraph(str_arr(x))
 
             doc.add_paragraph("Список максимумов значений фактор-образца {}:".format(self.factor_name))
             doc.add_paragraph("Количество значений равно = {}".format(len(x_seq_max)))
-            doc.add_paragraph(str(x_seq_max))
+            doc.add_paragraph(str_arr(x_seq_max))
             doc.add_paragraph('')
 
             doc.add_heading("Последовательность расстояний от максимумов значений эталона "
                             "до максимумов фактор-образца {}".format(self.factor_name), 1)
-            doc.add_paragraph(str(self.distance))
+            doc.add_paragraph(str_arr(self.distance))
 
             doc.add_heading("Последовательность расстояний от максимумов амплитуд значений эталона "
                             "до максимумов фактор-образца {}".format(self.factor_name), 1)
-            doc.add_paragraph(str(self.distance_apl))
+            doc.add_paragraph(str_arr(self.distance_apl))
 
         self.get_report_info(doc)
         self.get_report_info_apl(doc)
@@ -81,9 +81,9 @@ class StandardFactorSample:
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.3f}".format(self.stat[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.3f}".format(self.stat[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.3f}, {:.3f})".format(*self.stat[2]))
+        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[0]))
+        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[1]))
+        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[2]))
 
     def get_report_ntest(self, doc: Printer):
         # Костыль 3, стоит от этого избавиться
@@ -103,9 +103,9 @@ class StandardFactorSample:
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний амплитуд эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.3f}".format(self.stat_apl[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.3f}".format(self.stat_apl[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.3f}, {:.3f})".format(*self.stat_apl[2]))
+        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[0]))
+        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[1]))
+        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[2]))
 
     def get_report_ntest_apl(self, doc: Printer):
         # Костыль 5, стоит от этого избавиться
@@ -142,25 +142,25 @@ class StandardSample:
 
         doc.add_heading("Список значений эталона", 1)
         doc.add_paragraph("Количество значений равно = {}".format(len(self.std.data)))
-        doc.add_paragraph(str(self.std.data))
+        doc.add_paragraph(str_arr(self.std.data))
 
         doc.add_heading("Список максимумов эталона:", 1)
-        doc.add_paragraph("Количество значений равно = {}".format(str(len(self.std.seq_max))))
-        doc.add_paragraph(str(self.std.seq_max))
+        doc.add_paragraph("Количество значений равно = {}".format(len(self.std.seq_max)))
+        doc.add_paragraph(str_arr(self.std.seq_max))
 
         doc.add_heading("Список максимумов амплитуд эталона:", 1)
-        doc.add_paragraph("Количество значений равно = {}".format(str(len_ampl(self.std.seq_max_apl))))
-        doc.add_paragraph(str(self.std.seq_max_apl))
+        doc.add_paragraph("Количество значений равно = {}".format(len_ampl(self.std.seq_max_apl)))
+        doc.add_paragraph(str_arr(self.std.seq_max_apl))
         doc.add_paragraph('')
 
         for factor, y, y_seq_max in zip(range(4), self.sample.data, self.sample.seq_max):
             doc.add_paragraph("Список значений образца {}:".format(FACTORS[factor]))
             doc.add_paragraph("Количество значений равно = {}".format(len(y)))
-            doc.add_paragraph(str(y))
+            doc.add_paragraph(str_arr(y))
 
             doc.add_paragraph("Список максимумов значений образца {}:".format(FACTORS[factor]))
             doc.add_paragraph("Количество значений равно = {}".format(len(y_seq_max)))
-            doc.add_paragraph(str(y_seq_max))
+            doc.add_paragraph(str_arr(y_seq_max))
             doc.add_paragraph('')
 
         doc.add_heading("Ряды расстояний и распределения расстояний от максимумов значений "
@@ -169,12 +169,12 @@ class StandardSample:
             doc.add_paragraph(
                 "Ряд расстояний от максимумов значений эталона до ближайшего максимума образца {}:".format(
                     factor.lower()))
-            doc.add_paragraph(str(xr))
+            doc.add_paragraph(str_arr(xr))
 
             doc.add_paragraph(
                 "Ряд расстояний от максимумов амплитуд эталона до ближайшего максимума образца {}:".format(
                     factor.lower()))
-            doc.add_paragraph(str(xr_apl))
+            doc.add_paragraph(str_arr(xr_apl))
             doc.add_paragraph('')
 
         doc.add_heading("Результаты визуального анализа и тестирования нормальности", 1)
@@ -191,13 +191,13 @@ class StandardSample:
         for factor, stat, stat_apl in zip(FACTORS, self.stat, self.stat_apl):
             doc.add_paragraph("Результаты статистического анализа распределения значений эталона для образца {}"
                               .format(factor.lower()))
-            doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(stat[0]))
-            doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(stat[1]))
-            doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*stat[2]))
+            doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stat[0]))
+            doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stat[1]))
+            doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stat[2]))
 
             doc.add_paragraph(
                 "Результаты статистического анализа распределения амплитуд эталона для образца {}".format(
                     factor.lower()))
-            doc.add_paragraph("\tВыборочное среднее = {:.4f}".format(stat_apl[0]))
-            doc.add_paragraph("\tСтандартное отклонение = {:.4f}".format(stat_apl[1]))
-            doc.add_paragraph("\tДоверительный интервал = ({:.4f}, {:.4f})".format(*stat_apl[2]))
+            doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stat_apl[0]))
+            doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stat_apl[1]))
+            doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stat_apl[2]))
