@@ -12,6 +12,9 @@ main_window = None
 _samples = os.path.join(root, "science", "samples")
 samples = _samples if os.path.exists(_samples) else root
 
+last_open = ""
+last_save = ""
+
 
 def set_main_window(window):
     global main_window
@@ -37,8 +40,10 @@ def get_file_filter(formats: tuple):
 
 
 def dialog_open(title, *formats):
-    # TODO: разобраться с диалогами
-    dialog = QFileDialog(main_window, title, samples, get_file_filter(formats))
+    global last_open
+    path = samples if last_open == "" else last_open
+
+    dialog = QFileDialog(main_window, title, path, get_file_filter(formats))
     dialog.setLabelText(QFileDialog.Accept, "Добавить")
     dialog.setLabelText(QFileDialog.Reject, "Отмена")
     dialog.setAcceptMode(QFileDialog.AcceptOpen)
@@ -48,18 +53,27 @@ def dialog_open(title, *formats):
         fname = dialog.selectedFiles()[0]
         if fname and not os.path.exists(fname):
             raise ValueError("Выбранный файл не существует")
+        last_open = os.path.dirname(fname)
         return fname
     else:
         return ""
 
 
 def dialog_save(title, *formats, filename=''):
-    dialog = QFileDialog(main_window, title, root, get_file_filter(formats))
+    global last_save
+    path = root if last_save == "" else last_save
+
+    dialog = QFileDialog(main_window, title, path, get_file_filter(formats))
     dialog.setLabelText(QFileDialog.Accept, "Сохранить")
     dialog.setLabelText(QFileDialog.Reject, "Отмена")
     dialog.setAcceptMode(QFileDialog.AcceptSave)
     dialog.selectFile(filename)
-    return dialog.selectedFiles()[0] if dialog.exec() else ""
+
+    if dialog.exec():
+        fname = dialog.selectedFiles()[0]
+        last_save = os.path.dirname(fname)
+        return fname
+    return ""
 
 
 def dialog_save_report(filename):
