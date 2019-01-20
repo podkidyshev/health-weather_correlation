@@ -1,5 +1,5 @@
 from reports import Printer, str_arr
-from reports.utils import report_ntest
+from reports.utils import report_ntest, report_stats
 
 from science import plot_image, FACTORS
 from science.funcs import *
@@ -81,9 +81,7 @@ class StandardFactorSample:
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[2]))
+        report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
         # Костыль 3, стоит от этого избавиться
@@ -103,9 +101,7 @@ class StandardFactorSample:
                         .format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний амплитуд эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[2]))
+        report_stats(self.stat_apl, doc)
 
     def get_report_ntest_apl(self, doc: Printer):
         # Костыль 5, стоит от этого избавиться
@@ -191,13 +187,9 @@ class StandardSample:
         for factor, stat, stat_apl in zip(FACTORS, self.stat, self.stat_apl):
             doc.add_paragraph("Результаты статистического анализа распределения значений эталона для образца {}"
                               .format(factor.lower()))
-            doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stat[0]))
-            doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stat[1]))
-            doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stat[2]))
+            report_stats(stat, doc)
 
             doc.add_paragraph(
                 "Результаты статистического анализа распределения амплитуд эталона для образца {}".format(
                     factor.lower()))
-            doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stat_apl[0]))
-            doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stat_apl[1]))
-            doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stat_apl[2]))
+            report_stats(stat_apl, doc)

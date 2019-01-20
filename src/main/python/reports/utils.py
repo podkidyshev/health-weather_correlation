@@ -32,40 +32,10 @@ def report_ntest(report, doc: Printer):
         doc.add_picture(img)
 
 
-def report_ntest_full(report, doc: Printer):
-    res_ok = "Образец выглядит гауссовским (не может отклонить гипотезу H0)"
-    res_nok = "Образец не выглядит гауссовским (отклонить гипотезу H0)"
-
-    shapiro = report["shapiro"]
-    doc.add_heading("Тест нормальности Шапиро-Вилка", 2)
-    doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(shapiro["stat"], shapiro["p"]))
-    doc.add_paragraph((res_ok if shapiro["res"] else res_nok) + '\n')
-
-    agostino = report["agostino"]
-    doc.add_heading("D'Agostino and Pearson's Test", 2)
-    doc.add_paragraph("Statistics = {:.3f}, p = {:.3f}".format(agostino["stat"], agostino["p"]))
-    doc.add_paragraph((res_ok if agostino["res"] else res_nok) + '\n')
-
-    anderson = report["anderson"]
-    doc.add_heading("Тест нормальности Андерсона-Дарлинга", 2)
-    doc.add_paragraph("Statistic = {:.3f}".format(anderson["statistic"]))
-    for res, cv, sl in zip(anderson["res"], anderson["critical"], anderson["sig_level"]):
-        doc.add_paragraph("{:.3f}: {:.3f}, {}\n".format(sl, cv, res_ok if res else res_nok))
-
-    ks = report["ks"]
-    doc.add_heading("Тест нормальности Колмогорова-Смирнова", 2)
-    num_tests = ks["num_tests"]
-    num_rejects = ks["num_rejects"]
-    ratio = ks["ratio"]
-    alpha = ks["alpha"]
-    doc.add_paragraph(
-        "Результаты теста Колмогорова-Смирнова: "
-        "из {} прогонов доля {}/{} = {:.2f} отклоняет гипотезу H0 на уровне отклонения {}\n".format(
-            num_tests, num_rejects, num_tests, ratio, alpha))
-
-    if report['qq']:
-        img = plot_image(test_normal_plot, report, io=True)
-        doc.add_picture(img)
+def report_stats(stats, doc: Printer):
+    doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stats[0]))
+    doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stats[1]))
+    doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stats[2]))
 
 
 def report_sample_factor(sample: Sample, factor: int, doc: Printer):

@@ -1,5 +1,5 @@
 from reports import Printer, str_arr
-from reports.utils import report_ntest
+from reports.utils import report_ntest, report_stats
 
 from science import plot_image, FACTORS
 from science.funcs import *
@@ -27,9 +27,7 @@ class FactorSampleStandard:
         doc.add_paragraph(str_arr(self.distance))
 
         doc.add_heading("Результат статистического анализа распределения расстояний фактор-образца", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[2]))
+        report_stats(self.stat, doc)
 
         doc.add_heading("Результаты тестирования нормальности распределения расстояний фактор-образца", 1)
         report_ntest(self.ntest, doc)
@@ -40,9 +38,7 @@ class FactorSampleStandard:
     def get_report_stat(self, doc: Printer):
         doc.add_heading("{}, фактор {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[2]))
+        report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
         doc.add_heading("{}, фактор {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
@@ -94,9 +90,7 @@ class SampleStandard:
         doc.add_heading("Результаты статистического анализа распределения образца", 1)
         for factor, stat in zip(FACTORS, self.stat):
             doc.add_heading("Результаты статистического анализа распределения образца {}".format(factor.lower()), 2)
-            doc.add_paragraph("\tвыборочное среднее = {:.2f}".format(stat[0]))
-            doc.add_paragraph("\tстандартное отклонение = {:.2f}".format(stat[1]))
-            doc.add_paragraph("\tдоверительный интервал = ({:.2f}, {:.2f})".format(*stat[2]))
+            report_stats(stat, doc)
 
         doc.add_heading("Ядерные оценки плотности и кривая Гаусса для сравнения распределения расстояний "
                         "от фактор-образцов (с физической нагрузкой, после отдыха, с эмоциональной нагрузкой) до "
@@ -113,9 +107,7 @@ class SampleStandard:
         for factor, stat in zip(FACTORS, self.stat3):
             doc.add_heading("Результаты статистического группового анализа распределения расстояний от фактора {}"
                             .format(factor.lower()), 2)
-            doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stat[0]))
-            doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stat[1]))
-            doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stat[2]))
+            report_stats(stat, doc)
 
     def get_report_ntest3(self, doc: Printer):
         doc.add_heading("Тестирование нормальности распределения расстояний от фактор-образцов "
