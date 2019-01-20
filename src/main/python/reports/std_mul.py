@@ -1,4 +1,4 @@
-from science import plot_image, FACTORS
+from science import plot_image, FACTORS_L
 from science.funcs import *
 from science.classes import Standard, Sample
 
@@ -9,7 +9,7 @@ from reports.utils import report_ntest, report_stats
 class FactorSampleMulStandards:
     def __init__(self, sample: Sample, factor: int, stds: list):
         self.sample = sample
-        self.sample_name = "Групповой образец" if self.sample.name == "group" else "Образец " + self.sample.name
+        self.sample_name = sample.display()
         self.factor = factor
         self.stds = stds[:]
 
@@ -19,28 +19,26 @@ class FactorSampleMulStandards:
         self.stat = [stat_analysis(xr) for xr in self.distance]
 
     def get_report(self, doc: Printer):
-        doc.add_heading("{}, фактор {} и группа эталонов".format(self.sample_name, FACTORS[self.factor]), 0)
+        doc.add_heading("{} {} и группа эталонов".format(self.sample_name, FACTORS_L[self.factor]), 0)
 
         doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
-            doc.add_paragraph("Последовательность расстояний для эталона {}. Количество значений равно = {}"
-                              .format(std.name, len(self.distance[idx])))
-            doc.add_paragraph(str(self.distance[idx]))
-            doc.add_heading("Результаты визуального анализа распределения расстояний для эталона {}"
-                            .format(std.name), 2)
+            doc.add_heading("Для эталона {}".format(std.name), 1)
+            doc.add_paragraph("Последовательность расстояний. Количество значений равно = {}"
+                              .format(len(self.distance[idx])))
+            doc.add_paragraph(str_arr(self.distance[idx]))
+            doc.add_heading("Результаты визуального анализа распределения расстояний", 2)
             doc.add_picture(self.va[idx])
-            doc.add_heading("Результаты тестирования нормальности распределения расстояний для эталона {}"
-                            .format(std.name), 2)
+            doc.add_heading("Результаты тестирования нормальности распределения расстояний", 2)
             report_ntest(self.ntest[idx], doc)
-            doc.add_heading("Результаты статистического анализа распределения расстояний для эталона {}"
-                            .format(std.name), 2)
+            doc.add_heading("Результаты статистического анализа распределения расстояний", 2)
             report_stats(self.stat[idx], doc)
 
 
 class SampleMulStandards:
     def __init__(self, sample: Sample, stds: list):
         self.sample = sample
-        self.sample_name = "Групповой образец" if self.sample.name == "group" else "Образец " + self.sample.name
+        self.sample_name = sample.display()
         self.stds = stds[:]
 
         self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
@@ -55,20 +53,20 @@ class SampleMulStandards:
         doc.add_heading("Отчеты по эталонам", 1)
         for idx, std in enumerate(self.stds):
             doc.add_heading("Для эталона {}".format(std.name), 1)
-            for factor in range(4):
-                doc.add_heading("Для фактор-образца {}".format(FACTORS[factor]), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading("Для фактор-образца {}".format(factor_name), 1)
                 doc.add_paragraph("Последовательность расстояний для образца {} и эталона {}. "
-                                  "Количество значений равно = {}".format(FACTORS[factor],
+                                  "Количество значений равно = {}".format(factor_name,
                                                                           std.name, len(self.distance[idx][factor])))
                 doc.add_paragraph(str_arr(self.distance[idx][factor]))
                 doc.add_heading("Результаты визуального анализа распределения расстояний "
-                                "фактор-образца {} и эталона {}".format(FACTORS[factor], std.name), 2)
+                                "фактор-образца {} и эталона {}".format(factor_name, std.name), 2)
                 doc.add_picture(self.va[idx][factor])
                 doc.add_heading("Результаты тестирования нормальности распределения расстояний "
-                                "фактор-образца {} и эталона {}".format(FACTORS[factor], std.name), 2)
+                                "фактор-образца {} и эталона {}".format(factor_name, std.name), 2)
                 report_ntest(self.ntest[idx][factor], doc)
                 doc.add_heading("Результаты статистического анализа распределения расстояний "
-                                "фактор-образца {} и эталона {}".format(FACTORS[factor], std.name), 2)
+                                "фактор-образца {} и эталона {}".format(factor_name, std.name), 2)
                 report_stats(self.stat[idx][factor], doc)
 
 
@@ -91,7 +89,7 @@ class MulFactorSamplesStandard:
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
 
-        factor_name = FACTORS[self.factor].lower()
+        factor_name = FACTORS_L[self.factor]
         doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
         doc.add_paragraph(str_arr(self.max_list))
         doc.add_heading("Результаты  визуального  анализа распределений средних значений фактор-образцов {}"
@@ -106,14 +104,14 @@ class MulFactorSamplesStandard:
 
     def get_report_stat(self, doc: Printer):
         # TODO: Костыль 2, стоит от этого избавиться
-        doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
+        doc.add_heading("Фактор {}. Эталон {}".format(FACTORS_L[self.factor], self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
         report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
         # TODO: Костыль 3, стоит от этого избавиться
-        doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
+        doc.add_heading("Фактор {}. Эталон {}".format(FACTORS_L[self.factor], self.std.name), 0)
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
         report_ntest(self.ntest, doc)
 
@@ -141,7 +139,7 @@ class MulSamplesStandard:
         doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
 
         for factor in range(4):
-            factor_name = FACTORS[factor].lower()
+            factor_name = FACTORS_L[factor]
             doc.add_heading("Для фактора {}".format(factor_name), 1)
             doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
             doc.add_paragraph(str_arr(self.max_list[factor]))
@@ -176,7 +174,7 @@ class MulSamplesMulStandards:
 
         for idx, std in enumerate(self.stds):
             for factor in range(4):
-                factor_name = FACTORS[factor].lower()
+                factor_name = FACTORS_L[factor]
                 doc.add_heading("Для эталона {} и фактора {}".format(std.name, factor_name), 1)
                 doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
                 doc.add_paragraph(str(self.max_list[idx][factor]))

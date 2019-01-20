@@ -78,6 +78,18 @@ class Sample:
         Sample.group.seq_max0 = [funcs.sequence_max0(data) for data in Sample.group.data]
         Sample.samples[GROUP_SAMPLE_NAME] = Sample.group
 
+    def display(self):
+        if self.name == GROUP_SAMPLE_NAME:
+            return "Групповой образец"
+        else:
+            return "Образец: " + self.name
+
+    def display_g(self):
+        if self.name == GROUP_SAMPLE_NAME:
+            return "группового образца"
+        else:
+            return "образца " + self.name
+
 
 class Standard:
     class StandardError(Exception):
@@ -118,6 +130,9 @@ class Standard:
         if len(data) != DATA_LENGTH:
             raise Sample.SampleError('Для эталона {} переданы некорректные данные: '
                                      'проверьте количество данных'.format(name))
+
+    def display(self):
+        return "Погода: " + self.name
 
 
 if __name__ == '__main__':
