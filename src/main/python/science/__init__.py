@@ -12,6 +12,7 @@ FACTORS = [
     "С эмоциональной нагрузкой",
     "После отдыха"
 ]
+FACTORS_L = [factor.lower() for factor in FACTORS]
 
 
 class XLSXParseError(ValueError):

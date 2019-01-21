@@ -3,7 +3,7 @@ from science.funcs import *
 from science.classes import Standard, Sample
 
 from reports import Printer, str_arr
-from reports.utils import report_ntest
+from reports.utils import report_ntest, report_stats
 
 
 class MulStandardsSample:
@@ -43,9 +43,7 @@ class MulStandardsSample:
                 report_ntest(self.ntest[idx][factor], doc)
                 doc.add_heading("\nРезультаты статистического анализа распределения расстояний значений "
                                 "эталона {} и фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[idx][factor][0]))
-                doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[idx][factor][1]))
-                doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[idx][factor][2]))
+                report_stats(self.stat[idx][factor], doc)
 
                 doc.add_paragraph("Последовательность расстояний амплитуд для эталона {} и образца {}."
                                   "Количество значений равно = {}".format(std.name, FACTORS[factor],
@@ -59,9 +57,7 @@ class MulStandardsSample:
                 report_ntest(self.ntest_apl[idx][factor], doc)
                 doc.add_heading("\nРезультаты статистического анализа распределения расстояний амплитуд "
                                 "эталона {} и фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[idx][factor][0]))
-                doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[idx][factor][1]))
-                doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[idx][factor][2]))
+                report_stats(self.stat_apl[idx][factor], doc)
 
 
 class StandardMulFactorSamples:
@@ -104,12 +100,10 @@ class StandardMulFactorSamples:
         report_ntest(self.ntest, doc)
         doc.add_heading("Результаты статистического анализа распределений средних значений эталона {} для фактор-образцов {}"
                         .format(self.std.name, factor_name), 2)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[2]))
+        report_stats(self.stat, doc)
 
-        doc.add_heading("Распределение средних амплитуд эталона {} для образцов {}".format(self.std.name, factor_name),
-                        2)
+        doc.add_heading("Распределение средних амплитуд эталона {} для образцов {}"
+                        .format(self.std.name, factor_name), 2)
         doc.add_paragraph(str_arr(self.max_list_apl))
         doc.add_heading(
             "Результаты  визуального  анализа распределений средних амплитуд эталона {} для фактор-образцов {}"
@@ -122,18 +116,14 @@ class StandardMulFactorSamples:
         doc.add_heading(
             "Результаты статистического анализа распределений средних амплитуд эталона {} для фактор-образцов {}"
             .format(self.std.name, factor_name), 2)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[2]))
+        report_stats(self.stat_apl, doc)
 
     def get_report_stat(self, doc: Printer):
         # TODO: Костыль 2, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[2]))
+        report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
         # TODO: Костыль 3, стоит от этого избавиться
@@ -146,9 +136,7 @@ class StandardMulFactorSamples:
         doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний амплитуд эталона", 1)
-        doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[0]))
-        doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[1]))
-        doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[2]))
+        report_stats(self.stat_apl, doc)
 
     def get_report_ntest_apl(self, doc: Printer):
         # TODO: Костыль 5, стоит от этого избавиться
@@ -228,9 +216,7 @@ class StandardMulSamples:
             doc.add_heading(
                 "Результаты статистического анализа распределений средних амплитуд эталона {} для фактор-образцов {}"
                     .format(self.std.name, factor_name), 2)
-            doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[factor][0]))
-            doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[factor][1]))
-            doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[factor][2]))
+            report_stats(self.stat_apl[factor], doc)
 
 
 class MulStandardsMulSamples:
@@ -279,9 +265,7 @@ class MulStandardsMulSamples:
                 doc.add_heading(
                     "Результаты статистического анализа распределений средних значений эталона {} для фактор-образцов {}"
                     .format(std.name, factor_name), 2)
-                doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat[idx][factor][0]))
-                doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat[idx][factor][1]))
-                doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat[idx][factor][2]))
+                report_stats(self.stat[idx][factor], doc)
 
                 doc.add_heading(
                     "Распределение средних амплитуд эталона {} для фактора {}".format(std.name, factor_name), 2)
@@ -297,6 +281,4 @@ class MulStandardsMulSamples:
                 doc.add_heading(
                     "Результаты статистического анализа распределений средних амплитуд эталона {} для фактор-образцов {}"
                     .format(std.name, factor_name), 2)
-                doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(self.stat_apl[idx][factor][0]))
-                doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(self.stat_apl[idx][factor][1]))
-                doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*self.stat_apl[idx][factor][2]))
+                report_stats(self.stat_apl[idx][factor], doc)
