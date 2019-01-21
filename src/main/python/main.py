@@ -82,4 +82,6 @@ pyuic5 src/main/python/ui/utils/image.ui -o src/main/python/frames/utils/image.p
 pyuic5 src/main/python/ui/utils/kde.ui -o src/main/python/frames/utils/kde.py
 pyuic5 src/main/python/ui/utils/info.ui -o src/main/python/frames/utils/info.py
 pyuic5 src/main/python/ui/utils/text.ui -o src/main/python/frames/utils/text.py
+
+pyuic5 src/main/python/ui/dialog.ui -o src/main/python/frames/dialog.py
 """

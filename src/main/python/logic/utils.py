@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QCheckBox
+from PyQt5.QtWidgets import QFrame, QCheckBox, QDialog
 
 from logic import QFrameBase
 
@@ -9,6 +9,7 @@ from frames.utils.text import Ui_FrameText
 from frames.utils.combo import Ui_FrameCombo
 from frames.utils.check import Ui_FrameCheck
 from frames.utils.standard_type import Ui_FrameStandardType
+from frames.dialog import Ui_DialogGroup
 
 from reports import print_report
 
@@ -183,3 +184,22 @@ class QFrameCombo(QFrame, Ui_FrameCombo):
         if self.signal_func is not None:
             value = self.combo.currentText()
             self.signal_func(value)
+
+
+class QDialogGroup(QDialog, Ui_DialogGroup):
+    def __init__(self, parent, values):
+        # noinspection PyArgumentList
+        QDialog.__init__(self, parent)
+        Ui_DialogGroup.setupUi(self, self)
+
+        self.values = None
+        self.cbs = []
+        for v in reversed(values):
+            self.cbs.append(QCheckBox(v, self))
+            self.cbs[-1].setChecked(1)
+            self.layout().insertWidget(0, self.cbs[-1])
+
+    def accept(self):
+        self.values = [cb.text() for cb in self.cbs if cb.isChecked()]
+        QDialog.accept(self)
+

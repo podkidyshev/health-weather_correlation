@@ -15,6 +15,8 @@ from logic.standard import QFrameStandard
 from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdSample, QFrameMulStdMulSamples
 from logic.mul_sample_lead import QFrameSampleMulStd, QFrameMulSamplesStd, QFrameMulSamplesMulStd
 
+from logic.utils import QDialogGroup
+
 matplotlib.use("Qt5Agg")
 
 
@@ -42,6 +44,7 @@ class Main(Ui_MainBaseForm):
         self.slave_box.activated.connect(self.choose_data_frame)
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
+        self.report_group_btn.clicked.connect(self.report_group_btn_clicked)
 
         self.set_data_frame(QFrameDefault)
         self.show()
@@ -174,6 +177,9 @@ class Main(Ui_MainBaseForm):
             self.data_frame.save_report()
         else:
             print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
+
+    def report_group_btn_clicked(self):
+        print("report_group_btn_clicked")
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]
