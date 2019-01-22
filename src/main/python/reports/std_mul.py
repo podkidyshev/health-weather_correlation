@@ -6,12 +6,12 @@ from reports import Printer, str_arr
 from reports.utils import report_ntest, report_stats
 
 
-class MulStandardsFactorSample:
-    def __init__(self, stds: list, sample: Sample, factor: int):
-        self.stds = stds[:]
+class FactorSampleMulStandards:
+    def __init__(self, sample: Sample, factor: int, stds: list):
         self.sample = sample
         self.sample_name = sample.display()
         self.factor = factor
+        self.stds = stds[:]
 
         self.distance = [sequence_distance(self.sample.seq_max[factor], std.seq_max) for std in stds]
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
@@ -35,11 +35,11 @@ class MulStandardsFactorSample:
             report_stats(self.stat[idx], doc)
 
 
-class MulStandardsSample:
-    def __init__(self, stds: list, sample: Sample):
-        self.stds = stds[:]
+class SampleMulStandards:
+    def __init__(self, sample: Sample, stds: list):
         self.sample = sample
         self.sample_name = sample.display()
+        self.stds = stds[:]
 
         self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
                          for std in stds]
@@ -70,11 +70,11 @@ class MulStandardsSample:
                 report_stats(self.stat[idx][factor], doc)
 
 
-class StandardMulFactorSamples:
-    def __init__(self, std: Standard, samples: list, factor: int):
-        self.std = std
+class MulFactorSamplesStandard:
+    def __init__(self, samples: list, factor: int, std: Standard):
         self.samples = samples[:]
         self.factor = factor
+        self.std = std
 
         self.distance = [sequence_distance_1(sample.seq_max[factor], std.seq_max) for sample in samples]
 
@@ -116,10 +116,10 @@ class StandardMulFactorSamples:
         report_ntest(self.ntest, doc)
 
 
-class StandardMulSamples:
-    def __init__(self, std: Standard, samples: list):
-        self.std = std
+class MulSamplesStandard:
+    def __init__(self, samples: list, std: Standard):
         self.samples = samples[:]
+        self.std = std
 
         self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
                          for sample in samples]
@@ -194,10 +194,10 @@ class MulFactorSamplesMulStandards:
             report_stats(stat, doc)
 
 
-class MulStandardsMulSamples:
-    def __init__(self, stds: list, samples: list):
-        self.stds = stds[:]
+class MulSamplesMulStandards:
+    def __init__(self, samples: list, stds: list):
         self.samples = samples[:]
+        self.stds = stds[:]
 
         self.distance = [[[sequence_distance_1(factor, std.seq_max) for factor in sample.seq_max]
                           for sample in samples] for std in stds]

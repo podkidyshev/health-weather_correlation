@@ -1,36 +1,37 @@
 from logic import QFrameBase, dialog_save_report
-from logic.utils import QFrameStandardType
 from logic.utils import QFrameInfo, QFrameInfoKde, QDialogStds
 
-from frames.standard import Ui_FrameStandard
+from frames.sample import Ui_FramePatient
 
 from science import FACTORS_ALL
 from science.classes import Standard, Sample
 
 from reports import Printer
-from reports.sample import FactorSampleStandard, SampleStandard
-from reports.sample_mul import FactorSampleMulStandards, SampleMulStandards
-from reports.sample_mul import (MulSamplesStandard, MulFactorSamplesStandard,
-                                MulSamplesMulStandards, MulFactorSamplesMulStandards)
+from reports.std import FactorSampleStandard, SampleStandard
+from reports.std_mul import FactorSampleMulStandards, SampleMulStandards
+from reports.std_mul import (MulSamplesStandard, MulFactorSamplesStandard,
+                             MulSamplesMulStandards, MulFactorSamplesMulStandards)
 
 
-class QFrameSampleStd(QFrameBase, Ui_FrameStandard):
-    def __init__(self, parent, sample_name, std_name):
-        QFrameBase.__init__(self, parent, Ui_FrameStandard)
+class QFrameSample(QFrameBase, Ui_FramePatient):
+    def __init__(self, parent, std_name, sample_name):
+        QFrameBase.__init__(self, parent, Ui_FramePatient)
 
-        self.sample = Sample.samples[sample_name] if sample_name != "--Групповой--" else Sample.group
         self.std = Standard.standards[std_name]
+        self.sample = Sample.samples[sample_name] if sample_name != "--Групповой--" else Sample.group
 
         self.report = SampleStandard(self.sample, self.std)
 
-        self.title_label.setText("Погода {}".format(std_name))
+        self.title_label.setText("{}".format(self.report.sample_name))
 
         self.reports = []
         self.frames = []
         for factor in range(4):
             self.reports.append(FactorSampleStandard(self.sample, factor, self.std))
-            self.frames.append(QFrameStandardType(self, self.reports[-1]))
-            self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
+            self.frames.append(QFrameInfo(self, self.reports[-1]))
+            self.tabs.widget(1 + factor).layout().insertWidget(0, self.frames[-1])
+
+        self.tabs.widget(0).layout().insertWidget(0, QFrameInfoKde(self, self.report, "kde"))
 
     def save_report(self):
         factor = QDialogStds.settings(self, get_stds=False)
@@ -59,11 +60,9 @@ class QFrameSampleStd(QFrameBase, Ui_FrameStandard):
         Printer('doc', report.get_report).print(fname)
 
 
-# TODO: таб значения/амплитуды некорректно ресайзится
-# TODO: пока не понятно нужен этот фрейм или нет
-class QFrameMulSamplesStd(QFrameBase):
+class QFrameStdMulSamples(QFrameBase, Ui_FramePatient):
     def __init__(self, parent, std):
-        QFrameBase.__init__(self, parent)
+        QFrameBase.__init__(self, parent, Ui_FramePatient)
 
         self.samples = list(Sample.samples.values())
         self.std = Standard.standards[std]
@@ -71,12 +70,13 @@ class QFrameMulSamplesStd(QFrameBase):
         self.report = MulSamplesStandard(self.samples, self.std)
         self.reports, self.frames = [], []
 
+        self.tabs.removeTab(0)
         for factor in range(4):
             self.reports.append(MulFactorSamplesStandard(self.samples, factor, self.std))
-            self.frames.append(QFrameStandardType(self, self.reports[-1]))
+            self.frames.append(QFrameInfo(self, self.reports[-1]))
             self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
 
-        self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
+        self.title_label.setText("Эталон {} и группа образцов".format(self.std.name))
 
     def save_report(self):
         factor = QDialogStds.settings(self, get_stds=False)
