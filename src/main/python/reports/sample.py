@@ -23,7 +23,6 @@ class FactorSampleStandard:
         self.stat_apl = stat_analysis(self.distance_apl)
 
         self.sample_name = sample.display()
-        # Костыль 1, стоит от этого избавиться
         self.factor_name = FACTORS_L[self.factor]
 
     def get_report(self, doc: Printer):
@@ -75,17 +74,15 @@ class FactorSampleStandard:
             doc.add_picture(self.va_apl)
 
     def get_report_stat(self, doc: Printer):
-        # Костыль 2, стоит от этого избавиться
-        doc.add_heading("{}, фактор {}. Эталон {}"
-                        .format(self.sample_name, self.factor_name, self.std.name), 0)
+        # TODO: Костыль 2, стоит от этого избавиться
+        doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
         report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
-        # Костыль 3, стоит от этого избавиться
-        doc.add_heading("{}, фактор {}. Эталон {}"
-                        .format(self.sample_name, self.factor_name, self.std.name), 0)
+        # TODO: Костыль 3, стоит от этого избавиться
+        doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
         report_ntest(self.ntest, doc)
@@ -95,17 +92,15 @@ class FactorSampleStandard:
         self.get_report_ntest(doc)
 
     def get_report_stat_apl(self, doc: Printer):
-        # Костыль 4, стоит от этого избавиться
-        doc.add_heading("{}, фактор {}. Эталон {}"
-                        .format(self.sample_name, self.factor_name, self.std.name), 0)
+        # TODO: Костыль 4, стоит от этого избавиться
+        doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результат статистического анализа распределения расстояний амплитуд эталона", 1)
         report_stats(self.stat_apl, doc)
 
     def get_report_ntest_apl(self, doc: Printer):
-        # Костыль 5, стоит от этого избавиться
-        doc.add_heading("{}, фактор {}. Эталон {}"
-                        .format(self.sample_name, self.factor_name, self.std.name), 0)
+        # TODO: Костыль 5, стоит от этого избавиться
+        doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
 
         doc.add_heading("Результаты тестирования нормальности распределения расстояний амплитуд эталона", 1)
         report_ntest(self.ntest_apl, doc)
