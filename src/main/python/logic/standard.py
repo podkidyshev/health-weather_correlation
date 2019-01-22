@@ -9,7 +9,8 @@ from science.classes import Standard, Sample
 from reports import Printer
 from reports.sample import StandardFactorSample, StandardSample
 from reports.sample_mul import MulStandardsSample
-from reports.sample_mul import StandardMulSamples, StandardMulFactorSamples, MulStandardsMulSamples
+from reports.sample_mul import (StandardMulSamples, StandardMulFactorSamples,
+                                MulStandardsMulSamples, MulStandardsFactorSample)
 
 
 class QFrameStandard(QFrameBase, Ui_FrameStandard):
@@ -53,9 +54,7 @@ class QFrameStandard(QFrameBase, Ui_FrameStandard):
         if factor == FACTORS_ALL:
             report = MulStandardsSample(stds, self.sample)
         else:
-            return
-            # TODO: сделать отчет
-            # report = MulStandardsFactorSample
+            report = MulStandardsFactorSample(stds, self.sample, factor)
         Printer("doc", report.get_report).print(fname)
 
 

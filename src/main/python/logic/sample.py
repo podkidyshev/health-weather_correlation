@@ -3,13 +3,14 @@ from logic.utils import QFrameInfo, QFrameInfoKde, QDialogGroupFactor
 
 from frames.sample import Ui_FramePatient
 
-from science import FACTORS_L, FACTORS_ALL
+from science import FACTORS_ALL
 from science.classes import Standard, Sample
 
 from reports import Printer
 from reports.std import FactorSampleStandard, SampleStandard
 from reports.std_mul import FactorSampleMulStandards, SampleMulStandards
-from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard, MulSamplesMulStandards
+from reports.std_mul import (MulSamplesStandard, MulFactorSamplesStandard,
+                             MulSamplesMulStandards, MulFactorSamplesMulStandards)
 
 
 class QFrameSample(QFrameBase, Ui_FramePatient):
@@ -98,7 +99,5 @@ class QFrameStdMulSamples(QFrameBase, Ui_FramePatient):
         if factor == FACTORS_ALL:
             report = MulSamplesMulStandards(self.samples, stds)
         else:
-            print("Добавить отчет MulFactorSamplesMulStandards")
-            return
-            # report = MulFactorSamplesMulStandards(self.samples, factor, std)
+            report = MulFactorSamplesMulStandards(self.samples, factor, stds)
         Printer('doc', report.get_report).print(fname)
