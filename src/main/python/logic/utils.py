@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QCheckBox, QDialog
+from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox
+from PyQt5.QtCore import Qt
 
 from logic import QFrameBase
 
@@ -137,6 +138,10 @@ class QDialogGroup(QDialog, Ui_DialogGroup):
             self.cbs.append(QCheckBox(v, self))
             self.cbs[-1].setChecked(1)
             self.layout().insertWidget(0, self.cbs[-1])
+
+        self.buttons.button(QDialogButtonBox.Save).setText("Сохранить")
+        self.buttons.button(QDialogButtonBox.Cancel).setText("Отмена")
+        self.setWindowFlags(self.windowFlags() ^ Qt.WindowContextHelpButtonHint)
 
     def accept(self):
         self.values = [cb.text() for cb in self.cbs if cb.isChecked()]
