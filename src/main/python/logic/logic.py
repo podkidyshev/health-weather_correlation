@@ -9,11 +9,10 @@ from form import Ui_MainBaseForm
 from science.classes import *
 
 from logic import dialog_open, set_main_window
-from logic.default import QFrameDefault
-from logic.sample import QFrameSample
-from logic.standard import QFrameStandard
-from logic.mul_std_lead import QFrameStdMulSamples, QFrameMulStdSample, QFrameMulStdMulSamples
-from logic.mul_sample_lead import QFrameSampleMulStd, QFrameMulSamplesStd, QFrameMulSamplesMulStd
+from logic.sample import QFrameSample, QFrameStdMulSamples
+from logic.standard import QFrameStandard, QFrameMulSamplesStd
+
+from logic.utils import QDialogGroup, QFrameDefault
 
 matplotlib.use("Qt5Agg")
 
@@ -42,6 +41,7 @@ class Main(Ui_MainBaseForm):
         self.slave_box.activated.connect(self.choose_data_frame)
         # Отчет
         self.report_btn.clicked.connect(self.report_btn_clicked)
+        self.report_group_btn.clicked.connect(self.report_group_btn_clicked)
 
         self.set_data_frame(QFrameDefault)
         self.show()
@@ -77,8 +77,7 @@ class Main(Ui_MainBaseForm):
     def update_boxes(self):
         self.lead_box.clear()
         self.slave_box.clear()
-        std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())] + \
-                    ["Погода: --Группа--"]
+        std_items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         sample_items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())]
         self.lead_box.addItems(std_items + sample_items)
 
@@ -101,22 +100,14 @@ class Main(Ui_MainBaseForm):
                 self.set_data_frame(QFrameSample, lead, slave)
             elif lead in Standard.standards and slave == "--Группа--":
                 self.set_data_frame(QFrameStdMulSamples, lead)
-            elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
-                self.set_data_frame(QFrameMulStdSample, slave)
-            elif lead == "--Группа--" and slave == "--Группа--":
-                self.set_data_frame(QFrameMulStdMulSamples)
             else:
                 raise ValueError("Неизвестный случай")
         # Образец - погода
         else:
             if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
                 self.set_data_frame(QFrameStandard, lead, slave)
-            elif (lead in Sample.samples or lead == "--Групповой--") and slave == "--Группа--":
-                self.set_data_frame(QFrameSampleMulStd, lead)
             elif lead == "--Группа--" and slave in Standard.standards:
                 self.set_data_frame(QFrameMulSamplesStd, slave)
-            elif lead == "--Группа--" and slave == "--Группа--":
-                self.set_data_frame(QFrameMulSamplesMulStd)
             else:
                 raise ValueError('Неизвестный случай')
 
@@ -124,8 +115,7 @@ class Main(Ui_MainBaseForm):
     def lead_box_activated(self):
         lead_type = self.lead_box.currentText().split(' ')[0]
         if lead_type == 'Образец:':
-            items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())] + \
-                    ["Погода: --Группа--"]
+            items = ["Погода: " + str(self.std_list.item(i).text()) for i in range(self.std_list.count())]
         elif lead_type == 'Погода:':
             items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())] + \
                     ["Образец: --Группа--"]
@@ -170,10 +160,14 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def report_btn_clicked(self):
-        if hasattr(self.data_frame, "save_report"):
+        if self.data_frame is not None:
             self.data_frame.save_report()
-        else:
-            print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
+
+    def report_group_btn_clicked(self):
+        if self.data_frame is not None:
+            dialog = QDialogGroup(self, list(Standard.standards.keys()))
+            if dialog.exec():
+                self.data_frame.save_report_group(dialog.values)
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]

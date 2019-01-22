@@ -3,7 +3,7 @@ import sys
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QTextCursor
-from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit
+from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit, QVBoxLayout
 
 
 root = os.path.dirname(sys.argv[0])
@@ -84,14 +84,24 @@ class QFrameBase(QFrame):
     class QFrameBaseException(Exception):
         pass
 
-    def __init__(self, parent, child_frame_class):
+    def __init__(self, parent, child_frame_class=None):
         # noinspection PyArgumentList
         QFrame.__init__(self, parent=parent)
         if child_frame_class is not None:
             child_frame_class.setupUi(self, self)
         self.resize(500, 500)
         self.setMinimumSize(QSize(500, 500))
+
+        if child_frame_class is None:
+            QVBoxLayout(self)
         self.layout().setContentsMargins(0, 0, 0, 0)
+
+    def save_report(self):
+        print("Функция save_report у класса {} не переопределена".format(type(self)))
+
+    def save_report_group(self, stds: "лист строк"):
+        print("Функция save_report_group у класса {} не переопределена".format(type(self)))
+        print("Эталоны: {}".format(stds))
 
     def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
         """

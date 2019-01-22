@@ -76,13 +76,18 @@ class Sample:
                 Sample.group.data[factor][idx] += self.data[factor][idx]
         Sample.group.seq_max = [funcs.sequence_max(data) for data in Sample.group.data]
         Sample.group.seq_max0 = [funcs.sequence_max0(data) for data in Sample.group.data]
-        Sample.samples[GROUP_SAMPLE_NAME] = Sample.group
 
     def display(self):
         if self.name == GROUP_SAMPLE_NAME:
             return "Групповой образец"
         else:
             return "Образец: " + self.name
+
+    def display_file(self, factor=None):
+        fname = self.display().replace(":", "")
+        if factor is not None:
+            fname += " " + science.FACTORS_L[factor]
+        return fname
 
     def display_g(self):
         if self.name == GROUP_SAMPLE_NAME:
@@ -133,6 +138,9 @@ class Standard:
 
     def display(self):
         return "Погода: " + self.name
+
+    def display_file(self):
+        return self.display().replace(":", "")
 
 
 if __name__ == '__main__':

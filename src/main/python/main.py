@@ -70,16 +70,12 @@ r"""
 pyuic5 src/main\python/ui/form.ui -o src/main/python/form.py
 pyuic5 src/main\python/ui/default.ui -o src/main/python/frames/default.py
 pyuic5 src/main/python/ui/sample.ui -o src/main/python/frames/sample.py
-pyuic5 src/main/python/ui/factor.ui -o src/main/python/frames/factor.py
+pyuic5 src/main/python/ui/standard.ui -o src/main/python/frames/standard.py
+pyuic5 src/main/python/ui/dialog.ui -o src/main/python/frames/dialog.py
 
-pyuic5 src/main/python/ui/mul_std.ui -o src/main/python/frames/mul_both.py
-pyuic5 src/main/python/ui/mul_one.ui -o src/main/python/frames/mul_one.py
-pyuic5 src/main/python/ui/mul_both.ui -o src/main/python/frames/mul_both.py
-
-pyuic5 src/main/python/ui/utils/check.ui -o src/main/python/frames/utils/check.py
-pyuic5 src/main/python/ui/utils/combo.ui -o src/main/python/frames/utils/combo.py
 pyuic5 src/main/python/ui/utils/image.ui -o src/main/python/frames/utils/image.py
-pyuic5 src/main/python/ui/utils/kde.ui -o src/main/python/frames/utils/kde.py
 pyuic5 src/main/python/ui/utils/info.ui -o src/main/python/frames/utils/info.py
+pyuic5 src/main/python/ui/utils/kde.ui -o src/main/python/frames/utils/kde.py
+pyuic5 src/main/python/ui/utils/standard_type.ui -o src/main/python/frames/utils/standard_type.py
 pyuic5 src/main/python/ui/utils/text.ui -o src/main/python/frames/utils/text.py
 """

@@ -7,6 +7,8 @@ from science.classes import Standard, Sample
 
 from reports import Printer
 from reports.std import FactorSampleStandard, SampleStandard
+from reports.std_mul import FactorSampleMulStandards, SampleMulStandards
+from reports.std_mul import MulSamplesStandard, MulFactorSamplesStandard, MulSamplesMulStandards
 
 
 class QFrameSample(QFrameBase, Ui_FramePatient):
@@ -30,8 +32,58 @@ class QFrameSample(QFrameBase, Ui_FramePatient):
         self.tabs.widget(0).layout().insertWidget(0, QFrameInfoKde(self, self.report, "kde"))
 
     def save_report(self):
-        sample_name_pretty = "Образец {}".format(self.sample.name) if self.sample.name != "group" \
-            else self.report.sample_name
-        fname = dialog_save_report("{} Эталон {}".format(sample_name_pretty, self.std.name))
-        if fname:
+        tab = self.tabs.currentIndex()
+        factor = None if tab == 0 else tab - 1
+        fname = dialog_save_report("{} Эталон {}".format(self.sample.display_file(factor), self.std.name))
+        if not fname:
+            return
+        if factor is None:
             Printer('doc', self.report.get_report).print(fname)
+        else:
+            Printer('doc', self.reports[factor].get_report).print(fname)
+
+    def save_report_group(self, stds: "лист строк"):
+        tab = self.tabs.currentIndex()
+        factor = None if tab == 0 else tab - 1
+        fname = dialog_save_report("{} Группа эталонов".format(self.sample.display_file(factor)))
+        stds = [Standard.standards[std] for std in stds]
+        if not fname:
+            return
+        if factor is None:
+            report = SampleMulStandards(self.sample, stds)
+        else:
+            report = FactorSampleMulStandards(self.sample, tab - 1, stds)
+        Printer('doc', report.get_report).print(fname)
+
+
+class QFrameStdMulSamples(QFrameBase, Ui_FramePatient):
+    def __init__(self, parent, std):
+        QFrameBase.__init__(self, parent, Ui_FramePatient)
+
+        self.samples = list(Sample.samples.values())
+        self.std = Standard.standards[std]
+
+        self.report = MulSamplesStandard(self.samples, self.std)
+        self.reports, self.frames = [], []
+
+        self.tabs.removeTab(0)
+        for factor in range(4):
+            self.reports.append(MulFactorSamplesStandard(self.samples, factor, self.std))
+            self.frames.append(QFrameInfo(self, self.reports[-1]))
+            self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
+
+        self.title_label.setText("Эталон {} и группа образцов".format(self.std.name))
+
+    def save_report(self):
+        fname = dialog_save_report("Группа образцов Эталон {}".format(self.std.name))
+        if fname:
+            Printer('doc', self.report_frame.report.get_report).print(fname)
+
+# TODO: реализовать сохранение отчета по факторам
+    def save_report_group(self, stds: "лист строк"):
+        fname = dialog_save_report("Группа образцов Группа эталонов")
+        if not fname:
+            return
+        stds = [Standard.standards[std] for std in stds]
+        report = MulSamplesMulStandards(self.samples, stds)
+        Printer('doc', report.get_report).print(fname)
