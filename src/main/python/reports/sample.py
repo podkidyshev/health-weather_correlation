@@ -1,16 +1,16 @@
 from reports import Printer, str_arr
 from reports.utils import report_ntest, report_stats
 
-from science import plot_image, FACTORS
+from science import plot_image, FACTORS, FACTORS_L
 from science.funcs import *
 from science.classes import Standard, Sample
 
 
-class StandardFactorSample:
-    def __init__(self, std: Standard, factor: int, sample: Sample):
-        self.std = std
-        self.factor = factor
+class FactorSampleStandard:
+    def __init__(self, sample: Sample, factor: int, std: Standard):
         self.sample = sample
+        self.factor = factor
+        self.std = std
 
         self.distance = sequence_distance_1(self.std.seq_max, self.sample.seq_max[factor])
         self.va = plot_image(visual_analysis, self.distance)
@@ -22,10 +22,9 @@ class StandardFactorSample:
         self.ntest_apl = test_normal(self.distance_apl, qq=False)
         self.stat_apl = stat_analysis(self.distance_apl)
 
-        # Наполовину костыль))
-        self.sample_name = "Групповой образец" if self.sample.name == "group" else "Образец " + self.sample.name
+        self.sample_name = sample.display()
         # Костыль 1, стоит от этого избавиться
-        self.factor_name = FACTORS[self.factor]
+        self.factor_name = FACTORS_L[self.factor]
 
     def get_report(self, doc: Printer):
         x, x_seq_max = self.sample.data[self.factor], self.sample.seq_max[self.factor]
@@ -116,10 +115,10 @@ class StandardFactorSample:
         self.get_report_ntest_apl(doc)
 
 
-class StandardSample:
-    def __init__(self, std: Standard, sample: Sample):
-        self.std = std
+class SampleStandard:
+    def __init__(self, sample: Sample, std: Standard):
         self.sample = sample
+        self.std = std
 
         self.distance = [sequence_distance_1(self.std.seq_max, seq_max) for seq_max in self.sample.seq_max]
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
@@ -131,7 +130,7 @@ class StandardSample:
         self.ntest_apl = [test_normal(xr, qq=False) for xr in self.distance_apl]
         self.stat_apl = [stat_analysis(xr) for xr in self.distance_apl]
 
-        self.sample_name = "Групповой образец" if self.sample.name == "group" else "Образец " + self.sample.name
+        self.sample_name = sample.display()
 
     def get_report(self, doc: Printer):
         doc.add_heading("{}. Эталон {}".format(self.sample_name, self.std.name), 0)

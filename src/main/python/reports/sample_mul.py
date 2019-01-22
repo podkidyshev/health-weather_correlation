@@ -1,4 +1,4 @@
-from science import plot_image, FACTORS
+from science import plot_image, FACTORS, FACTORS_L
 from science.funcs import *
 from science.classes import Standard, Sample
 
@@ -6,11 +6,11 @@ from reports import Printer, str_arr
 from reports.utils import report_ntest, report_stats
 
 
-class MulStandardsSample:
-    def __init__(self, stds: list, sample: Sample):
-        self.stds = stds[:]
+class SampleMulStandards:
+    def __init__(self, sample: Sample, stds: list):
         self.sample = sample
-        self.sample_name = "Групповой образец" if self.sample.name == "group" else "Образец " + self.sample.name
+        self.sample_name = sample.display()
+        self.stds = stds[:]
 
         self.distance = [[sequence_distance_1(std.seq_max, sample.seq_max[factor]) for factor in range(4)]
                          for std in stds]
@@ -116,11 +116,11 @@ class MulStandardsFactorSample:
             report_stats(stat, doc)
 
 
-class StandardMulFactorSamples:
-    def __init__(self, std: Standard, samples: list, factor: int):
-        self.std = std
+class MulFactorSamplesStandard:
+    def __init__(self, samples: list, factor: int, std: Standard):
         self.samples = samples[:]
         self.factor = factor
+        self.std = std
 
         self.distance = [sequence_distance_1(std.seq_max, sample.seq_max[factor]) for sample in samples]
 
@@ -145,7 +145,7 @@ class StandardMulFactorSamples:
     def get_report(self, doc: Printer):
         doc.add_heading("Эталон {}. Группа образцов".format(self.std.name), 0)
 
-        factor_name = FACTORS[self.factor].lower()
+        factor_name = FACTORS_L[self.factor]
         doc.add_heading("Распределение средних значений эталона {} для образцов {}".format(self.std.name, factor_name), 2)
         doc.add_paragraph(str_arr(self.max_list))
         doc.add_heading("Результаты  визуального  анализа распределений средних значений эталона {} для фактор-образцов {}"
@@ -201,10 +201,10 @@ class StandardMulFactorSamples:
         report_ntest(self.ntest_apl, doc)
 
 
-class StandardMulSamples:
-    def __init__(self, std: Standard, samples: list):
-        self.std = std
+class MulSamplesStandard:
+    def __init__(self, samples: list, std: Standard):
         self.samples = samples[:]
+        self.std = std
 
         self.distance = [[sequence_distance_1(std.seq_max, sample.seq_max[factor]) for factor in range(4)]
                          for sample in samples]
@@ -275,10 +275,10 @@ class StandardMulSamples:
             report_stats(self.stat_apl[factor], doc)
 
 
-class MulStandardsMulSamples:
-    def __init__(self, stds: list, samples: list):
-        self.stds = stds[:]
+class MulSamplesMulStandards:
+    def __init__(self, samples: list, stds: list):
         self.samples = samples[:]
+        self.stds = stds[:]
 
         self.distance = [[[sequence_distance_1(std.seq_max, factor) for factor in sample.seq_max]
                           for sample in samples] for std in stds]
