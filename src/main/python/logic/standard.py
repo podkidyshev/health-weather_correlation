@@ -1,5 +1,5 @@
 from logic import QFrameBase, dialog_save_report
-from logic.utils import QFrameStandardType, QDialogGroupFactor
+from logic.utils import QFrameStandardType, QDialogStds
 
 from frames.standard import Ui_FrameStandard
 
@@ -32,7 +32,7 @@ class QFrameStandard(QFrameBase, Ui_FrameStandard):
             self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
 
     def save_report(self):
-        factor = QDialogGroupFactor.get_factor(self)
+        factor = QDialogStds.settings(self, get_stds=False)
         if factor is None:
             return
         fname = dialog_save_report("{} {}".format(self.std.display_file(), self.sample.display_file(factor)))
@@ -43,8 +43,8 @@ class QFrameStandard(QFrameBase, Ui_FrameStandard):
         else:
             Printer("doc", self.reports[factor].get_report).print(fname)
 
-    def save_report_group(self, stds: "лист строк"):
-        factor = QDialogGroupFactor.get_factor(self)
+    def save_report_group(self):
+        factor, stds = QDialogStds.settings(self, get_stds=True)
         if factor is None:
             return
         fname = dialog_save_report("Группа эталонов {}".format(self.sample.display_file(factor)))
@@ -77,7 +77,7 @@ class QFrameMulSamplesStd(QFrameBase):
         self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
 
     def save_report(self):
-        factor = QDialogGroupFactor.get_factor(self)
+        factor = QDialogStds.settings(self, get_stds=False)
         if factor is None:
             return
         fname = dialog_save_report("{} {}".format(self.std.display_file(), Sample.display_file_group(factor)))
@@ -89,7 +89,7 @@ class QFrameMulSamplesStd(QFrameBase):
             Printer("doc", self.reports[factor].get_report).print(fname)
 
     def save_report_group(self, stds: "лист строк"):
-        factor = QDialogGroupFactor.get_factor(self)
+        factor, stds = QDialogStds.settings(self, get_stds=True)
         if factor is None:
             return
         fname = dialog_save_report("Группа эталонов {}".format(Sample.display_file_group(factor)))

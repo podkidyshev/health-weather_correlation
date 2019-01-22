@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox
+from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout
 from PyQt5.QtCore import Qt
 
 from logic import QFrameBase
@@ -9,12 +9,12 @@ from frames.utils.kde import Ui_FrameKde
 from frames.utils.image import Ui_FrameImage
 from frames.utils.text import Ui_FrameText
 from frames.utils.standard_type import Ui_FrameStandardType
-from frames.dialogs.stds import Ui_DialogGroup
-from frames.dialogs.factors import Ui_DialogFactors
+from frames.dialogs.stds import Ui_DialogStds
 
 from reports import print_report
 
 from science import FACTORS_ALL
+from science.classes import Standard
 
 
 class QFrameDefault(QFrameBase, Ui_FrameDefault):
@@ -135,36 +135,27 @@ class QFrameText(QFrameBase, Ui_FrameText):
             return self.report.get_report_ntest3
 
 
-class QDialogGroup(QDialog, Ui_DialogGroup):
-    def __init__(self, parent, values):
+class QDialogStds(QDialog, Ui_DialogStds):
+    def __init__(self, parent, get_stds):
         # noinspection PyArgumentList
         QDialog.__init__(self, parent)
-        Ui_DialogGroup.setupUi(self, self)
+        Ui_DialogStds.setupUi(self, self)
 
-        self.values = None
-        self.cbs = []
-        for v in reversed(values):
-            self.cbs.append(QCheckBox(v, self))
-            self.cbs[-1].setChecked(1)
-            self.layout().insertWidget(0, self.cbs[-1])
+        self.result = None
+        self.get_stds = get_stds
 
-        self.buttons.button(QDialogButtonBox.Save).setText("Сохранить")
-        self.buttons.button(QDialogButtonBox.Cancel).setText("Отмена")
-        self.setWindowFlags(self.windowFlags() ^ Qt.WindowContextHelpButtonHint)
-
-    def accept(self):
-        self.values = [cb.text() for cb in self.cbs if cb.isChecked()]
-        QDialog.accept(self)
-
-
-class QDialogGroupFactor(QDialog, Ui_DialogFactors):
-    def __init__(self, parent):
-        # noinspection PyArgumentList
-        QDialog.__init__(self, parent)
-        Ui_DialogFactors.setupUi(self, self)
-
-        self.factor = FACTORS_ALL
         self.btn_all.setChecked(True)
+
+        if get_stds:
+            # self.layout_stds = QVBoxLayout()
+            self.cbs = []
+            for v in reversed(sorted(list(Standard.standards.keys()))):
+                self.cbs.append(QCheckBox(v, self))
+                self.cbs[-1].setChecked(1)
+                self.layout_stds.insertWidget(0, self.cbs[-1])
+            # self.layout().insertWidget(0, self.layout_stds)
+        else:
+            self.layout().removeItem(self.layout_stds)
 
         self.buttons.button(QDialogButtonBox.Save).setText("Сохранить")
         self.buttons.button(QDialogButtonBox.Cancel).setText("Отмена")
@@ -172,14 +163,26 @@ class QDialogGroupFactor(QDialog, Ui_DialogFactors):
 
     def accept(self):
         if self.btn_all.isChecked():
-            self.factor = FACTORS_ALL
+            factor = FACTORS_ALL
         else:
-            for factor in range(4):
-                if self.__dict__["btn_{}".format(factor)].isChecked():
-                    self.factor = factor
+            for idx in range(4):
+                if self.__dict__["btn_{}".format(idx)].isChecked():
+                    factor = idx
+                    break
+            else:
+                raise ValueError("Не выбран ни один вариант")
+        if self.get_stds:
+            stds = [cb.text() for cb in self.cbs if cb.isChecked()]
+            self.result = (factor, stds)
+        else:
+            self.result = factor
+
         QDialog.accept(self)
 
     @staticmethod
-    def get_factor(parent):
-        dialog = QDialogGroupFactor(parent)
-        return dialog.factor if dialog.exec() else None
+    def settings(parent, *, get_stds):
+        dialog = QDialogStds(parent, get_stds)
+        if dialog.exec():
+            return dialog.result
+        else:
+            return (None, None) if get_stds else None
