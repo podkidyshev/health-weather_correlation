@@ -143,7 +143,7 @@ class MulSamplesStandard:
             doc.add_heading("Для фактора {}".format(factor_name), 1)
             doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
             doc.add_paragraph(str_arr(self.max_list[factor]))
-            doc.add_heading("Результаты  визуального  анализа распределений средних значений фактор-образцов {}"
+            doc.add_heading("Результаты визуального анализа распределений средних значений фактор-образцов {}"
                             .format(factor_name), 2)
             doc.add_picture(self.va[factor])
             doc.add_heading("Результаты тестирования нормальности распределений средних значений фактор-образцов {}"
@@ -152,6 +152,46 @@ class MulSamplesStandard:
             doc.add_heading("Результаты статистического анализа распределений средних значений фактор-образцов {}"
                             .format(factor_name), 2)
             report_stats(self.stat[factor], doc)
+
+
+class MulFactorSamplesMulStandards:
+    def __init__(self, samples: list, factor: int, stds: list):
+        self.samples = samples[:]
+        self.factor = factor
+        self.stds = stds[:]
+
+        self.distance = [[sequence_distance_1(sample.seq_max[self.factor], std.seq_max)
+                          for sample in samples] for std in stds]
+
+        self.max_list = [[np.mean(std[sample_num][self.factor]) for sample_num in range(len(self.samples))]
+                         for std in self.distance]
+
+        self.va = [plot_image(visual_analysis, xr) for xr in self.max_list]
+        self.ntest = [test_normal(xr, qq=False) for xr in self.max_list]
+        self.stat = [stat_analysis(xr) for xr in self.max_list]
+
+    def get_report(self, doc: Printer):
+        doc.add_heading("{} Группа эталонов".format(Sample.display_file_group(self.factor)), 0)
+
+        doc.add_heading("Распределение средних значений образцов {}".format(FACTORS_L[self.factor]), 1)
+        for std, ml in zip(self.stds, self.max_list):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_paragraph(str_arr(ml))
+
+        doc.add_heading("Результаты визуального анализа распределений средних значений", 1)
+        for std, va in zip(self.stds, self.va):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_picture(va)
+
+        doc.add_heading("Результаты тестирования нормальности распределений средних значений", 1)
+        for std, ntest in zip(self.stds, self.ntest):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            report_ntest(ntest, doc)
+
+        doc.add_heading("Результаты статистического анализа распределений средних значений", 1)
+        for std, stat in zip(self.stds, self.stat):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            report_stats(stat, doc)
 
 
 class MulSamplesMulStandards:

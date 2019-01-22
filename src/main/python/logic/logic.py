@@ -12,7 +12,7 @@ from logic import dialog_open, set_main_window
 from logic.sample import QFrameSample, QFrameStdMulSamples
 from logic.standard import QFrameStandard, QFrameMulSamplesStd
 
-from logic.utils import QDialogGroup, QFrameDefault
+from logic.utils import QDialogStds, QFrameDefault
 
 matplotlib.use("Qt5Agg")
 
@@ -160,14 +160,16 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def report_btn_clicked(self):
-        if self.data_frame is not None:
+        if self.data_frame is not None and hasattr(self.data_frame, "save_report"):
             self.data_frame.save_report()
+        else:
+            print("Функция save_report не реализована")
 
     def report_group_btn_clicked(self):
-        if self.data_frame is not None:
-            dialog = QDialogGroup(self, list(Standard.standards.keys()))
-            if dialog.exec():
-                self.data_frame.save_report_group(dialog.values)
+        if self.data_frame is not None and hasattr(self.data_frame, "save_report_group"):
+            self.data_frame.save_report_group()
+        else:
+            print("Функция save_report_group не реализована")
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]
