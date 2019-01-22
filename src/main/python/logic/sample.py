@@ -8,8 +8,8 @@ from science.classes import Standard, Sample
 
 from reports import Printer
 from reports.sample import FactorSampleStandard, SampleStandard
-from reports.sample_mul import SampleMulStandards
-from reports.sample_mul import (MulSamplesStandard, MulFactorSamplesStandard,
+from reports.sample_mul import MulSamplesStandard, MulFactorSamplesStandard
+from reports.sample_mul import (SampleMulStandards, MulFactorSamplesMulStandards,
                                 MulSamplesMulStandards, FactorSampleMulStandards)
 
 
@@ -24,8 +24,7 @@ class QFrameSampleStd(QFrameBase, Ui_FrameStandard):
 
         self.title_label.setText("Погода {}".format(std_name))
 
-        self.reports = []
-        self.frames = []
+        self.reports, self.frames = [], []
         for factor in range(4):
             self.reports.append(FactorSampleStandard(self.sample, factor, self.std))
             self.frames.append(QFrameStandardType(self, self.reports[-1]))
@@ -67,14 +66,14 @@ class QFrameMulSamplesStd(QFrameBase):
         self.std = Standard.standards[std]
 
         self.report = MulSamplesStandard(self.samples, self.std)
-        self.reports, self.frames = [], []
 
+        self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
+
+        self.reports, self.frames = [], []
         for factor in range(4):
             self.reports.append(MulFactorSamplesStandard(self.samples, factor, self.std))
             self.frames.append(QFrameStandardType(self, self.reports[-1]))
             self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
-
-        self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
 
     def save_report(self):
         factor = QDialogStds.settings(self, get_stds=False)
@@ -99,7 +98,6 @@ class QFrameMulSamplesStd(QFrameBase):
         if factor == FACTORS_ALL:
             report = MulSamplesMulStandards(self.samples, stds)
         else:
-            return
             # TODO: сделать отчет
-            # report = MulFactorSamplesMulStandards
+            report = MulFactorSamplesMulStandards(self.samples, factor, stds)
         Printer("doc", report.get_report).print(fname)

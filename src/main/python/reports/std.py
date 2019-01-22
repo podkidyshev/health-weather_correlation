@@ -20,7 +20,8 @@ class StandardFactorSample:
         self.factor_name = FACTORS_L[self.factor]
 
     def get_report(self, doc: Printer):
-        doc.add_heading("{}, фактор {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
+        # TODO: Понять, что писать в заголовке ведомый ряд - ведущий ряд или ведущий ряд - ведомый ряд
+        doc.add_heading("{} {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
 
         doc.add_heading("Последовательность расстояний от максимумов образца до ближайшего максимума эталона", 1)
         doc.add_paragraph(str_arr(self.distance))
@@ -35,12 +36,12 @@ class StandardFactorSample:
         doc.add_picture(self.va)
 
     def get_report_stat(self, doc: Printer):
-        doc.add_heading("{}, фактор {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
+        doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
         report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
-        doc.add_heading("{}, фактор {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
+        doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
         report_ntest(self.ntest, doc)
 
@@ -69,6 +70,7 @@ class StandardSample:
         doc.add_heading("Ряды расстояний и распределения расстояний от максимумов образца до ближайшего максимума "
                         "эталона", 1)
         for factor, xr in zip(FACTORS_L, self.distance):
+            # TODO: определить, когда указывается factor_name, писать "для образца" или "для фактор-образца"
             doc.add_paragraph("Ряд расстояний от максимумов образца {} до ближайшего максимума эталона:".format(factor))
             doc.add_paragraph(str_arr(xr))
 
@@ -104,7 +106,7 @@ class StandardSample:
                         "(с физической нагрузкой, после отдыха, с эмоциональной нагрузкой) до исходного стандарта – "
                         "фактор-образца без нагрузки", 1)
         for factor, stat in zip(FACTORS_L, self.stat3):
-            doc.add_heading("Результаты статистического группового анализа распределения расстояний от фактора {}"
+            doc.add_heading("Результаты статистического группового анализа распределения расстояний от образца {}"
                             .format(factor), 2)
             report_stats(stat, doc)
 
@@ -113,6 +115,6 @@ class StandardSample:
                         "(с физической нагрузкой, после отдыха, с эмоциональной нагрузкой) до исходного стандарта – "
                         "фактор-образца без нагрузки", 1)
         for factor, ntest in zip(FACTORS_L, self.ntest3):
-            doc.add_heading("Тестирование нормальности распределения расстояний от фактора {}"
+            doc.add_heading("Тестирование нормальности распределения расстояний от образца {}"
                             .format(factor), 2)
             report_ntest(ntest, doc)

@@ -275,6 +275,16 @@ class MulSamplesStandard:
             report_stats(self.stat_apl[factor], doc)
 
 
+class MulFactorSamplesMulStandards:
+    def __init__(self, samples: list, factor : int, stds: list):
+        self.samples = samples[:]
+        self.factor = factor
+        self.stds = stds[:]
+
+        def get_report(self, doc: Printer):
+            pass
+
+
 class MulSamplesMulStandards:
     def __init__(self, samples: list, stds: list):
         self.samples = samples[:]
