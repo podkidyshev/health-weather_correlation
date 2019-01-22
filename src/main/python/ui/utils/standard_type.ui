@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
    <property name="sizeConstraint">
-    <enum>QLayout::SetDefaultConstraint</enum>
+    <enum>QLayout::SetMinimumSize</enum>
    </property>
    <item>
     <widget class="QTabWidget" name="tabs">
@@ -32,13 +32,21 @@
       <attribute name="title">
        <string>Значения</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7"/>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_info_1">
       <attribute name="title">
        <string>Амплитуды</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4"/>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+      </layout>
      </widget>
     </widget>
    </item>

@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <property name="sizeConstraint">
-    <enum>QLayout::SetDefaultConstraint</enum>
+    <enum>QLayout::SetMinimumSize</enum>
    </property>
    <item>
     <widget class="QLabel" name="title_label">
@@ -47,25 +47,41 @@
       <attribute name="title">
        <string>Без нагрузки</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7"/>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_factor_1">
       <attribute name="title">
        <string>С физической</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4"/>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_factor_2">
       <attribute name="title">
        <string>С эмоциональной</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5"/>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_factor_3">
       <attribute name="title">
        <string>После отдыха</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6"/>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+      </layout>
      </widget>
     </widget>
    </item>
