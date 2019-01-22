@@ -71,7 +71,8 @@ pyuic5 src/main\python/ui/form.ui -o src/main/python/form.py
 pyuic5 src/main\python/ui/default.ui -o src/main/python/frames/default.py
 pyuic5 src/main/python/ui/sample.ui -o src/main/python/frames/sample.py
 pyuic5 src/main/python/ui/standard.ui -o src/main/python/frames/standard.py
-pyuic5 src/main/python/ui/dialog.ui -o src/main/python/frames/dialog.py
+
+pyuic5 src/main/python/ui/dialogs/stds.ui -o src/main/python/frames/dialogs/stds.py
 
 pyuic5 src/main/python/ui/utils/image.ui -o src/main/python/frames/utils/image.py
 pyuic5 src/main/python/ui/utils/info.ui -o src/main/python/frames/utils/info.py

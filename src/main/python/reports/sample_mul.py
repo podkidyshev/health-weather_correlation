@@ -60,6 +60,62 @@ class SampleMulStandards:
                 report_stats(self.stat_apl[idx][factor], doc)
 
 
+class MulStandardsFactorSample:
+    def __init__(self, stds: list, sample: Sample, factor: int):
+        self.stds = stds[:]
+        self.sample = sample
+        self.factor = factor
+
+        self.distance = [sequence_distance_1(std.seq_max, sample.seq_max[self.factor]) for std in stds]
+        self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
+        self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
+        self.stat = [stat_analysis(xr) for xr in self.distance]
+
+        self.distance_apl = [sequence_distance_1(std.seq_max_apl, sample.seq_max0[factor]) for std in stds]
+        self.va_apl = [plot_image(visual_analysis, xr) for xr in self.distance_apl]
+        self.ntest_apl = [test_normal(xr, qq=False) for xr in self.distance_apl]
+        self.stat_apl = [stat_analysis(xr) for xr in self.distance_apl]
+
+    def get_report(self, doc: Printer):
+        doc.add_heading("Группа эталонов и {}".format(self.sample.display_file(self.factor).lower()), 0)
+
+        doc.add_heading("Последовательности расстояний", 1)
+        for std, xr in zip(self.stds, self.distance):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
+            doc.add_paragraph(str_arr(xr))
+        doc.add_heading("Результаты визуального анализа распределения расстояний", 1)
+        for std, va in zip(self.stds, self.va):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_picture(va)
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний", 1)
+        for std, ntest in zip(self.stds, self.ntest):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            report_ntest(ntest, doc)
+        doc.add_heading("Результаты статистического анализа распределения расстояний", 1)
+        for std, stat in zip(self.stds, self.stat):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            report_stats(stat, doc)
+
+        doc.add_heading("Последовательности расстояний амплитуд", 1)
+        for std, xr in zip(self.stds, self.distance):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
+            doc.add_paragraph(str_arr(xr))
+        doc.add_heading("Результаты визуального анализа распределения расстояний амплитуд", 1)
+        for std, va in zip(self.stds, self.va):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            doc.add_picture(va)
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний амплитуд", 1)
+        for std, ntest in zip(self.stds, self.ntest):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            report_ntest(ntest, doc)
+        doc.add_heading("Результаты статистического анализа распределения расстояний амплитуд", 1)
+        for std, stat in zip(self.stds, self.stat):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            report_stats(stat, doc)
+
+
 class MulFactorSamplesStandard:
     def __init__(self, samples: list, factor: int, std: Standard):
         self.samples = samples[:]

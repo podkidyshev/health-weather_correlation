@@ -83,9 +83,16 @@ class Sample:
         else:
             return "Образец: " + self.name
 
-    def display_file(self, factor=None):
+    def display_file(self, factor=science.FACTORS_ALL):
         fname = self.display().replace(":", "")
-        if factor is not None:
+        if factor != science.FACTORS_ALL:
+            fname += " " + science.FACTORS_L[factor]
+        return fname
+
+    @staticmethod
+    def display_file_group(factor=science.FACTORS_ALL):
+        fname = "Группа образцов"
+        if factor != science.FACTORS_ALL:
             fname += " " + science.FACTORS_L[factor]
         return fname
 

@@ -96,13 +96,6 @@ class QFrameBase(QFrame):
             QVBoxLayout(self)
         self.layout().setContentsMargins(0, 0, 0, 0)
 
-    def save_report(self):
-        print("Функция save_report у класса {} не переопределена".format(type(self)))
-
-    def save_report_group(self, stds: "лист строк"):
-        print("Функция save_report_group у класса {} не переопределена".format(type(self)))
-        print("Эталоны: {}".format(stds))
-
     def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
         """
         принимает PIL-изображение и рисует на img-label картинку:

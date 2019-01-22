@@ -13,6 +13,7 @@ FACTORS = [
     "После отдыха"
 ]
 FACTORS_L = [factor.lower() for factor in FACTORS]
+FACTORS_ALL = -1
 
 
 class XLSXParseError(ValueError):
