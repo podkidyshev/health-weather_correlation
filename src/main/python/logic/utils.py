@@ -9,9 +9,12 @@ from frames.utils.kde import Ui_FrameKde
 from frames.utils.image import Ui_FrameImage
 from frames.utils.text import Ui_FrameText
 from frames.utils.standard_type import Ui_FrameStandardType
-from frames.dialog import Ui_DialogGroup
+from frames.dialogs.stds import Ui_DialogGroup
+from frames.dialogs.factors import Ui_DialogFactors
 
 from reports import print_report
+
+from science import FACTORS_ALL
 
 
 class QFrameDefault(QFrameBase, Ui_FrameDefault):
@@ -152,3 +155,31 @@ class QDialogGroup(QDialog, Ui_DialogGroup):
     def accept(self):
         self.values = [cb.text() for cb in self.cbs if cb.isChecked()]
         QDialog.accept(self)
+
+
+class QDialogGroupFactor(QDialog, Ui_DialogFactors):
+    def __init__(self, parent):
+        # noinspection PyArgumentList
+        QDialog.__init__(self, parent)
+        Ui_DialogFactors.setupUi(self, self)
+
+        self.factor = FACTORS_ALL
+        self.btn_all.setChecked(True)
+
+        self.buttons.button(QDialogButtonBox.Save).setText("Сохранить")
+        self.buttons.button(QDialogButtonBox.Cancel).setText("Отмена")
+        self.setWindowFlags(self.windowFlags() ^ Qt.WindowContextHelpButtonHint)
+
+    def accept(self):
+        if self.btn_all.isChecked():
+            self.factor = FACTORS_ALL
+        else:
+            for factor in range(4):
+                if self.__dict__["btn_{}".format(factor)].isChecked():
+                    self.factor = factor
+        QDialog.accept(self)
+
+    @staticmethod
+    def get_factor(parent):
+        dialog = QDialogGroupFactor(parent)
+        return dialog.factor if dialog.exec() else None

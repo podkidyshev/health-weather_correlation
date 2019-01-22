@@ -164,7 +164,7 @@ class Main(Ui_MainBaseForm):
             self.data_frame.save_report()
 
     def report_group_btn_clicked(self):
-        if self.data_frame is not None:
+        if self.data_frame is not None and type(self.data_frame) != QFrameDefault:
             dialog = QDialogGroup(self, list(Standard.standards.keys()))
             if dialog.exec():
                 self.data_frame.save_report_group(dialog.values)
