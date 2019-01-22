@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+# TODO: убрать этот модуль к чертям
 class Ui_FrameMulOne(object):
     def setupUi(self, FrameMulOne):
         FrameMulOne.setObjectName("FrameMulOne")

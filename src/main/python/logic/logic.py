@@ -103,26 +103,14 @@ class Main(Ui_MainBaseForm):
                 self.set_data_frame(QFrameSample, lead, slave)
             elif lead in Standard.standards and slave == "--Группа--":
                 self.set_data_frame(QFrameStdMulSamples, lead)
-            elif lead == "--Группа--" and (slave in Sample.samples or slave == "--Групповой--"):
-                pass
-                # self.set_data_frame(QFrameMulStdSample, slave)
-            elif lead == "--Группа--" and slave == "--Группа--":
-                pass
-                # self.set_data_frame(QFrameMulStdMulSamples)
             else:
                 raise ValueError("Неизвестный случай")
         # Образец - погода
         else:
             if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
                 self.set_data_frame(QFrameStandard, lead, slave)
-            elif (lead in Sample.samples or lead == "--Групповой--") and slave == "--Группа--":
-                pass
-                # self.set_data_frame(QFrameSampleMulStd, lead)
             elif lead == "--Группа--" and slave in Standard.standards:
                 self.set_data_frame(QFrameMulSamplesStd, slave)
-            elif lead == "--Группа--" and slave == "--Группа--":
-                pass
-                # self.set_data_frame(QFrameMulSamplesMulStd)
             else:
                 raise ValueError('Неизвестный случай')
 
@@ -175,13 +163,14 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def report_btn_clicked(self):
-        if hasattr(self.data_frame, "save_report"):
+        if self.data_frame is not None:
             self.data_frame.save_report()
-        else:
-            print("ФУНКЦИЯ save_report НЕ РЕАЛИЗОВАНА")
 
     def report_group_btn_clicked(self):
-        print("report_group_btn_clicked")
+        if self.data_frame is not None:
+            dialog = QDialogGroup(self, list(Standard.standards.keys()))
+            if dialog.exec():
+                self.data_frame.save_report_group(dialog.values)
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]
