@@ -9,13 +9,12 @@ from form import Ui_MainBaseForm
 from science.classes import *
 
 from logic import dialog_open, set_main_window
-from logic.default import QFrameDefault
 from logic.sample import QFrameSample
 from logic.standard import QFrameStandard
 from logic.mul_std_lead import QFrameStdMulSamples
 from logic.mul_sample_lead import QFrameMulSamplesStd
 
-from logic.utils import QDialogGroup
+from logic.utils import QDialogGroup, QFrameDefault
 
 matplotlib.use("Qt5Agg")
 

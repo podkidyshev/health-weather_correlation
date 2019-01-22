@@ -7,9 +7,9 @@ from logic import QFrameBase, dialog_save_report
 from logic.utils import QFrameStandardType
 
 from frames.standard import Ui_FrameStandard
-from frames.mul_one import Ui_FrameMulOne
 
 
+# TODO: таб значения/амплитуды некорректно ресайзится
 class QFrameMulSamples(QFrameBase, Ui_FrameStandard):
     def __init__(self, parent, std, samples):
         QFrameBase.__init__(self, parent, Ui_FrameStandard)
@@ -27,19 +27,15 @@ class QFrameMulSamples(QFrameBase, Ui_FrameStandard):
         self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
 
 
-class QFrameMulSamplesStd(QFrameBase, Ui_FrameMulOne):
-    class QFrameMulStds(QFrameBase):
-        def __init__(self, parent):
-            QFrameBase.__init__(self, parent, None)
-
+class QFrameMulSamplesStd(QFrameBase):
     def __init__(self, parent, std):
-        QFrameBase.__init__(self, parent, Ui_FrameMulOne)
+        QFrameBase.__init__(self, parent)
 
         self.samples = list(Sample.samples.values())
         self.std = Standard.standards[std]
 
         self.report_frame = QFrameMulSamples(self, self.std.name, [s.name for s in self.samples])
-        self.layout_vertical.insertWidget(1, self.report_frame)
+        self.layout().insertWidget(1, self.report_frame)
 
     def save_report(self):
         fname = dialog_save_report("Эталон {}. Группа образцов".format(self.std.name))

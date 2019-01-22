@@ -7,10 +7,8 @@ from reports.utils import Printer
 
 from logic import QFrameBase, dialog_save_report
 from logic.utils import QFrameInfo
-from logic.sample import QFrameSample
 
 from frames.sample import Ui_FramePatient
-from frames.mul_one import Ui_FrameMulOne
 
 
 class QFrameMulSamples(QFrameBase, Ui_FramePatient):
@@ -31,15 +29,15 @@ class QFrameMulSamples(QFrameBase, Ui_FramePatient):
         self.title_label.setText("Эталон {} и группа образцов".format(self.std.name))
 
 
-class QFrameStdMulSamples(QFrameBase, Ui_FrameMulOne):
+class QFrameStdMulSamples(QFrameBase):
     def __init__(self, parent, std):
-        QFrameBase.__init__(self, parent, Ui_FrameMulOne)
+        QFrameBase.__init__(self, parent)
 
         self.samples = list(Sample.samples.values())
         self.std = Standard.standards[std]
 
         self.report_frame = QFrameMulSamples(self, self.std.name, [s.name for s in self.samples])
-        self.layout_vertical.insertWidget(1, self.report_frame)
+        self.layout().insertWidget(1, self.report_frame)
 
     def save_report(self):
         fname = dialog_save_report("Группа образцов. Эталон {}".format(self.std.name))

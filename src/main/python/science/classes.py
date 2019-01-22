@@ -83,6 +83,12 @@ class Sample:
         else:
             return "Образец: " + self.name
 
+    def display_file(self, factor=None):
+        fname = self.display().replace(":", "")
+        if factor is not None:
+            fname += " " + science.FACTORS_L[factor]
+        return fname
+
     def display_g(self):
         if self.name == GROUP_SAMPLE_NAME:
             return "группового образца"
@@ -132,6 +138,9 @@ class Standard:
 
     def display(self):
         return "Погода: " + self.name
+
+    def display_file(self):
+        return self.display().replace(":", "")
 
 
 if __name__ == '__main__':

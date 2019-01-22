@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 
 from logic import QFrameBase
 
+from frames.default import Ui_FrameDefault
 from frames.utils.info import Ui_FrameInfo
 from frames.utils.kde import Ui_FrameKde
 from frames.utils.image import Ui_FrameImage
@@ -11,6 +12,11 @@ from frames.utils.standard_type import Ui_FrameStandardType
 from frames.dialog import Ui_DialogGroup
 
 from reports import print_report
+
+
+class QFrameDefault(QFrameBase, Ui_FrameDefault):
+    def __init__(self, parent):
+        QFrameBase.__init__(self, parent, Ui_FrameDefault)
 
 
 class QFrameInfo(QFrameBase, Ui_FrameInfo):
