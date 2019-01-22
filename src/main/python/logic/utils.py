@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QCheckBox, QDialog
+from PyQt5.QtWidgets import QCheckBox, QDialog
 
 from logic import QFrameBase
 
@@ -6,8 +6,6 @@ from frames.utils.info import Ui_FrameInfo
 from frames.utils.kde import Ui_FrameKde
 from frames.utils.image import Ui_FrameImage
 from frames.utils.text import Ui_FrameText
-from frames.utils.combo import Ui_FrameCombo
-from frames.utils.check import Ui_FrameCheck
 from frames.utils.standard_type import Ui_FrameStandardType
 from frames.dialog import Ui_DialogGroup
 
@@ -54,7 +52,6 @@ class QFrameKde(QFrameBase, Ui_FrameKde):
             self.tabs.widget(info).layout().insertWidget(0, self.frames[info])
 
 
-# Проблема со скролером изображений
 class QFrameImage(QFrameBase, Ui_FrameImage):
     def __init__(self, parent, report, va_type: str):
         QFrameBase.__init__(self, parent, Ui_FrameImage)
@@ -128,64 +125,6 @@ class QFrameText(QFrameBase, Ui_FrameText):
             return self.report.get_report_ntest3
 
 
-class QFrameCheck(QFrame, Ui_FrameCheck):
-    def __init__(self, parent, values):
-        # noinspection PyArgumentList
-        QFrame.__init__(self, parent=parent)
-        Ui_FrameCheck.setupUi(self, self)
-        self.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.values = values
-        self.cbs = []
-        for idx, value in enumerate(values):
-            cb = QCheckBox(value, self)
-            cb.setChecked(1)
-            # noinspection PyUnresolvedReferences
-            cb.stateChanged.connect(self.state_changed)
-            self.cbs.append(cb)
-            self.scroll_contents.layout().insertWidget(idx, cb)
-
-        self.signal_func = None
-
-    def get_turned(self):
-        pressed = [cb.isChecked() for cb in self.cbs]
-        values_pressed = []
-        for p, v in zip(pressed, self.values):
-            if p:
-                values_pressed.append(v)
-        return values_pressed
-
-    def state_changed(self, *_):
-        if self.signal_func is not None:
-            self.signal_func(self.get_turned())
-
-
-class QFrameCombo(QFrame, Ui_FrameCombo):
-    def __init__(self, parent, values):
-        # noinspection PyArgumentList
-        QFrame.__init__(self, parent=parent)
-        Ui_FrameCombo.setupUi(self, self)
-        self.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.update_values(values)
-        self.signal_func = None
-
-    def update_values(self, values):
-        try:
-            self.combo.currentIndexChanged.disconnect()
-        except TypeError:
-            pass
-        self.combo.clear()
-        for value in values:
-            self.combo.addItem(value)
-        self.combo.currentIndexChanged.connect(self.combo_changed)
-
-    def combo_changed(self, *_):
-        if self.signal_func is not None:
-            value = self.combo.currentText()
-            self.signal_func(value)
-
-
 class QDialogGroup(QDialog, Ui_DialogGroup):
     def __init__(self, parent, values):
         # noinspection PyArgumentList
@@ -202,4 +141,3 @@ class QDialogGroup(QDialog, Ui_DialogGroup):
     def accept(self):
         self.values = [cb.text() for cb in self.cbs if cb.isChecked()]
         QDialog.accept(self)
-

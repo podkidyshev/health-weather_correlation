@@ -76,7 +76,6 @@ class Sample:
                 Sample.group.data[factor][idx] += self.data[factor][idx]
         Sample.group.seq_max = [funcs.sequence_max(data) for data in Sample.group.data]
         Sample.group.seq_max0 = [funcs.sequence_max0(data) for data in Sample.group.data]
-        Sample.samples[GROUP_SAMPLE_NAME] = Sample.group
 
     def display(self):
         if self.name == GROUP_SAMPLE_NAME:
