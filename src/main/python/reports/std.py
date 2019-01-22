@@ -5,11 +5,11 @@ from science.funcs import *
 from science.classes import Standard, Sample
 
 
-class FactorSampleStandard:
-    def __init__(self, sample: Sample, factor: int, std: Standard):
+class StandardFactorSample:
+    def __init__(self, std: Standard, sample: Sample, factor: int):
+        self.std = std
         self.sample = sample
         self.factor = factor
-        self.std = std
 
         self.distance = sequence_distance_1(sample.seq_max[factor], std.seq_max)
         self.va = plot_image(visual_analysis, self.distance)
@@ -45,10 +45,10 @@ class FactorSampleStandard:
         report_ntest(self.ntest, doc)
 
 
-class SampleStandard:
-    def __init__(self, sample: Sample, std: Standard):
-        self.sample = sample
+class StandardSample:
+    def __init__(self, std: Standard, sample: Sample):
         self.std = std
+        self.sample = sample
 
         self.distance = [sequence_distance_1(seq_max, std.seq_max) for seq_max in sample.seq_max]
         self.kde = plot_image(graph_kde, self.distance)

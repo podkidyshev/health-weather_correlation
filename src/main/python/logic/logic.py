@@ -9,8 +9,8 @@ from form import Ui_MainBaseForm
 from science.classes import *
 
 from logic import dialog_open, set_main_window
-from logic.sample import QFrameSample, QFrameStdMulSamples
-from logic.standard import QFrameStandard, QFrameMulSamplesStd
+from logic.standard import QFrameStdSample, QFrameStdMulSamples
+from logic.sample import QFrameSampleStd, QFrameMulSamplesStd
 
 from logic.utils import QDialogGroup, QFrameDefault
 
@@ -97,7 +97,7 @@ class Main(Ui_MainBaseForm):
         # Погода - образец
         if orientation:
             if lead in Standard.standards and (slave in Sample.samples or slave == "--Групповой--"):
-                self.set_data_frame(QFrameSample, lead, slave)
+                self.set_data_frame(QFrameStdSample, lead, slave)
             elif lead in Standard.standards and slave == "--Группа--":
                 self.set_data_frame(QFrameStdMulSamples, lead)
             else:
@@ -105,7 +105,7 @@ class Main(Ui_MainBaseForm):
         # Образец - погода
         else:
             if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
-                self.set_data_frame(QFrameStandard, lead, slave)
+                self.set_data_frame(QFrameSampleStd, lead, slave)
             elif lead == "--Группа--" and slave in Standard.standards:
                 self.set_data_frame(QFrameMulSamplesStd, slave)
             else:
