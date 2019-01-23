@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout
+from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox
 from PyQt5.QtCore import Qt
 
 from logic import QFrameBase

@@ -1,3 +1,4 @@
+# Ведущий ряд - эталон
 from logic import QFrameBase, dialog_save_report
 from logic.utils import QFrameInfo, QFrameInfoKde, QDialogStds
 
@@ -7,10 +8,12 @@ from science import FACTORS_ALL
 from science.classes import Standard, Sample
 
 from reports import Printer
+# Для QFrameStdSample
 from reports.std import StandardFactorSample, StandardSample
 from reports.std_mul import MulStandardsFactorSample, MulStandardsSample
-from reports.std_mul import (StandardMulSamples, StandardMulFactorSamples,
-                             MulStandardsMulSamples, MulStandardsMulFactorSamples)
+# Для QFrameStdMulSamples
+from reports.std_mul import StandardMulFactorSamples, StandardMulSamples
+from reports.std_mul import MulStandardsMulFactorSamples, MulStandardsMulSamples
 
 
 class QFrameStdSample(QFrameBase, Ui_FramePatient):
