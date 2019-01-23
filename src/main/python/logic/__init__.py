@@ -3,7 +3,7 @@ import sys
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QTextCursor
-from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit, QVBoxLayout
+from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit, QVBoxLayout, QMessageBox
 
 
 root = os.path.dirname(sys.argv[0])
@@ -78,6 +78,14 @@ def dialog_save(title, *formats, filename=''):
 
 def dialog_save_report(filename):
     return dialog_save("Сохранить отчет", "docx", filename=filename)
+
+
+def error_dialog(msg):
+    mbox = QMessageBox()
+    mbox.setWindowTitle("Лала")
+    mbox.setText("ОШИБКА: " + msg)
+    mbox.setIcon(QMessageBox.Warning)
+    mbox.exec()
 
 
 class QFrameBase(QFrame):

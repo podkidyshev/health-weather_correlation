@@ -8,7 +8,7 @@ from form import Ui_MainBaseForm
 
 from science.classes import *
 
-from logic import dialog_open, set_main_window
+from logic import dialog_open, set_main_window, error_dialog
 from logic.standard import QFrameStdSample, QFrameStdMulSamples
 from logic.sample import QFrameSampleStd, QFrameMulSamplesStd
 
@@ -132,8 +132,8 @@ class Main(Ui_MainBaseForm):
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
         if std is None:
-            # TODO: всплывающее окно
-            print('Выберите эталон для удаления!')
+            error_dialog("Выберите эталон для удаления!")
+            return
         std = std.text()
         self.std_list.takeItem(self.std_list.currentRow())
         Standard.delete(Standard.standards[std])
@@ -148,8 +148,7 @@ class Main(Ui_MainBaseForm):
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()
         if sample is None:
-            # TODO: всплывающее окно
-            print('Для удаления пациента кликните по нему!')
+            error_dialog("Выберите пациента для удаления!")
             return
         sample = sample.text()
         self.sample_list.takeItem(self.sample_list.currentRow())
