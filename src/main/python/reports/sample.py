@@ -1,4 +1,5 @@
 # Ведущий ряд - образец
+# Писать в заголовке ведущий ряд - ведомый ряд
 from reports import Printer, str_arr
 from reports.utils import report_ntest, report_stats
 

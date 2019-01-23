@@ -24,18 +24,18 @@ def report_ntest(report, doc: Printer):
 
     ks = report["ks"]
     doc.add_paragraph("Тест нормальности Колмогорова-Смирнова: из {0} прогонов доля {1}/{0} = {2:.2f} отклоняет "
-                      "гипотезу о нормальности на уровне отклонения {3}"
+                      "гипотезу о нормальности на уровне отклонения {3}\n"
                       .format(ks["num_tests"], ks["num_rejects"], ks["ratio"], ks["alpha"]))
 
     if report['qq'] and doc.destination == "doc":
-        img = plot_image(test_normal_plot, report, io=True)
+        img = plot_image(test_normal_plot, report)
         doc.add_picture(img)
 
 
 def report_stats(stats, doc: Printer):
     doc.add_paragraph("\tВыборочное среднее = {:.2f}".format(stats[0]))
     doc.add_paragraph("\tСтандартное отклонение = {:.2f}".format(stats[1]))
-    doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})".format(*stats[2]))
+    doc.add_paragraph("\tДоверительный интервал = ({:.2f}, {:.2f})\n".format(*stats[2]))
 
 
 def report_sample_factor(sample: Sample, factor: int, doc: Printer):
