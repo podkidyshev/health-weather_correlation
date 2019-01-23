@@ -46,7 +46,7 @@ class QFrameSampleStd(QFrameBase, Ui_FrameStandard):
             Printer("doc", self.reports[factor].get_report).print(fname)
 
     def save_report_group(self):
-        factor, stds = QDialogStds.settings(self, get_stds=True)
+        factor, stds = QDialogStds.settings(self, get_stds=True, std_main=self.std.name)
         if factor is None:
             return
         fname = dialog_save_report("Группа эталонов {}".format(self.sample.display_file(factor)))
@@ -91,7 +91,7 @@ class QFrameMulSamplesStd(QFrameBase):
             Printer("doc", self.reports[factor].get_report).print(fname)
 
     def save_report_group(self):
-        factor, stds = QDialogStds.settings(self, get_stds=True)
+        factor, stds = QDialogStds.settings(self, get_stds=True, std_main=self.std.name)
         if factor is None:
             return
         fname = dialog_save_report("Группа эталонов {}".format(Sample.display_file_group(factor)))
