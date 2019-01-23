@@ -13,11 +13,7 @@ class MulStandardsFactorSample:
         self.sample_name = sample.display()
         self.factor = factor
 
-        # TODO: при выборе отдельных факторов (к примеру, вариант выбора "Погода BX_60 - Образец 1_4, Фактор без нагрузки
-        # TODO: происходит вылет. Ругается на использование sequence_distance. Если поменять на sequence_distance_1,
-        # TODO: то вроде всё норм
-
-        self.distance = [sequence_distance(self.sample.seq_max[factor], std.seq_max) for std in stds]
+        self.distance = [sequence_distance_1(self.sample.seq_max[factor], std.seq_max) for std in stds]
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
         self.stat = [stat_analysis(xr) for xr in self.distance]
@@ -25,18 +21,28 @@ class MulStandardsFactorSample:
     def get_report(self, doc: Printer):
         doc.add_heading("{} {}. Группа эталонов".format(self.sample_name, FACTORS_L[self.factor]), 0)
 
-        doc.add_heading("Отчеты по эталонам", 1)
-        for idx, std in enumerate(self.stds):
-            doc.add_heading("Для эталона {}".format(std.name), 1)
-            doc.add_paragraph("Последовательность расстояний. Количество значений равно = {}"
-                              .format(len(self.distance[idx])))
-            doc.add_paragraph(str_arr(self.distance[idx]))
-            doc.add_heading("Результаты визуального анализа распределения расстояний", 2)
-            doc.add_picture(self.va[idx])
-            doc.add_heading("Результаты тестирования нормальности распределения расстояний", 2)
-            report_ntest(self.ntest[idx], doc)
-            doc.add_heading("Результаты статистического анализа распределения расстояний", 2)
-            report_stats(self.stat[idx], doc)
+        doc.add_heading("Последовательности расстояний", 1)
+        for std, xr in zip(self.stds, self.distance):
+            doc.add_heading("Последовательность расстояний до эталона {}".format(std.name), 2)
+            doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
+            doc.add_paragraph(str_arr(xr))
+
+        doc.add_heading("Результаты визуального анализа распределения расстояний", 1)
+        for std, va in zip(self.stds, self.va):
+            doc.add_heading("Результаты визуального анализа распределения расстояний до эталона {}".format(std.name), 2)
+            doc.add_picture(va)
+
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний", 1)
+        for std, ntest in zip(self.stds, self.ntest):
+            doc.add_heading("Результаты тестирования нормальности распределения расстояний до эталона {}"
+                            .format(std.name), 2)
+            report_ntest(ntest, doc)
+
+        doc.add_heading("Результаты статистического анализа распределения расстояний", 1)
+        for std, stat in zip(self.stds, self.stat):
+            doc.add_heading("Результаты статистического анализа распределения расстояний до эталона {}"
+                            .format(std.name), 2)
+            report_stats(stat, doc)
 
 
 class MulStandardsSample:
@@ -54,23 +60,35 @@ class MulStandardsSample:
     def get_report(self, doc: Printer):
         doc.add_heading("{}. Группа эталонов".format(self.sample_name), 0)
 
-        doc.add_heading("Отчеты по эталонам", 1)
-        for idx, std in enumerate(self.stds):
-            doc.add_heading("Для эталона {}".format(std.name), 1)
-            for factor, factor_name in enumerate(FACTORS_L):
-                doc.add_heading("Для образца {}".format(factor_name), 1)
-                doc.add_paragraph("Последовательность расстояний для образца {} и эталона {}. "
-                                  "Количество значений равно = {}".format(factor_name,
-                                                                          std.name, len(self.distance[idx][factor])))
+        for factor, factor_name in enumerate(FACTORS_L):
+            doc.add_heading("Для фактора {}".format(factor_name), 1)
+
+            doc.add_heading("Последовательности расстояний от фактор образца {}".format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Последовательность расстояний для образца {} и эталона {}"
+                                .format(factor_name, std.name), 2)
+                doc.add_paragraph("Количество значений равно = {}".format(len(self.distance[idx][factor])))
                 doc.add_paragraph(str_arr(self.distance[idx][factor]))
-                doc.add_heading("Результаты визуального анализа распределения расстояний "
-                                "образца {} и эталона {}".format(factor_name, std.name), 2)
+
+            doc.add_heading("Результаты визуального анализа распределения расстояний от фактор-образца {}"
+                            .format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Результаты визуального анализа распределения расстояний до эталона {}"
+                                .format(std.name), 2)
                 doc.add_picture(self.va[idx][factor])
-                doc.add_heading("Результаты тестирования нормальности распределения расстояний "
-                                "образца {} и эталона {}".format(factor_name, std.name), 2)
+
+            doc.add_heading("Результаты тестирования нормальности распределения расстояний от фактор-образца {}"
+                            .format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Результаты тестирования нормальности распределения расстояний до эталона {}"
+                                .format(std.name), 2)
                 report_ntest(self.ntest[idx][factor], doc)
-                doc.add_heading("Результаты статистического анализа распределения расстояний "
-                                "образца {} и эталона {}".format(factor_name, std.name), 2)
+
+            doc.add_heading("Результаты статистического анализа распределения расстояний от фактор-образца {}"
+                            .format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Результаты статистического анализа распределения расстояний до эталона {}"
+                                .format(std.name), 2)
                 report_stats(self.stat[idx][factor], doc)
 
 
@@ -143,17 +161,21 @@ class StandardMulSamples:
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Эталон {}".format(self.std.name), 0)
 
-        for factor in range(4):
-            factor_name = FACTORS_L[factor]
+        for factor, factor_name in enumerate(FACTORS_L):
             doc.add_heading("Для фактора {}".format(factor_name), 1)
+
             doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
+            doc.add_paragraph("Количество значений равно = {}".format(len(self.max_list[factor])))
             doc.add_paragraph(str_arr(self.max_list[factor]))
+
             doc.add_heading("Результаты  визуального  анализа распределений средних значений образцов {}"
                             .format(factor_name), 2)
             doc.add_picture(self.va[factor])
+
             doc.add_heading("Результаты тестирования нормальности распределений средних значений образцов {}"
                             .format(factor_name), 2)
             report_ntest(self.ntest[factor], doc)
+
             doc.add_heading("Результаты статистического анализа распределений средних значений образцов {}"
                             .format(factor_name), 2)
             report_stats(self.stat[factor], doc)
@@ -217,18 +239,29 @@ class MulStandardsMulSamples:
     def get_report(self, doc: Printer):
         doc.add_heading("Группа образцов. Группа эталонов", 0)
 
-        for idx, std in enumerate(self.stds):
-            for factor in range(4):
-                factor_name = FACTORS_L[factor]
-                doc.add_heading("Для эталона {} и фактора {}".format(std.name, factor_name), 1)
-                doc.add_heading("Распределение средних значений образцов {}".format(factor_name), 2)
-                doc.add_paragraph(str(self.max_list[idx][factor]))
-                doc.add_heading("Результаты  визуального  анализа распределений средних значений образцов {}"
-                                .format(factor_name), 2)
+        for factor, factor_name in enumerate(FACTORS_L):
+            doc.add_heading("Для фактора {}".format(factor_name), 1)
+
+            doc.add_heading("Распределения средних значений фактор-образцов {}".format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Для эталона {}".format(std.name), 2)
+                doc.add_paragraph("Количество значений равно = {}".format(len(self.max_list[idx][factor])))
+                doc.add_paragraph(str_arr(self.max_list[idx][factor]))
+
+            doc.add_heading("Результаты визуального анализа распределений средних значений фактор-образцов {}"
+                            .format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Для эталона {}".format(std.name), 2)
                 doc.add_picture(self.va[idx][factor])
-                doc.add_heading("Результаты тестирования нормальности распределений средних значений образцов {}"
-                                .format(factor_name), 2)
+
+            doc.add_heading("Результаты тестирования нормальности распределений средних значений фактор-образцов {}"
+                            .format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Для эталона {}".format(std.name), 2)
                 report_ntest(self.ntest[idx][factor], doc)
-                doc.add_heading("Результаты статистического анализа распределений средних значений образцов {}"
-                                .format(factor_name), 2)
+
+            doc.add_heading("Результаты статистического анализа распределений средних значений фактор-образцов {}"
+                            .format(factor_name), 1)
+            for idx, std in enumerate(self.stds):
+                doc.add_heading("Для эталона {}".format(std.name), 2)
                 report_stats(self.stat[idx][factor], doc)

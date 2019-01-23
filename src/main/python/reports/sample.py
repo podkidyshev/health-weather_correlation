@@ -1,3 +1,4 @@
+# Ведущий ряд - образец
 from reports import Printer, str_arr
 from reports.utils import report_ntest, report_stats
 
