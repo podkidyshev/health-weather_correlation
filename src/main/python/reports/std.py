@@ -1,3 +1,4 @@
+# Ведущий ряд - эталон
 from reports.utils import *
 
 from science import plot_image, FACTORS_L
@@ -89,8 +90,7 @@ class StandardSample:
 
         doc.add_heading("Результаты статистического анализа распределения расстояний для образца", 1)
         for factor, stat in zip(FACTORS_L, self.stat):
-            doc.add_heading("Результаты статистического анализа распределения расстояний образца {}"
-                            .format(factor), 2)
+            doc.add_heading("Результаты статистического анализа распределения расстояний образца {}".format(factor), 2)
             report_stats(stat, doc)
 
         doc.add_heading("Ядерные оценки плотности и кривая Гаусса для сравнения распределения расстояний "

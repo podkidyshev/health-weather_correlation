@@ -12,7 +12,7 @@ from logic import dialog_open, set_main_window
 from logic.standard import QFrameStdSample, QFrameStdMulSamples
 from logic.sample import QFrameSampleStd, QFrameMulSamplesStd
 
-from logic.utils import QDialogStds, QFrameDefault
+from logic.utils import QFrameDefault
 
 matplotlib.use("Qt5Agg")
 

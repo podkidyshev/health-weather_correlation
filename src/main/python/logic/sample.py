@@ -1,3 +1,4 @@
+# Ведущий ряд - образец
 from logic import QFrameBase, dialog_save_report
 from logic.utils import QFrameStandardType, QDialogStds
 
@@ -7,10 +8,12 @@ from science import FACTORS_ALL
 from science.classes import Standard, Sample
 
 from reports import Printer
+# Для QFrameSampleStd
 from reports.sample import FactorSampleStandard, SampleStandard
-from reports.sample_mul import MulSamplesStandard, MulFactorSamplesStandard
-from reports.sample_mul import (SampleMulStandards, MulFactorSamplesMulStandards,
-                                MulSamplesMulStandards, FactorSampleMulStandards)
+from reports.sample_mul import FactorSampleMulStandards, SampleMulStandards
+# Для QFrameMulSamplesStd
+from reports.sample_mul import MulFactorSamplesStandard, MulSamplesStandard
+from reports.sample_mul import MulFactorSamplesMulStandards, MulSamplesMulStandards
 
 
 class QFrameSampleStd(QFrameBase, Ui_FrameStandard):
@@ -43,7 +46,7 @@ class QFrameSampleStd(QFrameBase, Ui_FrameStandard):
             Printer("doc", self.reports[factor].get_report).print(fname)
 
     def save_report_group(self):
-        factor, stds = QDialogStds.settings(self, get_stds=True)
+        factor, stds = QDialogStds.settings(self, get_stds=True, std_main=self.std.name)
         if factor is None:
             return
         fname = dialog_save_report("Группа эталонов {}".format(self.sample.display_file(factor)))
@@ -88,7 +91,7 @@ class QFrameMulSamplesStd(QFrameBase):
             Printer("doc", self.reports[factor].get_report).print(fname)
 
     def save_report_group(self):
-        factor, stds = QDialogStds.settings(self, get_stds=True)
+        factor, stds = QDialogStds.settings(self, get_stds=True, std_main=self.std.name)
         if factor is None:
             return
         fname = dialog_save_report("Группа эталонов {}".format(Sample.display_file_group(factor)))
@@ -98,6 +101,5 @@ class QFrameMulSamplesStd(QFrameBase):
         if factor == FACTORS_ALL:
             report = MulSamplesMulStandards(self.samples, stds)
         else:
-            # TODO: сделать отчет
             report = MulFactorSamplesMulStandards(self.samples, factor, stds)
         Printer("doc", report.get_report).print(fname)

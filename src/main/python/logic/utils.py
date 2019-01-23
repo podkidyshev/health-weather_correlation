@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout
+from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox
 from PyQt5.QtCore import Qt
 
 from logic import QFrameBase
@@ -136,7 +136,7 @@ class QFrameText(QFrameBase, Ui_FrameText):
 
 
 class QDialogStds(QDialog, Ui_DialogStds):
-    def __init__(self, parent, get_stds):
+    def __init__(self, parent, get_stds, **kwargs):
         # noinspection PyArgumentList
         QDialog.__init__(self, parent)
         Ui_DialogStds.setupUi(self, self)
@@ -147,15 +147,19 @@ class QDialogStds(QDialog, Ui_DialogStds):
         self.btn_all.setChecked(True)
 
         if get_stds:
-            # self.layout_stds = QVBoxLayout()
             self.cbs = []
             for v in reversed(sorted(list(Standard.standards.keys()))):
                 self.cbs.append(QCheckBox(v, self))
                 self.cbs[-1].setChecked(1)
                 self.layout_stds.insertWidget(0, self.cbs[-1])
-            # self.layout().insertWidget(0, self.layout_stds)
         else:
             self.layout().removeItem(self.layout_stds)
+
+        if get_stds:
+            std_main = kwargs.get("std_main", None)
+            if std_main is not None:
+                for cb in self.cbs:
+                    cb.setChecked(True if cb.text() == std_main else False)
 
         self.buttons.button(QDialogButtonBox.Save).setText("Сохранить")
         self.buttons.button(QDialogButtonBox.Cancel).setText("Отмена")
@@ -180,8 +184,8 @@ class QDialogStds(QDialog, Ui_DialogStds):
         QDialog.accept(self)
 
     @staticmethod
-    def settings(parent, *, get_stds):
-        dialog = QDialogStds(parent, get_stds)
+    def settings(parent, *, get_stds, **kwargs):
+        dialog = QDialogStds(parent, get_stds, **kwargs)
         if dialog.exec():
             return dialog.result
         else:
