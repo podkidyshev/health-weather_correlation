@@ -89,8 +89,7 @@ class QFrameBase(QFrame):
         QFrame.__init__(self, parent=parent)
         if child_frame_class is not None:
             child_frame_class.setupUi(self, self)
-        self.resize(500, 500)
-        self.setMinimumSize(QSize(500, 500))
+        self.setMinimumSize(QSize(300, 300))
 
         if child_frame_class is None:
             QVBoxLayout(self)
@@ -119,7 +118,7 @@ class QFrameBase(QFrame):
         img_label._pixmap = pixmap
         img_label.setPixmap(pixmap.scaled(img_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         img_label.setAlignment(Qt.AlignCenter)
-        img_label.setMinimumSize(QSize(200, 200))
+        img_label.setMinimumSize(QSize(300, 300))
 
         img_label.installEventFilter(main_window)
         img_label.updateGeometry()
