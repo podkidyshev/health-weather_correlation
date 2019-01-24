@@ -6,9 +6,10 @@ from PyQt5.QtCore import QEvent, Qt
 
 from form import Ui_MainBaseForm
 
+from science import ClassesError, ScienceError
 from science.classes import *
 
-from logic import dialog_open, set_main_window
+from logic import dialog_open, set_main_window, error_dialog
 from logic.standard import QFrameStdSample, QFrameStdMulSamples
 from logic.sample import QFrameSampleStd, QFrameMulSamplesStd
 
@@ -60,9 +61,11 @@ class Main(Ui_MainBaseForm):
     def add_sample(self, fname):
         try:
             sample = Sample.from_file(fname)
-        except Sample.SampleError as e:
-            # TODO: всплывающее окно
-            print(e.args[0])
+        except ClassesError as e:
+            error_dialog(e)
+            return
+        except Exception as e:
+            error_dialog(e, unknown=True)
             return
         if self.sample_list.count() == 0:
             self.sample_list.addItem("--Групповой--")
@@ -70,7 +73,14 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def add_std(self, fname):
-        std = Standard.from_file(fname)
+        try:
+            std = Standard.from_file(fname)
+        except ClassesError as e:
+            error_dialog(e)
+            return
+        except Exception as e:
+            error_dialog(e, unknown=True)
+            return
         self.std_list.addItem(std.name)
         self.update_boxes()
 
@@ -86,8 +96,13 @@ class Main(Ui_MainBaseForm):
             self.data_layout.removeWidget(self.data_frame)
             self.data_frame.hide()
             self.data_frame = None
-        self.data_frame = frame_class(self, *args)
-        self.data_layout.insertWidget(0, self.data_frame)
+        try:
+            self.data_frame = frame_class(self, *args)
+            self.data_layout.insertWidget(0, self.data_frame)
+        except (ScienceError, Exception) as e:
+            error_dialog(e, unknown=True)
+            self.data_frame = None
+            self.set_data_frame(QFrameDefault)
 
     def choose_data_frame(self):
         orientation = self.lead_box.currentText().split(' ')[0] == "Погода:"
@@ -101,7 +116,8 @@ class Main(Ui_MainBaseForm):
             elif lead in Standard.standards and slave == "--Группа--":
                 self.set_data_frame(QFrameStdMulSamples, lead)
             else:
-                raise ValueError("Неизвестный случай")
+                error_dialog("Необработанный случай выбора фрейма: lead={}, slave={}, orient={}"
+                             .format(lead, slave, orientation), unknown=True)
         # Образец - погода
         else:
             if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
@@ -109,7 +125,8 @@ class Main(Ui_MainBaseForm):
             elif lead == "--Группа--" and slave in Standard.standards:
                 self.set_data_frame(QFrameMulSamplesStd, slave)
             else:
-                raise ValueError('Неизвестный случай')
+                error_dialog("Необработанный случай выбора фрейма: lead={}, slave={}, orient={}"
+                             .format(lead, slave, orientation), unknown=True)
 
     # КНОПКИ
     def lead_box_activated(self):
@@ -120,7 +137,8 @@ class Main(Ui_MainBaseForm):
             items = ["Образец: " + str(self.sample_list.item(i).text()) for i in range(self.sample_list.count())] + \
                     ["Образец: --Группа--"]
         else:
-            raise ValueError('Неизвестный тип данных')
+            error_dialog("Неизвестный тип данных в боксе: {}".format(lead_type), unknown=True)
+            return
         self.slave_box.clear()
         self.slave_box.addItems(items)
 
@@ -131,9 +149,11 @@ class Main(Ui_MainBaseForm):
 
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
+        if self.std_list.count() == 0:
+            return
         if std is None:
-            # TODO: всплывающее окно
-            print('Выберите эталон для удаления!')
+            error_dialog("Выберите эталон для удаления!")
+            return
         std = std.text()
         self.std_list.takeItem(self.std_list.currentRow())
         Standard.delete(Standard.standards[std])
@@ -147,40 +167,57 @@ class Main(Ui_MainBaseForm):
 
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()
+        if self.sample_list.count() == 0:
+            return
         if sample is None:
-            # TODO: всплывающее окно
-            print('Для удаления пациента кликните по нему!')
+            error_dialog("Выберите пациента для удаления!")
             return
         sample = sample.text()
+        if sample == "--Групповой--":
+            # error_dialog("Невозможно удалить групповой образец!")
+            return
+        try:
+            Sample.delete(Sample.samples[sample])
+        except ClassesError as e:
+            error_dialog(e)
+        except Exception as e:
+            error_dialog(e, unknown=True)
         self.sample_list.takeItem(self.sample_list.currentRow())
         if self.sample_list.count() == 1:
             self.sample_list.clear()
-        Sample.delete(Sample.samples[sample])
         self.set_data_frame(QFrameDefault)
         self.update_boxes()
 
     def report_btn_clicked(self):
         if self.data_frame is not None and hasattr(self.data_frame, "save_report"):
-            self.data_frame.save_report()
-        else:
-            print("Функция save_report не реализована")
+            try:
+                self.data_frame.save_report()
+            except (ScienceError, Exception) as e:
+                error_dialog(e, unknown=True)
+        elif self.data_frame is not None:
+            error_dialog("Функция save_report не реализована у окна {}. Пожалуйста, свяжитесь с разработчиком"
+                         .format(type(self.data_frame).__name__))
 
     def report_group_btn_clicked(self):
         if self.data_frame is not None and hasattr(self.data_frame, "save_report_group"):
-            self.data_frame.save_report_group()
-        else:
-            print("Функция save_report_group не реализована")
+            try:
+                self.data_frame.save_report_group()
+            except (ScienceError, Exception) as e:
+                error_dialog(e, unknown=True)
+        elif self.data_frame is not None:
+            error_dialog("Функция save_report_group не реализована у окна {}. Пожалуйста, свяжитесь с разработчиком"
+                         .format(type(self.data_frame).__name__))
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]
 
-        if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
-            widget.setPixmap(widget._pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        if event.type() in event_types and isinstance(widget, QTextEdit) and hasattr(widget, '_custom'):
-            if widget._updating:
-                widget._updating = False
+        if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, 'plot_pixmap'):
+            widget.setPixmap(widget.plot_pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        if event.type() in event_types and isinstance(widget, QTextEdit) and hasattr(widget, 'c_updating'):
+            if widget.c_updating:
+                widget.c_updating = False
             else:
-                widget._updating = True
+                widget.c_updating = True
                 doc_height = widget.document().size().toSize().height()
                 widget.setMinimumHeight(doc_height)
         # noinspection PyCallByClass,PyTypeChecker
