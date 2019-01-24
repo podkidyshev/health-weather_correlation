@@ -80,10 +80,14 @@ def dialog_save_report(filename):
     return dialog_save("Сохранить отчет", "docx", filename=filename)
 
 
-def error_dialog(msg):
+def error_dialog(msg, *, unknown=False):
     mbox = QMessageBox()
-    mbox.setWindowTitle("Лала")
-    mbox.setText("ОШИБКА: " + msg)
+    mbox.setWindowTitle(main_window.windowTitle())
+    msg = msg if isinstance(msg, str) else msg.args[0]
+    if unknown:
+        mbox.setText("НЕИЗВЕСТНАЯ ОШИБКА: " + msg + "\nПожалуйста сделайте скриншот экрана и свяжитесь с разработчиком")
+    else:
+        mbox.setText("ОШИБКА: " + msg)
     mbox.setIcon(QMessageBox.Warning)
     mbox.exec()
 

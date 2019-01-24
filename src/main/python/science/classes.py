@@ -9,9 +9,6 @@ GROUP_SAMPLE_NAME = 'group'
 
 
 class Sample:
-    class SampleError(Exception):
-        pass
-
     samples = {}
     group = None
 
@@ -33,7 +30,7 @@ class Sample:
 
     def delete(self):
         if self.name == GROUP_SAMPLE_NAME:
-            raise Sample.SampleError('Невозможно удалить групповой образец')
+            raise science.ClassesError('Невозможно удалить групповой образец')
         # обновляем групповой образец
         for factor in range(4):
             for idx in range(DATA_LENGTH):
@@ -46,22 +43,25 @@ class Sample:
     @staticmethod
     def from_file(filename):
         name = science.file_base_name(filename)
-        datas = science.read_xlsx_sample(filename)
+        try:
+            datas = science.read_xlsx_sample(filename)
+        except science.ParseError as e:
+            raise science.ClassesError(e.args[0])
         return Sample(name, datas)
 
     @staticmethod
     def handle_init(name, datas):
         # проверка дубликатов
         if name in Sample.samples:
-            raise Sample.SampleError('Образец с именем {} уже загружен'.format(name))
+            raise science.ClassesError('Образец с именем {} уже загружен'.format(name))
         # все данные должны быть одной длины
         global DATA_LENGTH
         if DATA_LENGTH == DATA_LENGTH_DEFAULT:
             DATA_LENGTH = len(datas[0])
             print('DATA_LENGTH =', DATA_LENGTH)
         if any([len(datas[factor]) != DATA_LENGTH for factor in range(4)]):
-            raise Sample.SampleError('Для образца {} переданы некорректные данные: '
-                                     'проверьте количество данных для каждого фактора'.format(name))
+            raise science.ClassesError('Для образца {} переданы некорректные данные: '
+                                       'проверьте количество данных для каждого фактора'.format(name))
 
     def handle_group(self):
         if self.name == GROUP_SAMPLE_NAME:
@@ -104,9 +104,6 @@ class Sample:
 
 
 class Standard:
-    class StandardError(Exception):
-        pass
-
     standards = {}
 
     def __init__(self, name, data):
@@ -126,22 +123,25 @@ class Standard:
     @staticmethod
     def from_file(filename: str):
         name = science.file_base_name(filename)
-        data = science.read_sample(filename)
+        try:
+            data = science.read_sample(filename)
+        except science.ParseError as e:
+            raise science.ClassesError(e.args[0])
         return Standard(name, data)
 
     @staticmethod
     def handle_init(name, data):
         # проверка дубликатов
         if name in Standard.standards:
-            raise Standard.StandardError('Эталон с именем {} уже загружен'.format(name))
+            raise science.ClassesError('Эталон с именем {} уже загружен'.format(name))
         # все данные должны быть одной длины
         global DATA_LENGTH
         if DATA_LENGTH == DATA_LENGTH_DEFAULT:
             DATA_LENGTH = len(data)
             print('DATA_LENGTH =', DATA_LENGTH)
         if len(data) != DATA_LENGTH:
-            raise Sample.SampleError('Для эталона {} переданы некорректные данные: '
-                                     'проверьте количество данных'.format(name))
+            raise science.ClassesError('Для эталона {} переданы некорректные данные: '
+                                       'проверьте количество данных'.format(name))
 
     def display(self):
         return "Погода: " + self.name
