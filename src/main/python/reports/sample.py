@@ -16,100 +16,68 @@ class FactorSampleStandard:
 
         self.distance = sequence_distance_1(self.std.seq_max, self.sample.seq_max[factor])
         self.va = plot_image(visual_analysis, self.distance)
-        self.ntest = test_normal(self.distance, qq=False)
         self.stat = stat_analysis(self.distance)
+        self.ntest = test_normal(self.distance, qq=True)
 
         self.distance_apl = sequence_distance_1(self.std.seq_max_apl, self.sample.seq_max0[factor])
         self.va_apl = plot_image(visual_analysis, self.distance_apl)
-        self.ntest_apl = test_normal(self.distance_apl, qq=False)
         self.stat_apl = stat_analysis(self.distance_apl)
+        self.ntest_apl = test_normal(self.distance_apl, qq=True)
 
-        self.sample_name = sample.display()
+        self.sample_name = self.sample.display()
         self.factor_name = FACTORS_L[self.factor]
 
     def get_report(self, doc: Printer):
-        x, x_seq_max = self.sample.data[self.factor], self.sample.seq_max[self.factor]
-        y, y_seq_max, y_seq_max_apl = self.std.data, self.std.seq_max, self.std.seq_max_apl
+        doc.add_heading("{} {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
 
-        doc.add_heading("{}, фактор {}. Эталон {}"
-                        .format(self.sample_name, self.factor_name, self.std.name), 0)
+        doc.add_heading("Последовательность расстояний от максимумов значений эталона до максимумов фактор-образца", 1)
+        doc.add_paragraph(str_arr(self.distance))
 
-        if doc.destination == 'doc':
-            doc.add_heading("Список значений эталона", 1)
-            doc.add_paragraph("Количество значений равно = {}".format(len(y)))
-            doc.add_paragraph(str_arr(y))
+        doc.add_heading("Результат визуального анализа распределения расстояний от максимумов значений эталона", 1)
+        doc.add_picture(self.va)
 
-            doc.add_heading("Список максимумов значений эталона:", 1)
-            doc.add_paragraph("Количество значений равно = {}".format(len(y_seq_max)))
-            doc.add_paragraph(str_arr(y_seq_max))
+        doc.add_heading("Результат статистического анализа распределения расстояний от максимумов значений эталона", 1)
+        report_stats(self.stat, doc)
 
-            doc.add_heading("Список максимумов амплитуд эталона:", 1)
-            doc.add_paragraph("Количество амлитуд равно = {}".format(len_ampl(y_seq_max_apl)))
-            doc.add_paragraph(str_arr(y_seq_max_apl))
-            doc.add_paragraph('')
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний от максимумов значений эталона",
+                        1)
+        report_ntest(self.ntest, doc)
 
-            doc.add_paragraph("Список значений фактор-образца {}:".format(self.factor_name))
-            doc.add_paragraph("Количество значений равно = {}".format(len(x)))
-            doc.add_paragraph(str_arr(x))
+        doc.add_heading(
+            "Последовательность расстояний от максимумов амплитуд значений эталона до максимумов фактор-образца", 1)
+        doc.add_paragraph(str_arr(self.distance_apl))
 
-            doc.add_paragraph("Список максимумов значений фактор-образца {}:".format(self.factor_name))
-            doc.add_paragraph("Количество значений равно = {}".format(len(x_seq_max)))
-            doc.add_paragraph(str_arr(x_seq_max))
-            doc.add_paragraph('')
+        doc.add_heading(
+            "Результат визуального анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
+        doc.add_picture(self.va_apl)
 
-            doc.add_heading("Последовательность расстояний от максимумов значений эталона "
-                            "до максимумов фактор-образца {}".format(self.factor_name), 1)
-            doc.add_paragraph(str_arr(self.distance))
+        doc.add_heading(
+            "Результат статистического анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
+        report_stats(self.stat_apl, doc)
 
-            doc.add_heading("Последовательность расстояний от максимумов амплитуд значений эталона "
-                            "до максимумов фактор-образца {}".format(self.factor_name), 1)
-            doc.add_paragraph(str_arr(self.distance_apl))
-
-        self.get_report_info(doc)
-        self.get_report_info_apl(doc)
-
-        if doc.destination == 'doc':
-            doc.add_heading("Результат визуального анализа распределения расстояний значений эталона", 1)
-            doc.add_picture(self.va)
-
-            doc.add_heading("Результат визуального анализа распределения расстояний амплитуд эталона", 1)
-            doc.add_picture(self.va_apl)
+        doc.add_heading(
+            "Результаты тестирования нормальности распределения расстояний от максимумов амплитуд значений эталона", 1)
+        report_ntest(self.ntest_apl, doc)
 
     def get_report_stat(self, doc: Printer):
-        # TODO: Костыль 2, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
-
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
         report_stats(self.stat, doc)
 
     def get_report_ntest(self, doc: Printer):
-        # TODO: Костыль 3, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
-
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
         report_ntest(self.ntest, doc)
 
-    def get_report_info(self, doc: Printer):
-        self.get_report_stat(doc)
-        self.get_report_ntest(doc)
-
     def get_report_stat_apl(self, doc: Printer):
-        # TODO: Костыль 4, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
-
         doc.add_heading("Результат статистического анализа распределения расстояний амплитуд эталона", 1)
         report_stats(self.stat_apl, doc)
 
     def get_report_ntest_apl(self, doc: Printer):
-        # TODO: Костыль 5, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
-
         doc.add_heading("Результаты тестирования нормальности распределения расстояний амплитуд эталона", 1)
         report_ntest(self.ntest_apl, doc)
-
-    def get_report_info_apl(self, doc: Printer):
-        self.get_report_stat_apl(doc)
-        self.get_report_ntest_apl(doc)
 
 
 class SampleStandard:

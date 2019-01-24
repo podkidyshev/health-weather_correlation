@@ -12,11 +12,11 @@ class StandardMulFactorSamples:
         self.samples = samples[:]
         self.factor = factor
 
-        self.distance = [sequence_distance_1(sample.seq_max[factor], std.seq_max) for sample in samples]
+        self.distance = [sequence_distance_1(sample.seq_max[self.factor], self.std.seq_max) for sample in self.samples]
 
         self.max_list = []
-        for sample_num in range(len(samples)):
-            self.max_list.append(np.mean(self.distance[sample_num][factor]))
+        for sample_num in range(len(self.samples)):
+            self.max_list.append(np.mean(self.distance[sample_num]))
 
         self.va = plot_image(visual_analysis, self.max_list)
         self.stat = stat_analysis(self.max_list)
@@ -58,17 +58,17 @@ class StandardMulSamples:
         self.std = std
         self.samples = samples[:]
 
-        self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
-                         for sample in samples]
+        self.distance = [[sequence_distance_1(sample.seq_max[factor], self.std.seq_max) for sample in self.samples]
+                         for factor in range(4)]
 
         self.max_list = []
         for factor in range(4):
             max_list_factor = []
-            for sample_num in range(len(samples)):
-                max_list_factor.append(np.mean(self.distance[sample_num][factor]))
+            for sample_num in range(len(self.samples)):
+                max_list_factor.append(np.mean(self.distance[factor][sample_num]))
             self.max_list.append(max_list_factor)
 
-        self.va = [plot_image(visual_analysis, xr) for xr in self.max_list]
+        self.va = [plot_image(visual_analysis, max_list_factor) for max_list_factor in self.max_list]
         self.stat = [stat_analysis(max_list_factor) for max_list_factor in self.max_list]
         self.ntest = [test_normal(max_list_factor, qq=True) for max_list_factor in self.max_list]
 
@@ -106,16 +106,16 @@ class MulStandardsFactorSample:
         self.sample = sample
         self.factor = factor
 
-        self.distance = [sequence_distance_1(self.sample.seq_max[factor], std.seq_max) for std in stds]
+        self.distance = [sequence_distance_1(self.sample.seq_max[factor], std.seq_max) for std in self.stds]
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.stat = [stat_analysis(xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=True) for xr in self.distance]
 
-        self.sample_name = sample.display()
+        self.sample_name = self.sample.display()
         self.factor_name = FACTORS_L[self.factor]
 
     def get_report(self, doc: Printer):
-        doc.add_heading("Группа эталонов. {} {}".format(self.sample_name, FACTORS_L[self.factor]), 0)
+        doc.add_heading("Группа эталонов. {} {}".format(self.sample_name, self.factor_name), 0)
 
         doc.add_heading("Последовательности расстояний от фактор-образца {}".format(self.factor_name), 1)
         for std, xr in zip(self.stds, self.distance):
@@ -150,13 +150,13 @@ class MulStandardsSample:
         self.stds = stds[:]
         self.sample = sample
 
-        self.distance = [[sequence_distance_1(sample.seq_max[factor], std.seq_max) for factor in range(4)]
-                         for std in stds]
+        self.distance = [[sequence_distance_1(self.sample.seq_max[factor], std.seq_max) for factor in range(4)]
+                         for std in self.stds]
         self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.distance]
         self.stat = [[stat_analysis(factor) for factor in xr] for xr in self.distance]
         self.ntest = [[test_normal(factor, qq=True) for factor in xr] for xr in self.distance]
 
-        self.sample_name = sample.display()
+        self.sample_name = self.sample.display()
 
     def get_report(self, doc: Printer):
         doc.add_heading("Группа эталонов. {}".format(self.sample_name), 0)
@@ -201,9 +201,9 @@ class MulStandardsMulFactorSamples:
         self.factor = factor
 
         self.distance = [[sequence_distance_1(sample.seq_max[self.factor], std.seq_max)
-                          for sample in samples] for std in stds]
+                          for sample in self.samples] for std in self.stds]
 
-        self.max_list = [[np.mean(std[sample_num][self.factor]) for sample_num in range(len(self.samples))]
+        self.max_list = [[np.mean(std[sample_num]) for sample_num in range(len(self.samples))]
                          for std in self.distance]
 
         self.va = [plot_image(visual_analysis, xr) for xr in self.max_list]
@@ -240,8 +240,6 @@ class MulStandardsMulFactorSamples:
             report_ntest(ntest, doc)
 
 
-# TODO: Некорректные значения выдаются в отчёте, разобраться
-# TODO: Не понимаю в чём прокол
 class MulStandardsMulSamples:
     def __init__(self, stds: list, samples: list):
         self.stds = stds[:]

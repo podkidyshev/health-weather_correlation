@@ -13,7 +13,7 @@ class StandardFactorSample:
         self.sample = sample
         self.factor = factor
 
-        self.distance = sequence_distance_1(sample.seq_max[factor], std.seq_max)
+        self.distance = sequence_distance_1(self.sample.seq_max[self.factor], self.std.seq_max)
         self.va = plot_image(visual_analysis, self.distance)
         self.stat = stat_analysis(self.distance)
         self.ntest = test_normal(self.distance, qq=True)
@@ -52,13 +52,14 @@ class StandardSample:
         self.std = std
         self.sample = sample
 
-        self.distance = [sequence_distance_1(seq_max, std.seq_max) for seq_max in sample.seq_max]
+        self.distance = [sequence_distance_1(seq_max, self.std.seq_max) for seq_max in self.sample.seq_max]
         self.kde = plot_image(graph_kde, self.distance)
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.stat = [stat_analysis(xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=True) for xr in self.distance]
 
-        self.distance3 = [sequence_distance_1(sample.seq_max[factor], sample.seq_max[0]) for factor in range(1, 4)]
+        self.distance3 = [sequence_distance_1(self.sample.seq_max[factor], self.sample.seq_max[0]) for factor in
+                          range(1, 4)]
         self.kde3 = plot_image(graph_kde3, self.distance3)
         self.stat3 = [stat_analysis(xr) for xr in self.distance3]
         self.ntest3 = [test_normal(xr, qq=True) for xr in self.distance3]
@@ -109,7 +110,7 @@ class StandardSample:
         for factor, stat in zip(FACTORS_L[1:], self.stat3):
             doc.add_heading(
                 "Результаты статистического группового анализа распределения расстояний от фактор-образца {}"
-                .format(factor), 2)
+                    .format(factor), 2)
             report_stats(stat, doc)
 
     def get_report_ntest3(self, doc: Printer):
