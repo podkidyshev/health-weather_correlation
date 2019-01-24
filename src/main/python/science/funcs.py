@@ -183,7 +183,11 @@ def visual_analysis(x, base: Figure):
              edgecolor='none')
     fig.plot(rng, st.norm.pdf(rng, np.mean(x), np.std(x)), '-k')
     fig.plot(rng, st.gaussian_kde(x)(rng), color='blue')
-    fig.set(xlim=(-3, 4), ylim=(0, 0.5), xlabel='x', ylabel='',
+
+    maximum = max(st.norm.pdf(rng, np.mean(x), np.std(x)))
+    maximum = max(maximum, max(st.gaussian_kde(x)(rng)))
+
+    fig.set(xlim=(-3, 4), ylim=(0, max(0.5, maximum)), xlabel='x', ylabel='',
             title='синий график – ядерная оценка плотности распределения,\n'
                   'черный штрихпунктирный график – кривая Гаусса')
 
@@ -206,11 +210,14 @@ def graph_kde(xr: list, base: Figure):
     """Построение 4-х ядерных оценок плотности и кривой Гаусса"""
     fig = base.subplots(1)
     rng = np.linspace(0.9 * np.min(xr[0]), 1.1 * np.max(xr[0]), 100)
+    maximum = 0
     for xi, c in zip(xr, ["blue", "red", "green", "yellow"]):
+        maximum = max(maximum, max(st.gaussian_kde(xi)(rng)))
         fig.plot(rng, st.gaussian_kde(xi)(rng), color=c)
     fig.plot(rng, st.norm.pdf(rng, 0, 1), '-.k')
 
-    fig.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='',
+    maximum = max(maximum, max(st.norm.pdf(rng, 0, 1)))
+    fig.set(xlim=(-4, 4), ylim=(0, max(0.5, maximum)), xlabel='x', ylabel='',
             title='синий график – без нагрузки, красный график – с физ.нагрузкой,\n'
                   'зеленый график – после отдыха, желтый график – с эмоц.нагрузкой,\n'
                   'черный штрихпунктирный график – стандартная кривая Гаусса')
@@ -220,11 +227,15 @@ def graph_kde3(xr, base: Figure):
     """Построение 3-х ядерных оценок плотности и кривой Гаусса"""
     fig = base.subplots()
     rng = np.linspace(0.9 * np.min(xr[0]), 1.1 * np.max(xr[0]), 100)
+    maximum = 0
     for xi, c in zip(xr, ['blue', 'red', 'green']):
+        maximum = max(maximum, max(st.gaussian_kde(xi)(rng)))
         fig.plot(rng, st.gaussian_kde(xi)(rng), color=c)
     fig.plot(rng, st.norm.pdf(rng, 0, 1), '-.k')
+
     # fig.style.use('seaborn-white')
-    fig.set(xlim=(-4, 4), ylim=(0, 0.5), xlabel='x', ylabel='',
+    maximum = max(maximum, max(st.norm.pdf(rng, 0, 1)))
+    fig.set(xlim=(-4, 4), ylim=(0, max(0.5, maximum)), xlabel='x', ylabel='',
             title='синий график – с физ.нагрузкой, красный график – после отдыха,\n'
                   'зеленый график – с эмоц.нагрузкой,\n'
                   'черный штрихпунктирный график – стандартная кривая Гаусса')

@@ -6,62 +6,6 @@ from reports import Printer, str_arr, report_error
 from reports.utils import report_ntest, report_stats
 
 
-class SampleMulStandards:
-    @report_error("init")
-    def __init__(self, sample: Sample, stds: list):
-        self.sample = sample
-        self.sample_name = sample.display()
-        self.stds = stds[:]
-
-        self.distance = [[sequence_distance_1(std.seq_max, sample.seq_max[factor]) for factor in range(4)]
-                         for std in stds]
-        self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.distance]
-        self.ntest = [[test_normal(factor, qq=False) for factor in xr] for xr in self.distance]
-        self.stat = [[stat_analysis(factor) for factor in xr] for xr in self.distance]
-
-        self.distance_apl = [[sequence_distance_1(std.seq_max_apl, sample.seq_max0[factor]) for factor in range(4)]
-                             for std in stds]
-        self.va_apl = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.distance_apl]
-        self.ntest_apl = [[test_normal(factor, qq=False) for factor in xr] for xr in self.distance_apl]
-        self.stat_apl = [[stat_analysis(factor) for factor in xr] for xr in self.distance_apl]
-
-    @report_error("doc")
-    def get_report(self, doc: Printer):
-        doc.add_heading("Группа эталонов и {}".format(self.sample_name), 0)
-
-        doc.add_heading("Отчеты по эталонам", 1)
-        for idx, std in enumerate(self.stds):
-            for factor in range(4):
-                doc.add_heading("\nАнализ фактор-образца {}".format(FACTORS[factor]), 2)
-                doc.add_paragraph("Последовательность расстояний значений для эталона {} и образца {}."
-                                  "Количество значений равно = {}".format(std.name, FACTORS[factor],
-                                                                          len(self.distance[idx][factor])))
-                doc.add_paragraph(str_arr(self.distance[idx][factor]))
-                doc.add_heading("\nРезультаты визуального анализа распределения расстояний значений "
-                                "эталона {} фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                doc.add_picture(self.va[idx][factor])
-                doc.add_heading("\nРезультаты тестирования нормальности распределения расстояний значений "
-                                "эталона {} и фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                report_ntest(self.ntest[idx][factor], doc)
-                doc.add_heading("\nРезультаты статистического анализа распределения расстояний значений "
-                                "эталона {} и фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                report_stats(self.stat[idx][factor], doc)
-
-                doc.add_paragraph("Последовательность расстояний амплитуд для эталона {} и образца {}."
-                                  "Количество значений равно = {}".format(std.name, FACTORS[factor],
-                                                                          len_ampl(self.distance_apl[idx][factor])))
-                doc.add_paragraph(str_arr(self.distance_apl[idx][factor]))
-                doc.add_heading("\nРезультаты визуального анализа распределения расстояний амплитуд "
-                                "эталона {} фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                doc.add_picture(self.va_apl[idx][factor])
-                doc.add_heading("\nРезультаты тестирования нормальности распределения расстояний амплитуд "
-                                "эталона {} и фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                report_ntest(self.ntest_apl[idx][factor], doc)
-                doc.add_heading("\nРезультаты статистического анализа распределения расстояний амплитуд "
-                                "эталона {} и фактор-образца {}".format(std.name, FACTORS[factor]), 2)
-                report_stats(self.stat_apl[idx][factor], doc)
-
-
 class FactorSampleMulStandards:
     @report_error("init")
     def __init__(self, sample: Sample, factor: int, stds: list):
@@ -69,57 +13,157 @@ class FactorSampleMulStandards:
         self.factor = factor
         self.stds = stds[:]
 
-        self.distance = [sequence_distance_1(std.seq_max, sample.seq_max[self.factor]) for std in stds]
+        self.distance = [sequence_distance_1(std.seq_max0, self.sample.seq_max0[self.factor]) for std in self.stds]
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
-        self.ntest = [test_normal(xr, qq=False) for xr in self.distance]
         self.stat = [stat_analysis(xr) for xr in self.distance]
+        self.ntest = [test_normal(xr, qq=True) for xr in self.distance]
 
-        self.distance_apl = [sequence_distance_1(std.seq_max_apl, sample.seq_max0[factor]) for std in stds]
+        self.distance_apl = [sequence_distance_1(std.seq_max_apl, self.sample.seq_max0[factor]) for std in self.stds]
         self.va_apl = [plot_image(visual_analysis, xr) for xr in self.distance_apl]
-        self.ntest_apl = [test_normal(xr, qq=False) for xr in self.distance_apl]
         self.stat_apl = [stat_analysis(xr) for xr in self.distance_apl]
+        self.ntest_apl = [test_normal(xr, qq=True) for xr in self.distance_apl]
+
+        self.sample_name = self.sample.display()
+        self.factor_name = FACTORS_L[self.factor]
 
     @report_error("doc")
     def get_report(self, doc: Printer):
-        doc.add_heading("Группа эталонов и {}".format(self.sample.display_file(self.factor).lower()), 0)
+        doc.add_heading("{} {}. Группа эталонов".format(self.sample_name, self.factor_name), 0)
 
-        doc.add_heading("Последовательности расстояний", 1)
+        # Значения
+        doc.add_heading("Последовательность расстояний от максимумов значений эталона до максимумов фактор-образца", 1)
         for std, xr in zip(self.stds, self.distance):
             doc.add_heading("Для эталона {}".format(std.name), 2)
-            doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
+            # doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
             doc.add_paragraph(str_arr(xr))
-        doc.add_heading("Результаты визуального анализа распределения расстояний", 1)
+        doc.add_heading("Результат визуального анализа распределения расстояний от максимумов значений эталона", 1)
         for std, va in zip(self.stds, self.va):
             doc.add_heading("Для эталона {}".format(std.name), 2)
             doc.add_picture(va)
-        doc.add_heading("Результаты тестирования нормальности распределения расстояний", 1)
-        for std, ntest in zip(self.stds, self.ntest):
-            doc.add_heading("Для эталона {}".format(std.name), 2)
-            report_ntest(ntest, doc)
-        doc.add_heading("Результаты статистического анализа распределения расстояний", 1)
+        doc.add_heading("Результат статистического анализа распределения расстояний от максимумов значений эталона", 1)
         for std, stat in zip(self.stds, self.stat):
             doc.add_heading("Для эталона {}".format(std.name), 2)
             report_stats(stat, doc)
-
-        doc.add_heading("Последовательности расстояний амплитуд", 1)
-        for std, xr in zip(self.stds, self.distance):
+        doc.add_heading("Результаты тестирования нормальности распределения расстояний от максимумов значений эталона",
+                        1)
+        for std, ntest in zip(self.stds, self.ntest):
             doc.add_heading("Для эталона {}".format(std.name), 2)
-            doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
+            report_ntest(ntest, doc)
+
+        # Амплитуды
+        doc.add_heading(
+            "Последовательность расстояний от максимумов амплитуд значений эталона до максимумов фактор-образца", 1)
+        for std, xr in zip(self.stds, self.distance_apl):
+            doc.add_heading("Для эталона {}".format(std.name), 2)
+            # doc.add_paragraph("Количество значений равно = {}".format(len(xr)))
             doc.add_paragraph(str_arr(xr))
-        doc.add_heading("Результаты визуального анализа распределения расстояний амплитуд", 1)
-        for std, va in zip(self.stds, self.va):
+        doc.add_heading(
+            "Результат визуального анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
+        for std, va_apl in zip(self.stds, self.va_apl):
             doc.add_heading("Для эталона {}".format(std.name), 2)
-            doc.add_picture(va)
-        doc.add_heading("Результаты тестирования нормальности распределения расстояний амплитуд", 1)
-        for std, ntest in zip(self.stds, self.ntest):
+            doc.add_picture(va_apl)
+        doc.add_heading(
+            "Результат статистического анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
+        for std, stat_apl in zip(self.stds, self.stat_apl):
             doc.add_heading("Для эталона {}".format(std.name), 2)
-            report_ntest(ntest, doc)
-        doc.add_heading("Результаты статистического анализа распределения расстояний амплитуд", 1)
-        for std, stat in zip(self.stds, self.stat):
+            report_stats(stat_apl, doc)
+        doc.add_heading(
+            "Результаты тестирования нормальности распределения расстояний от максимумов амплитуд значений эталона", 1)
+        for std, ntest_apl in zip(self.stds, self.ntest_apl):
             doc.add_heading("Для эталона {}".format(std.name), 2)
-            report_stats(stat, doc)
+            report_ntest(ntest_apl, doc)
 
 
+class SampleMulStandards:
+    @report_error("init")
+    def __init__(self, sample: Sample, stds: list):
+        self.sample = sample
+        self.stds = stds[:]
+
+        self.distance = [[sequence_distance_1(std.seq_max0, self.sample.seq_max0[factor]) for factor in range(4)]
+                         for std in self.stds]
+        self.va = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.distance]
+        self.stat = [[stat_analysis(factor) for factor in xr] for xr in self.distance]
+        self.ntest = [[test_normal(factor, qq=True) for factor in xr] for xr in self.distance]
+
+        self.distance_apl = [[sequence_distance_1(std.seq_max_apl, self.sample.seq_max0[factor]) for factor in range(4)]
+                             for std in self.stds]
+        self.va_apl = [[plot_image(visual_analysis, factor) for factor in xr] for xr in self.distance_apl]
+        self.stat_apl = [[stat_analysis(factor) for factor in xr] for xr in self.distance_apl]
+        self.ntest_apl = [[test_normal(factor, qq=True) for factor in xr] for xr in self.distance_apl]
+
+        self.sample_name = sample.display()
+    
+    @report_error("doc")
+    def get_report(self, doc: Printer):
+        doc.add_heading("{}. Группа эталонов".format(self.sample_name), 0)
+
+        for idx, std in enumerate(self.stds):
+            doc.add_heading("Для эталона {}".format(std.name), 1)
+
+            # Значения
+            doc.add_heading("Последовательности расстояний от максимумов значений эталона {}".format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading("Последовательность расстояний до максимумов фактор-образца {}."
+                                                                                    .format(factor_name), 2)
+                doc.add_paragraph(str_arr(self.distance[idx][factor]))
+
+            doc.add_heading("Результаты визуального анализа распределения расстояний от максимумов значений эталона {}"
+                            .format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading("Результаты визуального анализа распределения расстояний до максимумов фактор-образца {}"
+                                .format(factor_name), 2)
+                doc.add_picture(self.va[idx][factor])
+
+            doc.add_heading("Результат статистического анализа распределения расстояний от максимумов значений эталона {}"
+                            .format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading("Результат статистического анализа распределения расстояний до максимумов фактор-образца {}"
+                    .format(factor_name), 2)
+                report_stats(self.stat[idx][factor], doc)
+
+            doc.add_heading("Результаты тестирования нормальности распределения расстояний от максимумов значений эталона {}"
+                .format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading("Результаты тестирования нормальности распределения расстояний до максимумов фактор-образца {}"
+                    .format(factor_name), 2)
+                report_ntest(self.ntest[idx][factor], doc)
+
+            # Амплитуды
+            doc.add_heading("Последовательности расстояний от максимумов амплитуд значений эталона {}".format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading("Последовательность расстояний до максимумов фактор-образца {}."
+                                .format(factor_name), 2)
+                doc.add_paragraph(str_arr(self.distance_apl[idx][factor]))
+
+            doc.add_heading("Результаты визуального анализа распределения расстояний от максимумов амплитуд значений эталона {}"
+                            .format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading(
+                    "Результаты визуального анализа распределения расстояний до максимумов фактор-образца {}"
+                    .format(factor_name), 2)
+                doc.add_picture(self.va_apl[idx][factor])
+
+            doc.add_heading(
+                "Результат статистического анализа распределения расстояний от максимумов амплитуд значений эталона {}"
+                .format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading(
+                    "Результат статистического анализа распределения расстояний до максимумов фактор-образца {}"
+                    .format(factor_name), 2)
+                report_stats(self.stat_apl[idx][factor], doc)
+
+            doc.add_heading(
+                "Результаты тестирования нормальности распределения расстояний от максимумов амплитуд значений эталона {}"
+                .format(std.name), 1)
+            for factor, factor_name in enumerate(FACTORS_L):
+                doc.add_heading(
+                    "Результаты тестирования нормальности распределения расстояний до максимумов фактор-образца {}"
+                    .format(factor_name), 2)
+                report_ntest(self.ntest_apl[idx][factor], doc)
+
+
+# TODO: в случае реализации фрейма QFrameMulSamplesStd в logic/sample.py
 class MulFactorSamplesStandard:
     @report_error("init")
     def __init__(self, samples: list, factor: int, std: Standard):
@@ -211,6 +255,7 @@ class MulFactorSamplesStandard:
         report_ntest(self.ntest_apl, doc)
 
 
+# TODO: в случае реализации фрейма QFrameMulSamplesStd в logic/sample.py
 class MulSamplesStandard:
     @report_error("init")
     def __init__(self, samples: list, std: Standard):
@@ -287,6 +332,7 @@ class MulSamplesStandard:
             report_stats(self.stat_apl[factor], doc)
 
 
+# TODO: в случае реализации фрейма QFrameMulSamplesStd в logic/sample.py
 class MulFactorSamplesMulStandards:
     @report_error("init")
     def __init__(self, samples: list, factor : int, stds: list):
@@ -299,6 +345,7 @@ class MulFactorSamplesMulStandards:
         pass
 
 
+# TODO: в случае реализации фрейма QFrameMulSamplesStd в logic/sample.py
 class MulSamplesMulStandards:
     @report_error("init")
     def __init__(self, samples: list, stds: list):

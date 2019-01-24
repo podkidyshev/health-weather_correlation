@@ -36,11 +36,8 @@ class QFrameStdSample(QFrameBase, Ui_FramePatient):
 
         self.tabs.widget(0).layout().insertWidget(0, QFrameInfoKde(self, self.report, "kde"))
 
-    def save_report(self):
-        factor = QDialogStds.settings(self, get_stds=False)
-        if factor is None:
-            return
-        fname = dialog_save_report("{} Эталон {}".format(self.sample.display_file(factor), self.std.name))
+    def dialog_std_sample(self, factor):
+        fname = dialog_save_report("Эталон {} {}".format(self.std.name, self.sample.display_file(factor)))
         if not fname:
             return
         if factor == FACTORS_ALL:
@@ -48,19 +45,30 @@ class QFrameStdSample(QFrameBase, Ui_FramePatient):
         else:
             Printer('doc', self.reports[factor].get_report).print(fname)
 
+    def save_report(self):
+        factor = QDialogStds.settings(self, get_stds=False)
+        if factor is None:
+            return
+        self.dialog_std_sample(factor)
+
     def save_report_group(self):
         factor, stds = QDialogStds.settings(self, get_stds=True, std_main=self.std.name)
         if factor is None:
             return
-        fname = dialog_save_report("{} Группа эталонов".format(self.sample.display_file(factor)))
-        stds = [Standard.standards[std] for std in stds]
-        if not fname:
+        if not len(stds):
             return
-        if factor == FACTORS_ALL:
-            report = MulStandardsSample(stds, self.sample)
+        if len(stds) == 1:
+            self.dialog_std_sample(factor)
         else:
-            report = MulStandardsFactorSample(stds, self.sample, factor)
-        Printer('doc', report.get_report).print(fname)
+            fname = dialog_save_report("Группа эталонов {}".format(self.sample.display_file(factor)))
+            stds = [Standard.standards[std] for std in stds]
+            if not fname:
+                return
+            if factor == FACTORS_ALL:
+                report = MulStandardsSample(stds, self.sample)
+            else:
+                report = MulStandardsFactorSample(stds, self.sample, factor)
+            Printer('doc', report.get_report).print(fname)
 
 
 class QFrameStdMulSamples(QFrameBase, Ui_FramePatient):
@@ -71,21 +79,18 @@ class QFrameStdMulSamples(QFrameBase, Ui_FramePatient):
         self.samples = list(Sample.samples.values())
 
         self.report = StandardMulSamples(self.std, self.samples)
-        self.reports, self.frames = [], []
 
+        self.title_label.setText("Эталон {} и группа образцов".format(self.std.name))
+
+        self.reports, self.frames = [], []
         self.tabs.removeTab(0)
         for factor in range(4):
             self.reports.append(StandardMulFactorSamples(self.std, self.samples, factor))
             self.frames.append(QFrameInfo(self, self.reports[-1]))
             self.tabs.widget(factor).layout().insertWidget(0, self.frames[-1])
 
-        self.title_label.setText("Группа образцов и эталон {}".format(self.std.name))
-
-    def save_report(self):
-        factor = QDialogStds.settings(self, get_stds=False)
-        if factor is None:
-            return
-        fname = dialog_save_report("{} {}".format(Sample.display_file_group(factor), self.std.display_file()))
+    def dialog_std_samples(self, factor):
+        fname = dialog_save_report("Эталон {} {}".format(self.std.name, Sample.display_file_group(factor)))
         if not fname:
             return
         if factor == FACTORS_ALL:
@@ -93,16 +98,27 @@ class QFrameStdMulSamples(QFrameBase, Ui_FramePatient):
         else:
             Printer("doc", self.reports[factor].get_report).print(fname)
 
+    def save_report(self):
+        factor = QDialogStds.settings(self, get_stds=False)
+        if factor is None:
+            return
+        self.dialog_std_samples(factor)
+
     def save_report_group(self):
         factor, stds = QDialogStds.settings(self, get_stds=True, std_main=self.std.name)
         if factor is None:
             return
-        fname = dialog_save_report("{} Группа эталонов".format(Sample.display_file_group(factor)))
-        if not fname:
+        if not len(stds):
             return
-        stds = [Standard.standards[std] for std in stds]
-        if factor == FACTORS_ALL:
-            report = MulStandardsMulSamples(stds, self.samples)
+        if len(stds) == 1:
+            self.dialog_std_samples(factor)
         else:
-            report = MulStandardsMulFactorSamples(stds, self.samples, factor)
-        Printer('doc', report.get_report).print(fname)
+            fname = dialog_save_report("Группа эталонов {}".format(Sample.display_file_group(factor)))
+            if not fname:
+                return
+            stds = [Standard.standards[std] for std in stds]
+            if factor == FACTORS_ALL:
+                report = MulStandardsMulSamples(stds, self.samples)
+            else:
+                report = MulStandardsMulFactorSamples(stds, self.samples, factor)
+            Printer('doc', report.get_report).print(fname)
