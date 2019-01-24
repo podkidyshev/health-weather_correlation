@@ -2,11 +2,12 @@ from science import plot_image, FACTORS, FACTORS_L
 from science.funcs import *
 from science.classes import Standard, Sample
 
-from reports import Printer, str_arr
+from reports import Printer, str_arr, report_error
 from reports.utils import report_ntest, report_stats
 
 
 class SampleMulStandards:
+    @report_error("init")
     def __init__(self, sample: Sample, stds: list):
         self.sample = sample
         self.sample_name = sample.display()
@@ -24,6 +25,7 @@ class SampleMulStandards:
         self.ntest_apl = [[test_normal(factor, qq=False) for factor in xr] for xr in self.distance_apl]
         self.stat_apl = [[stat_analysis(factor) for factor in xr] for xr in self.distance_apl]
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Группа эталонов и {}".format(self.sample_name), 0)
 
@@ -61,6 +63,7 @@ class SampleMulStandards:
 
 
 class FactorSampleMulStandards:
+    @report_error("init")
     def __init__(self, sample: Sample, factor: int, stds: list):
         self.sample = sample
         self.factor = factor
@@ -76,6 +79,7 @@ class FactorSampleMulStandards:
         self.ntest_apl = [test_normal(xr, qq=False) for xr in self.distance_apl]
         self.stat_apl = [stat_analysis(xr) for xr in self.distance_apl]
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Группа эталонов и {}".format(self.sample.display_file(self.factor).lower()), 0)
 
@@ -117,6 +121,7 @@ class FactorSampleMulStandards:
 
 
 class MulFactorSamplesStandard:
+    @report_error("init")
     def __init__(self, samples: list, factor: int, std: Standard):
         self.samples = samples[:]
         self.factor = factor
@@ -142,6 +147,7 @@ class MulFactorSamplesStandard:
         self.ntest_apl = test_normal(self.max_list_apl, qq=False)
         self.stat_apl = stat_analysis(self.max_list_apl)
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Эталон {}. Группа образцов".format(self.std.name), 0)
 
@@ -174,6 +180,7 @@ class MulFactorSamplesStandard:
             .format(self.std.name, factor_name), 2)
         report_stats(self.stat_apl, doc)
 
+    @report_error("ui")
     def get_report_stat(self, doc: Printer):
         # TODO: Костыль 2, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
@@ -181,12 +188,14 @@ class MulFactorSamplesStandard:
         doc.add_heading("Результат статистического анализа распределения расстояний значений эталона", 1)
         report_stats(self.stat, doc)
 
+    @report_error("ui")
     def get_report_ntest(self, doc: Printer):
         # TODO: Костыль 3, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
         doc.add_heading("Результаты тестирования нормальности распределения расстояний значений эталона", 1)
         report_ntest(self.ntest, doc)
 
+    @report_error("ui")
     def get_report_stat_apl(self, doc: Printer):
         # TODO: Костыль 4, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
@@ -194,6 +203,7 @@ class MulFactorSamplesStandard:
         doc.add_heading("Результат статистического анализа распределения расстояний амплитуд эталона", 1)
         report_stats(self.stat_apl, doc)
 
+    @report_error("ui")
     def get_report_ntest_apl(self, doc: Printer):
         # TODO: Костыль 5, стоит от этого избавиться
         doc.add_heading("Фактор {}. Эталон {}".format(FACTORS[self.factor], self.std.name), 0)
@@ -202,6 +212,7 @@ class MulFactorSamplesStandard:
 
 
 class MulSamplesStandard:
+    @report_error("init")
     def __init__(self, samples: list, std: Standard):
         self.samples = samples[:]
         self.std = std
@@ -234,6 +245,7 @@ class MulSamplesStandard:
         self.ntest_apl = [test_normal(max_list_factor, qq=False) for max_list_factor in self.max_list_apl]
         self.stat_apl = [stat_analysis(max_list_factor) for max_list_factor in self.max_list_apl]
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Эталон {}. Группа образцов".format(self.std.name), 0)
 
@@ -276,16 +288,19 @@ class MulSamplesStandard:
 
 
 class MulFactorSamplesMulStandards:
+    @report_error("init")
     def __init__(self, samples: list, factor : int, stds: list):
         self.samples = samples[:]
         self.factor = factor
         self.stds = stds[:]
 
-        def get_report(self, doc: Printer):
-            pass
+    @report_error("doc")
+    def get_report(self, doc: Printer):
+        pass
 
 
 class MulSamplesMulStandards:
+    @report_error("init")
     def __init__(self, samples: list, stds: list):
         self.samples = samples[:]
         self.stds = stds[:]
@@ -310,6 +325,7 @@ class MulSamplesMulStandards:
         self.ntest_apl = [[test_normal(factor, qq=False) for factor in std] for std in self.max_list_apl]
         self.stat_apl = [[stat_analysis(factor) for factor in std] for std in self.max_list_apl]
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Группа эталонов. Группа образцов", 0)
 

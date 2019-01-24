@@ -99,11 +99,7 @@ class Main(Ui_MainBaseForm):
         try:
             self.data_frame = frame_class(self, *args)
             self.data_layout.insertWidget(0, self.data_frame)
-        except ScienceError as e:
-            error_dialog(e)
-            self.data_frame = None
-            self.set_data_frame(QFrameDefault)
-        except Exception as e:
+        except (ScienceError, Exception) as e:
             error_dialog(e, unknown=True)
             self.data_frame = None
             self.set_data_frame(QFrameDefault)
@@ -194,17 +190,23 @@ class Main(Ui_MainBaseForm):
 
     def report_btn_clicked(self):
         if self.data_frame is not None and hasattr(self.data_frame, "save_report"):
-            self.data_frame.save_report()
+            try:
+                self.data_frame.save_report()
+            except (ScienceError, Exception) as e:
+                error_dialog(e, unknown=True)
         elif self.data_frame is not None:
-            error_dialog("Функция save_report не реализована не реализована у фрейма {}"
-                         .format(type(self.data_frame)), unknown=True)
+            error_dialog("Функция save_report не реализована у окна {}. Пожалуйста, свяжитесь с разработчиком"
+                         .format(type(self.data_frame).__name__))
 
     def report_group_btn_clicked(self):
         if self.data_frame is not None and hasattr(self.data_frame, "save_report_group"):
-            self.data_frame.save_report_group()
+            try:
+                self.data_frame.save_report_group()
+            except (ScienceError, Exception) as e:
+                error_dialog(e, unknown=True)
         elif self.data_frame is not None:
-            error_dialog("Функция save_report_group не реализована не реализована у фрейма {}"
-                         .format(type(self.data_frame)), unknown=True)
+            error_dialog("Функция save_report_group не реализована у окна {}. Пожалуйста, свяжитесь с разработчиком"
+                         .format(type(self.data_frame).__name__))
 
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]

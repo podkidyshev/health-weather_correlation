@@ -86,7 +86,11 @@ def error_dialog(msg, *, unknown=False):
     mbox.setWindowTitle(main_window.windowTitle())
     msg = msg if isinstance(msg, str) else msg.args[0]
     if unknown:
-        mbox.setText("НЕИЗВЕСТНАЯ ОШИБКА: " + msg + "\nПожалуйста сделайте скриншот экрана и свяжитесь с разработчиком")
+        if isinstance(msg, str):
+            mbox.setText("НЕИЗВЕСТНАЯ ОШИБКА: " + msg +
+                         "\nПожалуйста сделайте скриншот экрана и свяжитесь с разработчиком")
+        else:
+            mbox.setText("НЕИЗВЕСТНАЯ ОШИБКА: \nПожалуйста сделайте скриншот экрана и свяжитесь с разработчиком")
     else:
         mbox.setText("ОШИБКА: " + msg)
     mbox.setIcon(QMessageBox.Warning)

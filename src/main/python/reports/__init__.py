@@ -4,6 +4,30 @@ from docx import Document
 from docx.shared import Cm
 
 
+from science import ScienceError
+
+
+def report_error(dest):
+    def holy_crap(func):
+        def wrapped(self, *args):
+            try:
+                func(self, *args)
+            except Exception as e:
+                nonlocal dest
+                if dest == "init":
+                    dest = "при вычислении данных"
+                elif dest == "ui":
+                    dest = "при генерации вывода данных на экран"
+                elif dest == "doc":
+                    dest = "при генерации docx-отчета"
+                else:
+                    dest = "при генерации отчета"
+                raise ScienceError("Непредвиденная ошибка {}\nОтчет: {}\nОшибка: {}"
+                                   .format(dest, type(self).__name__, e.args[0]))
+        return wrapped
+    return holy_crap
+
+
 def str_arr(arr):
     return "[" + ", ".join(map(lambda x: "{:.2f}".format(x), arr)) + "]"
 
@@ -57,7 +81,11 @@ class Printer:
             section.bottom_margin = Cm(2)
             section.left_margin = Cm(2.5)
             section.right_margin = Cm(1.5)
-        doc.save(obj)
+        try:
+            doc.save(obj)
+        except Exception as e:
+            raise ScienceError("Ошибка при сохранении docx-отчета: {}"
+                               "\nВозможно уже существующий файл открыт в другой программе".format(e.args[0]))
 
 
 def print_report(destination, func, *args):
