@@ -1,6 +1,6 @@
 # Ведущий ряд - образец
 # Писать в заголовке ведущий ряд - ведомый ряд
-from reports import Printer, str_arr
+from reports import Printer, str_arr, report_error
 from reports.utils import report_ntest, report_stats
 
 from science import plot_image, FACTORS, FACTORS_L
@@ -9,6 +9,7 @@ from science.classes import Standard, Sample
 
 
 class FactorSampleStandard:
+    @report_error("init")
     def __init__(self, sample: Sample, factor: int, std: Standard):
         self.sample = sample
         self.factor = factor
@@ -27,6 +28,7 @@ class FactorSampleStandard:
         self.sample_name = self.sample.display()
         self.factor_name = FACTORS_L[self.factor]
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("{} {}. Эталон {}".format(self.sample_name, self.factor_name, self.std.name), 0)
 
@@ -61,23 +63,27 @@ class FactorSampleStandard:
             "Результаты тестирования нормальности распределения расстояний от максимумов амплитуд значений эталона", 1)
         report_ntest(self.ntest_apl, doc)
 
+    @report_error("ui")
     def get_report_stat(self, doc: Printer):
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
         doc.add_heading("Результат статистического анализа распределения расстояний от максимумов значений эталона", 1)
         report_stats(self.stat, doc)
 
+    @report_error("ui")
     def get_report_ntest(self, doc: Printer):
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
         doc.add_heading("Результаты тестирования нормальности распределения расстояний от максимумов значений эталона",
                         1)
         report_ntest(self.ntest, doc)
 
+    @report_error("ui")
     def get_report_stat_apl(self, doc: Printer):
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
         doc.add_heading(
             "Результат статистического анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
         report_stats(self.stat_apl, doc)
 
+    @report_error("ui")
     def get_report_ntest_apl(self, doc: Printer):
         doc.add_heading("Фактор {}. Эталон {}".format(self.factor_name, self.std.name), 0)
         doc.add_heading(
@@ -86,6 +92,7 @@ class FactorSampleStandard:
 
 
 class SampleStandard:
+    @report_error("init")
     def __init__(self, sample: Sample, std: Standard):
         self.sample = sample
         self.std = std
@@ -102,6 +109,7 @@ class SampleStandard:
 
         self.sample_name = self.sample.display()
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("{}. Эталон {}".format(self.sample_name, self.std.name), 0)
 

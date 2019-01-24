@@ -1,5 +1,6 @@
 # Ведущий ряд - эталон
 # Писать в заголовке ведущий ряд - ведомый ряд
+from reports import report_error
 from reports.utils import *
 
 from science import plot_image, FACTORS_L
@@ -8,6 +9,7 @@ from science.classes import Standard, Sample
 
 
 class StandardFactorSample:
+    @report_error("init")
     def __init__(self, std: Standard, sample: Sample, factor: int):
         self.std = std
         self.sample = sample
@@ -21,6 +23,7 @@ class StandardFactorSample:
         self.sample_name = self.sample.display()
         self.factor_name = FACTORS_L[self.factor]
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Эталон {}. {} {}".format(self.std.name, self.sample_name, self.factor_name), 0)
 
@@ -36,11 +39,13 @@ class StandardFactorSample:
         doc.add_heading("Результаты тестирования нормальности распределения расстояний фактор-образца", 1)
         report_ntest(self.ntest, doc)
 
+    @report_error("ui")
     def get_report_stat(self, doc: Printer):
         doc.add_heading("Эталон {}. Фактор {}".format(self.std.name, self.factor_name), 0)
         doc.add_heading("Результат статистического анализа распределения расстояний фактор-образца", 1)
         report_stats(self.stat, doc)
 
+    @report_error("ui")
     def get_report_ntest(self, doc: Printer):
         doc.add_heading("Эталон {}. Фактор {}".format(self.std.name, self.factor_name), 0)
         doc.add_heading("Результаты тестирования нормальности распределения расстояний фактор-образца", 1)
@@ -48,6 +53,7 @@ class StandardFactorSample:
 
 
 class StandardSample:
+    @report_error("init")
     def __init__(self, std: Standard, sample: Sample):
         self.std = std
         self.sample = sample
@@ -66,6 +72,7 @@ class StandardSample:
 
         self.sample_name = self.sample.display()
 
+    @report_error("doc")
     def get_report(self, doc: Printer):
         doc.add_heading("Эталон {}. {}".format(self.std.name, self.sample_name), 0)
 
@@ -103,6 +110,7 @@ class StandardSample:
         self.get_report_stat3(doc)
         self.get_report_ntest3(doc)
 
+    @report_error("ui")
     def get_report_stat3(self, doc: Printer):
         doc.add_heading("Результаты статистического анализа распределения расстояний от фактор-образцов "
                         "(с физической нагрузкой, с эмоциональной нагрузкой, после отдыха) до исходного стандарта – "
@@ -113,6 +121,7 @@ class StandardSample:
                     .format(factor), 2)
             report_stats(stat, doc)
 
+    @report_error("ui")
     def get_report_ntest3(self, doc: Printer):
         doc.add_heading("Тестирование нормальности распределения расстояний от фактор-образцов "
                         "(с физической нагрузкой, с эмоциональной нагрузкой, после отдыха) до исходного стандарта – "
@@ -121,3 +130,7 @@ class StandardSample:
             doc.add_heading("Тестирование нормальности распределения расстояний от фактор-образца {}"
                             .format(factor), 2)
             report_ntest(ntest, doc)
+
+
+if __name__ == '__main__':
+    StandardSample(None, None)

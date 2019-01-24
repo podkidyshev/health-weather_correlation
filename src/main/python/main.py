@@ -1,40 +1,7 @@
 import sys
 
 from fbs_runtime.application_context import ApplicationContext
-import PyQt5.QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QTabWidget, QTextEdit
-from PyQt5.QtGui import QWheelEvent
-
-
-class MyTabWidget(QTabWidget):
-    def __init__(self, *args, **kwargs):
-        super(MyTabWidget, self).__init__(*args, **kwargs)
-        # noinspection PyUnresolvedReferences
-        self.currentChanged.connect(self.on_change)
-
-    def on_change(self, index):
-        tab = self.widget(index)
-        if tab.layout() is not None:
-            for child in range(tab.layout().count()):
-                widget = tab.layout().itemAt(child).widget()
-                widget.update()
-
-
-class MyTextEdit(QTextEdit):
-    def __init__(self, *args):
-        super(MyTextEdit, self).__init__(*args)
-
-    def wheelEvent(self, event: QWheelEvent):
-        if hasattr(self, '_custom'):
-            event.ignore()
-
-
-QTabWidgetOriginal = PyQt5.QtWidgets.QTabWidget
-PyQt5.QtWidgets.QTabWidget = MyTabWidget
-
-QTextEditOriginal = PyQt5.QtWidgets.QTextEdit
-PyQt5.QtWidgets.QTextEdit = MyTextEdit
-
+from PyQt5.QtWidgets import QMainWindow
 
 import logic.logic as logic
 

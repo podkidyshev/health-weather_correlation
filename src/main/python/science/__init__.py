@@ -16,7 +16,15 @@ FACTORS_L = [factor.lower() for factor in FACTORS]
 FACTORS_ALL = -1
 
 
-class XLSXParseError(ValueError):
+class ScienceError(Exception):
+    pass
+
+
+class ClassesError(ValueError):
+    pass
+
+
+class ParseError(ValueError):
     pass
 
 
@@ -33,17 +41,29 @@ def file_base_name(filename: str):
 
 def read_sample(filename):
     """Чтение эталонов"""
-    with open(filename) as file:
-        data = [row.strip() for row in file]
+    try:
+        with open(filename) as file:
+            data = [row.strip() for row in file]
+    except Exception:
+        raise ParseError("Невозможно открыть файл эталона {}"
+                         "\nВозможно он открыт в другой программе".format(filename))
 
     for idx, el in enumerate(data):
-        # noinspection PyTypeChecker
-        data[idx] = float(el)
+        try:
+            # noinspection PyTypeChecker
+            data[idx] = float(el)
+        except ValueError:
+            raise ParseError("Невозможно распознать строку {} в файле {}: убедитесь, что там записано число "
+                             "(дробная часть отделяется точкой)".format(idx + 1, filename))
     return data
 
 
 def read_xlsx_sample(filename):
-    wb = load_workbook(filename=filename)
+    try:
+        wb = load_workbook(filename=filename)
+    except Exception:
+        raise ParseError("Невозможно открыть файл образца {}"
+                         "\nВозможно он открыт в другой программе".format(filename))
     sheet = wb.get_active_sheet()
 
     datas = []
@@ -61,20 +81,14 @@ def read_xlsx_sample(filename):
         while sheet.cell(row, col).value is not None and sheet.cell(row, col).value.strip():
             try:
                 data.append(float(sheet.cell(row, col).value))
-            except ValueError:
-                err = 'Ошибка при парсе файла {}, страницы {}, ячейки {}{}'.format(filename,
-                                                                                   sheet.title,
-                                                                                   'ABCD'[col],
-                                                                                   row)
+            except Exception:
+                err = 'Ошибка при обработке файла {}, страницы {}, ячейки {}{}'.format(filename, sheet.title,
+                                                                                       'ABCD'[col], row)
                 print(err)
-                raise XLSXParseError(err)
+                raise ParseError(err)
             row += 1
         datas.append(data)
     return datas
-
-
-def patient_suffix(filename: str, suffix):
-    return filename[:filename.rfind('.')] + suffix + filename[filename.rfind('.'):]
 
 
 def plot_image(plot_func, *args, **kwargs):
