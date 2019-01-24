@@ -84,7 +84,7 @@ class StandardSample:
             doc.add_heading("Результаты визуального анализа фактор-образца {}".format(factor), 2)
             doc.add_picture(va)
 
-        doc.add_heading("Результаты статистического анализа распределения расстояний для образца", 1)
+        doc.add_heading("Результаты статистического анализа распределения расстояний", 1)
         for factor, stat in zip(FACTORS_L, self.stat):
             doc.add_heading(
                 "Результаты статистического анализа распределения расстояний фактор-образца {}".format(factor), 2)

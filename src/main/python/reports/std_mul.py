@@ -169,7 +169,7 @@ class MulStandardsSample:
                 doc.add_heading(
                     "Последовательность расстояний от максимумов фактор-образца {} до ближайшего максимума эталона {}"
                         .format(factor_name, std.name), 2)
-                doc.add_paragraph("Количество значений равно = {}".format(len(self.distance[idx][factor])))
+                # doc.add_paragraph("Количество значений равно = {}".format(len(self.distance[idx][factor])))
                 doc.add_paragraph(str_arr(self.distance[idx][factor]))
 
             doc.add_heading("Результаты визуального анализа распределения расстояний от фактор-образца {}"
