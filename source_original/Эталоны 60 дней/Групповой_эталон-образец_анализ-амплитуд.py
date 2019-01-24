@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from pylab import *
 from numpy import *
 import numpy as np
@@ -576,6 +576,10 @@ for j in range(n_standart):
 #print("Распределение расстояний максимумов фактор-образца без нагрузки для образца  ", 0)
 #for i in range(n_standart): print("Для эталона  ", i, sequence_distance(sequence_max1(sample[0], np.mean(sample[0])), sequence_max1(standart[i], np.mean(standart[i]))), "\n" , sequence_distance(sequence_max1(sample[0], 0), sequence_max1(standart[i], min(standart[i]))), len_ampl(sequence_max1(sample[0], 0)))    
 
+
+
+
+
 #Анализ синхронизации максимумов значений эталонов с максимумами группы фактор-образцов без нагрузки
 
 
@@ -615,6 +619,10 @@ for i in range(n_sample): print("Для образца  ", i, "\n", visual_analy
 
 print("Результат статистического анализа распределения расстояний максимумов значений эталона 0 до всех максимумов фактор-образцов без нагрузки")
 for i in range(n_sample): print("Для образца  ", i, "\n",  "[Выборочное среднее, Стандартное отклонение,  Доверительный интервал] =  ", "\n" , stat_analys(sequence_distance(sequence_max0(standart[0]), sequence_max0(sample[i]))))
+
+
+
+
 
 
 print("Распределение расстояний максимумов фактор-образцов без нагрузки до всех максимумов значений группы эталонов")

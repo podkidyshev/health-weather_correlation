@@ -14,7 +14,7 @@ class FactorSampleStandard:
         self.factor = factor
         self.std = std
 
-        self.distance = sequence_distance_1(self.std.seq_max, self.sample.seq_max[factor])
+        self.distance = sequence_distance_1(self.std.seq_max0, self.sample.seq_max0[factor])
         self.va = plot_image(visual_analysis, self.distance)
         self.stat = stat_analysis(self.distance)
         self.ntest = test_normal(self.distance, qq=True)
@@ -90,7 +90,7 @@ class SampleStandard:
         self.sample = sample
         self.std = std
 
-        self.distance = [sequence_distance_1(self.std.seq_max, seq_max) for seq_max in self.sample.seq_max]
+        self.distance = [sequence_distance_1(self.std.seq_max0, seq_max0) for seq_max0 in self.sample.seq_max0]
         self.va = [plot_image(visual_analysis, xr) for xr in self.distance]
         self.stat = [stat_analysis(xr) for xr in self.distance]
         self.ntest = [test_normal(xr, qq=True) for xr in self.distance]
@@ -114,7 +114,7 @@ class SampleStandard:
             doc.add_paragraph(str_arr(xr))
 
         doc.add_heading("Результат визуального анализа распределения расстояний от максимумов значений эталона", 1)
-        for factor, va, in zip(FACTORS_L, self.va):
+        for factor, va in zip(FACTORS_L, self.va):
             doc.add_heading("Результаты визуального анализа до ближайшего максимума фактор-образца {}".format(factor), 2)
             doc.add_picture(va)
 
@@ -130,27 +130,26 @@ class SampleStandard:
             report_ntest(ntest, doc)
 
         # Амплитуды
-        doc.add_heading(
-            "Ряды расстояний и распределения расстояний от максимумов амплитуд значений эталона до ближайшего максимума "
-            "образца", 1)
+        doc.add_heading("Ряды расстояний и распределения расстояний от максимумов амплитуд значений эталона до "
+            "ближайшего максимума образца", 1)
         for factor, xr in zip(FACTORS_L, self.distance_apl):
             doc.add_paragraph(
                 "Ряд расстояний от максимумов амплитуд значений эталона до ближайшего максимума фактор-образца {}:".format(factor))
             doc.add_paragraph(str_arr(xr))
 
         doc.add_heading("Результат визуального анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
-        for factor, va, in zip(FACTORS_L, self.va_apl):
+        for factor, va_apl in zip(FACTORS_L, self.va_apl):
             doc.add_heading("Результаты визуального анализа до ближайшего максимума фактор-образца {}".format(factor),
                             2)
-            doc.add_picture(va)
+            doc.add_picture(va_apl)
 
         doc.add_heading("Результаты статистического анализа распределения расстояний от максимумов амплитуд значений эталона", 1)
-        for factor, stat in zip(FACTORS_L, self.stat_apl):
+        for factor, stat_apl in zip(FACTORS_L, self.stat_apl):
             doc.add_heading("Результаты статистического анализа до ближайшего максимума фактор-образца {}".format(factor), 2)
-            report_stats(stat, doc)
+            report_stats(stat_apl, doc)
 
             doc.add_heading(
                 "Результаты тестирования нормальности распределения расстояний от максимумов амплитуд значений эталона", 1)
-        for factor, ntest in zip(FACTORS_L, self.ntest_apl):
+        for factor, ntest_apl in zip(FACTORS_L, self.ntest_apl):
             doc.add_heading("Результаты тестирования нормальности до ближайшего максимума фактор-образца {}".format(factor), 2)
-            report_ntest(ntest, doc)
+            report_ntest(ntest_apl, doc)

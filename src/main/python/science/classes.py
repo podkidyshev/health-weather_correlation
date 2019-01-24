@@ -116,6 +116,7 @@ class Standard:
         self.name = name
         self.data = data
         self.seq_max = funcs.sequence_max(self.data)
+        self.seq_max0 = funcs.sequence_max0(self.data)
         self.seq_max_apl = funcs.sequence_max_ampl(self.data, np.mean(self.data))
         # добавление эталона в глобальный список
         Standard.standards[name] = self
