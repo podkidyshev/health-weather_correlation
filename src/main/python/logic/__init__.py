@@ -35,7 +35,7 @@ def get_file_filter(formats: tuple):
         elif f == "docx":
             file_filter += "Текстовые документы (*.docx);;"
         else:
-            raise ValueError("Неизвестный формат файла")
+            error_dialog("Попытка получить фильтр на неизвестный формат файла: {}".format(f), unknown=True)
     return file_filter[:-2]
 
 
@@ -52,7 +52,8 @@ def dialog_open(title, *formats):
     if dialog.exec():
         fname = dialog.selectedFiles()[0]
         if fname and not os.path.exists(fname):
-            raise ValueError("Выбранный файл не существует")
+            error_dialog("Выбранный файл не существует: {}".format(fname))
+            return ""
         last_open = os.path.dirname(fname)
         return fname
     else:
@@ -108,18 +109,6 @@ class QFrameBase(QFrame):
         self.layout().setContentsMargins(0, 0, 0, 0)
 
     def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
-        """
-        принимает PIL-изображение и рисует на img-label картинку:
-        добавляет необходимые объекты в корневой объект и конфигурирует лейбл
-        ВАЖНО!
-        label.sizePolicy: Expanding, Maximum
-        label_layout.layoutSizeConstraint.SetDefaultSizeConstraint
-        ВАЖНО!
-        :param img_obj: PIL-изображение для рисование
-        :param img_label: лейбл, на котором рисовать
-        :param img_name: имя объекта изображения - должно быть уникальным в self.__dict__
-        :return: None
-        """
         if img_name in self.__dict__:
             raise QFrameBase.QFrameBaseException('img_name должно быть уникальным')
 
@@ -127,7 +116,7 @@ class QFrameBase(QFrame):
         pixmap.loadFromData(img_obj)
         self.__dict__[img_name] = pixmap
 
-        img_label._pixmap = pixmap
+        img_label.plot_pixmap = pixmap
         img_label.setPixmap(pixmap.scaled(img_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         img_label.setAlignment(Qt.AlignCenter)
         img_label.setMinimumSize(QSize(300, 300))
@@ -136,8 +125,6 @@ class QFrameBase(QFrame):
         img_label.updateGeometry()
 
     def add_text(self, text: str, text_edit: QTextEdit):
-        # scroll area: лейаут, ей содержащий - layoutSizeConstraint->SetMinimumSize
-        # у самого лейаута scroll area то же самое
         text_edit.setFontPointSize(13)
         text_edit.insertPlainText(text)
         text_edit.document().adjustSize()
@@ -147,10 +134,10 @@ class QFrameBase(QFrame):
         cursor.movePosition(QTextCursor.Start)
         text_edit.setTextCursor(cursor)
 
-        text_edit._custom = True
-        text_edit._updating = False
+        text_edit.c_updating = False
 
         text_edit.installEventFilter(main_window)
+        self.__dict__["has_text"] = True
 
     @staticmethod
     def get_custom(ui_class):

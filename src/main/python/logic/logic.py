@@ -153,6 +153,8 @@ class Main(Ui_MainBaseForm):
 
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
+        if self.std_list.count() == 0:
+            return
         if std is None:
             error_dialog("Выберите эталон для удаления!")
             return
@@ -169,10 +171,15 @@ class Main(Ui_MainBaseForm):
 
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()
+        if self.sample_list.count() == 0:
+            return
         if sample is None:
             error_dialog("Выберите пациента для удаления!")
             return
         sample = sample.text()
+        if sample == "--Групповой--":
+            # error_dialog("Невозможно удалить групповой образец!")
+            return
         try:
             Sample.delete(Sample.samples[sample])
         except ClassesError as e:
@@ -202,13 +209,13 @@ class Main(Ui_MainBaseForm):
     def eventFilter(self, widget, event):
         event_types = [QEvent.Resize, QEvent.Show, 24]
 
-        if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, '_pixmap'):
-            widget.setPixmap(widget._pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        if event.type() in event_types and isinstance(widget, QTextEdit) and hasattr(widget, '_custom'):
-            if widget._updating:
-                widget._updating = False
+        if event.type() in event_types and isinstance(widget, QLabel) and hasattr(widget, 'plot_pixmap'):
+            widget.setPixmap(widget.plot_pixmap.scaled(widget.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        if event.type() in event_types and isinstance(widget, QTextEdit) and hasattr(widget, 'c_updating'):
+            if widget.c_updating:
+                widget.c_updating = False
             else:
-                widget._updating = True
+                widget.c_updating = True
                 doc_height = widget.document().size().toSize().height()
                 widget.setMinimumHeight(doc_height)
         # noinspection PyCallByClass,PyTypeChecker
