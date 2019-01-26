@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox
 from PyQt5.QtCore import Qt
 
-from logic import QFrameBase
+from logic import QFrameBase, error_dialog
 
 from frames.default import Ui_FrameDefault
 from frames.utils.info import Ui_FrameInfo
@@ -136,36 +136,41 @@ class QFrameText(QFrameBase, Ui_FrameText):
 
 
 class QDialogStds(QDialog, Ui_DialogStds):
-    def __init__(self, parent, get_stds, **kwargs):
+    def __init__(self, parent, **kwargs):
         # noinspection PyArgumentList
         QDialog.__init__(self, parent)
         Ui_DialogStds.setupUi(self, self)
 
+        self.dimension = 1
         self.result = None
-        self.get_stds = get_stds
+        # Эталоны
+        self.get_stds = kwargs.get("get_stds", False)
+        self.std_main = kwargs.get("std_main", None)
+        if self.get_stds:
+            self.dimension += 1
 
+        # Факторы
         self.btn_all.setChecked(True)
-
-        if get_stds:
+        # Эталоны
+        if self.get_stds:
             self.cbs = []
             for v in reversed(sorted(list(Standard.standards.keys()))):
                 self.cbs.append(QCheckBox(v, self))
-                self.cbs[-1].setChecked(1)
+                if self.std_main is None or self.std_main != v:
+                    self.cbs[-1].setChecked(False)
+                else:
+                    self.cbs[-1].setChecked(1)
                 self.layout_stds.insertWidget(0, self.cbs[-1])
         else:
             self.layout().removeItem(self.layout_stds)
-
-        if get_stds:
-            std_main = kwargs.get("std_main", None)
-            if std_main is not None:
-                for cb in self.cbs:
-                    cb.setChecked(True if cb.text() == std_main else False)
 
         self.buttons.button(QDialogButtonBox.Save).setText("Сохранить")
         self.buttons.button(QDialogButtonBox.Cancel).setText("Отмена")
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowContextHelpButtonHint)
 
     def accept(self):
+        self.result = []
+        # Факторы
         if self.btn_all.isChecked():
             factor = FACTORS_ALL
         else:
@@ -174,19 +179,24 @@ class QDialogStds(QDialog, Ui_DialogStds):
                     factor = idx
                     break
             else:
-                raise ValueError("Не выбран ни один вариант")
+                error_dialog("Не выбран ни один фактор/все факторы")
+                return
+        self.result.append(factor)
+        # Эталоны
         if self.get_stds:
             stds = [cb.text() for cb in self.cbs if cb.isChecked()]
-            self.result = (factor, stds)
-        else:
-            self.result = factor
+            if not len(stds):
+                error_dialog("Выберите по крайней мере один эталон")
+                return
+            self.result.append(stds)
 
         QDialog.accept(self)
 
     @staticmethod
-    def settings(parent, *, get_stds, **kwargs):
-        dialog = QDialogStds(parent, get_stds, **kwargs)
+    def settings(parent, **kwargs):
+        dialog = QDialogStds(parent, **kwargs)
         if dialog.exec():
-            return dialog.result
+            res = dialog.result
         else:
-            return (None, None) if get_stds else None
+            res = [None] * dialog.dimension
+        return res[0] if len(res) == 1 else res
