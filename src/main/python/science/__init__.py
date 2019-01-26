@@ -28,13 +28,6 @@ class ParseError(ValueError):
     pass
 
 
-def is_float(s: str):
-    try:
-        return float(s)
-    except ValueError:
-        return False
-
-
 def file_base_name(filename: str):
     return os.path.splitext(os.path.basename(filename))[0]
 
@@ -69,23 +62,12 @@ def read_xlsx_sample(filename):
     datas = []
     for col in range(1, 4 + 1):
         data, row = [], 1
-        val = sheet.cell(row, col).value
-        if not val:
-            datas.append(None)
-            continue
-
-        val = val.strip()
-        # Пропустим первую строку, если там не число (заголовок, например)
-        if is_float(val) is False:
-            row += 1
         while sheet.cell(row, col).value is not None and sheet.cell(row, col).value.strip():
             try:
                 data.append(float(sheet.cell(row, col).value))
             except Exception:
-                err = 'Ошибка при обработке файла {}, страницы {}, ячейки {}{}'.format(filename, sheet.title,
-                                                                                       'ABCD'[col], row)
-                print(err)
-                raise ParseError(err)
+                raise ParseError('Ошибка при обработке файла {}\nСтраница {}, ячейка {}{}'
+                                 .format(filename, sheet.title, 'ABCD'[col], row))
             row += 1
         datas.append(data)
     return datas

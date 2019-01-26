@@ -143,9 +143,10 @@ class Main(Ui_MainBaseForm):
         self.slave_box.addItems(items)
 
     def add_std_btn_clicked(self):
-        fname = dialog_open("Выбрать эталон", "txt")
-        if fname:
-            self.add_std(fname)
+        fnames = dialog_open("Выбрать эталон", "txt")
+        if fnames:
+            for fname in fnames:
+                self.add_std(fname)
 
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
@@ -161,9 +162,10 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def add_sample_btn_clicked(self):
-        fname = dialog_open("Выбрать файл пациента", "xlsx")
-        if fname:
-            self.add_sample(fname)
+        fnames = dialog_open("Выбрать файл пациента", "xlsx")
+        if fnames:
+            for fname in fnames:
+                self.add_sample(fname)
 
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()

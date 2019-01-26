@@ -47,17 +47,20 @@ def dialog_open(title, *formats):
     dialog.setLabelText(QFileDialog.Accept, "Добавить")
     dialog.setLabelText(QFileDialog.Reject, "Отмена")
     dialog.setAcceptMode(QFileDialog.AcceptOpen)
-    dialog.setFileMode(QFileDialog.ExistingFile)
+    dialog.setFileMode(QFileDialog.ExistingFiles)
 
     if dialog.exec():
-        fname = dialog.selectedFiles()[0]
-        if fname and not os.path.exists(fname):
-            error_dialog("Выбранный файл не существует: {}".format(fname))
-            return ""
-        last_open = os.path.dirname(fname)
-        return fname
+        fnames = dialog.selectedFiles()
+        if not fnames:
+            return
+        for fname in fnames:
+            if not os.path.exists(fname):
+                error_dialog("Файл не существует: {}".format(fname))
+                return
+        last_open = os.path.dirname(fnames[0])
+        return fnames
     else:
-        return ""
+        return
 
 
 def dialog_save(title, *formats, filename=''):
