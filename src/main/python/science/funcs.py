@@ -185,7 +185,7 @@ def visual_analysis(x, base: Figure):
     fig.plot(rng, norm_pdf, '-k')
     fig.plot(rng, st.gaussian_kde(x)(rng), color='blue')
 
-    fig.set(xlim=(-3, 4), ylim=max(max(norm_pdf), 0.5), xlabel='x', ylabel='',
+    fig.set(xlim=(-3, 4), ylim=(0, max(max(norm_pdf), 0.5)), xlabel='x', ylabel='',
             title='синий график – ядерная оценка плотности распределения,\n'
                   'черный штрихпунктирный график – кривая Гаусса')
 
