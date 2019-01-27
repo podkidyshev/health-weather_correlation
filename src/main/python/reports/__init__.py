@@ -62,9 +62,9 @@ class Printer:
         else:
             self.doc += s + '\n'
 
-    def add_picture(self, pic: bytes or bytearray):
+    def add_picture(self, pic: bytes or bytearray, **kwargs):
         if self.destination == 'doc':
-            self.doc.add_picture(BytesIO(pic))
+            self.doc.add_picture(BytesIO(pic), **kwargs)
 
     @staticmethod
     def create_docx():

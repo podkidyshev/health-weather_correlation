@@ -260,25 +260,22 @@ def test_normal(x: list, *, qq: bool):
         for i in range(8):
             x1.append(random.choice(x))
 
-    stat, p = st.normaltest(x1)
+    num_tests = 10 ** 2
+    num_rejects = 0
+    for i in range(num_tests):
+        stat, p = st.normaltest(x1)
+        if p < alpha:
+            num_rejects += 1
+    ratio = float(num_rejects) / num_tests
     report["agostino"] = {
         "name": "D'Agostino and Pearson's Test",
+        "num_tests": num_tests,
+        "num_rejects": num_rejects,
+        "ratio": ratio,
         "alpha": alpha,
-        "stat": stat,
-        "p": p,
-        "res": p > alpha
     }
 
-    statistic, critical_values, significance_level = st.anderson(x)
-    report["anderson"] = {
-        "name": "Anderson-Darling Test",
-        "statistic": statistic,
-        "critical": critical_values,
-        "sig_level": significance_level,
-        "res": [statistic < cv for cv in critical_values]
-    }
-
-    num_tests = 10 ** (3 if qq else 2)
+    num_tests = 10 ** 2
     num_rejects = 0
     for i in range(num_tests):
         normed_data = (x - np.mean(x)) / np.std(x)
