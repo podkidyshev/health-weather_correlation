@@ -1,4 +1,5 @@
 import os
+import sys
 import matplotlib
 
 from PyQt5.QtWidgets import QHBoxLayout, QWidget, QLabel, QMainWindow, QTextEdit
@@ -100,6 +101,10 @@ class Main(Ui_MainBaseForm):
             self.data_frame = frame_class(self, *args)
             self.data_layout.insertWidget(0, self.data_frame)
         except (ScienceError, Exception) as e:
+            raise ValueError from e
+            if frame_class == QFrameDefault:
+                error_dialog("Ошибка в окне по умолчанию. Свяжитесь с разработчиком")
+                sys.exit(1)
             error_dialog(e, unknown=True)
             self.data_frame = None
             self.set_data_frame(QFrameDefault)

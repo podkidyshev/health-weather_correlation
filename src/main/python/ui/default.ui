@@ -6,21 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>443</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Frame</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
    <item>
-    <widget class="QPlainTextEdit" name="instructions_edit">
+    <widget class="QTextEdit" name="instructions_edit">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
-     <property name="placeholderText">
-      <string>Здесь можно написать краткую инструкцию и (связь с разработчиками)</string>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

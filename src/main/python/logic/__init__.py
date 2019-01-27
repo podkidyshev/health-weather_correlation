@@ -113,7 +113,7 @@ class QFrameBase(QFrame):
 
         if child_frame_class is None:
             QVBoxLayout(self)
-        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setContentsMargins(5, 0, 5, 0)
 
     def add_image(self, img_obj: bytes or bytearray, img_label: QLabel, img_name: str):
         if img_name in self.__dict__:
