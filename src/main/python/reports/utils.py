@@ -1,5 +1,4 @@
-from operator import add
-from functools import reduce
+from docx.shared import Cm
 
 from science import plot_image, FACTORS
 from science.funcs import test_normal_plot
@@ -16,20 +15,19 @@ def report_ntest(report, doc: Printer):
     doc.add_paragraph("Тест нормальности Шапиро-Вилка: {}".format(res_ok if shapiro["res"] else res_nok))
 
     agostino = report["agostino"]
-    doc.add_paragraph("Тест Д'Агостино и Пирсона: {}".format(res_ok if agostino["res"] else res_nok))
-
-    anderson = report["anderson"]
-    oks = int(reduce(add, anderson["res"]))
-    doc.add_paragraph("Тест нормальности Андерсона-Дарлинга: пройдено {}/{} тестов".format(oks, len(anderson["res"])))
+    doc.add_paragraph("Тест нормальности Д'Агостино и Пирсона: из {0} прогонов доля {1}/{0} = {2:.2f} отклоняет "
+                      "гипотезу о нормальности на уровне отклонения {3}"
+                      .format(agostino["num_tests"], agostino["num_rejects"], agostino["ratio"], agostino["alpha"]))
 
     ks = report["ks"]
     doc.add_paragraph("Тест нормальности Колмогорова-Смирнова: из {0} прогонов доля {1}/{0} = {2:.2f} отклоняет "
-                      "гипотезу о нормальности на уровне отклонения {3}\n"
+                      "гипотезу о нормальности на уровне отклонения {3}"
                       .format(ks["num_tests"], ks["num_rejects"], ks["ratio"], ks["alpha"]))
 
     if report['qq'] and doc.destination == "doc":
         img = plot_image(test_normal_plot, report)
-        doc.add_picture(img)
+        doc.add_paragraph("QQ-тест:")
+        doc.add_picture(img, width=Cm(12.5))
 
 
 def report_stats(stats, doc: Printer):

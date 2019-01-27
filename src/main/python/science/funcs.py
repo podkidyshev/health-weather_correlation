@@ -179,15 +179,13 @@ def visual_analysis(x, base: Figure):
     """Визуальный анализ ряда распределений"""
     fig = base.subplots()
     rng = np.linspace(-3, 4, 100)
+    norm_pdf = st.norm.pdf(rng, np.mean(x), np.std(x))
     fig.hist(x, bins=7, range=(-3, 4), density=True, alpha=0.5, histtype='stepfilled', color='steelblue',
              edgecolor='none')
-    fig.plot(rng, st.norm.pdf(rng, np.mean(x), np.std(x)), '-k')
+    fig.plot(rng, norm_pdf, '-k')
     fig.plot(rng, st.gaussian_kde(x)(rng), color='blue')
 
-    maximum = max(st.norm.pdf(rng, np.mean(x), np.std(x)))
-    maximum = max(maximum, max(st.gaussian_kde(x)(rng)))
-
-    fig.set(xlim=(-3, 4), ylim=(0, max(0.5, maximum)), xlabel='x', ylabel='',
+    fig.set(xlim=(-3, 4), ylim=(0, max(max(norm_pdf), 0.5)), xlabel='x', ylabel='',
             title='синий график – ядерная оценка плотности распределения,\n'
                   'черный штрихпунктирный график – кривая Гаусса')
 
@@ -210,13 +208,14 @@ def graph_kde(xr: list, base: Figure):
     """Построение 4-х ядерных оценок плотности и кривой Гаусса"""
     fig = base.subplots(1)
     rng = np.linspace(0.9 * np.min(xr[0]), 1.1 * np.max(xr[0]), 100)
+    norm_pdf = st.norm.pdf(rng, 0, 1)
     maximum = 0
     for xi, c in zip(xr, ["blue", "red", "green", "yellow"]):
         maximum = max(maximum, max(st.gaussian_kde(xi)(rng)))
         fig.plot(rng, st.gaussian_kde(xi)(rng), color=c)
-    fig.plot(rng, st.norm.pdf(rng, 0, 1), '-.k')
+    fig.plot(rng, norm_pdf, '-.k')
 
-    maximum = max(maximum, max(st.norm.pdf(rng, 0, 1)))
+    maximum = max(maximum, max(norm_pdf))
     fig.set(xlim=(-4, 4), ylim=(0, max(0.5, maximum)), xlabel='x', ylabel='',
             title='синий график – без нагрузки, красный график – с физ.нагрузкой,\n'
                   'зеленый график – после отдыха, желтый график – с эмоц.нагрузкой,\n'
@@ -233,20 +232,11 @@ def graph_kde3(xr, base: Figure):
         fig.plot(rng, st.gaussian_kde(xi)(rng), color=c)
     fig.plot(rng, st.norm.pdf(rng, 0, 1), '-.k')
 
-    # fig.style.use('seaborn-white')
     maximum = max(maximum, max(st.norm.pdf(rng, 0, 1)))
     fig.set(xlim=(-4, 4), ylim=(0, max(0.5, maximum)), xlabel='x', ylabel='',
             title='синий график – с физ.нагрузкой, красный график – после отдыха,\n'
                   'зеленый график – с эмоц.нагрузкой,\n'
                   'черный штрихпунктирный график – стандартная кривая Гаусса')
-
-
-# def graph_kde_all(x, y, u, v, w, base: Figure):
-#     """Построение 4-х ядерных оценок плотности и кривой Гаусса для всех пациентов и эталона w"""
-#     for j in range(len(x)): graph_kde([sequence_distance(sequence_max(x[j]), sequence_max(w)),
-#                                        sequence_distance(sequence_max(y[j]), sequence_max(w)),
-#                                        sequence_distance(sequence_max(u[j]), sequence_max(w)),
-#                                        sequence_distance(sequence_max(v[j]), sequence_max(w))], base)
 
 
 def test_normal(x: list, *, qq: bool):
@@ -270,25 +260,22 @@ def test_normal(x: list, *, qq: bool):
         for i in range(8):
             x1.append(random.choice(x))
 
-    stat, p = st.normaltest(x1)
+    num_tests = 10 ** 2
+    num_rejects = 0
+    for i in range(num_tests):
+        stat, p = st.normaltest(x1)
+        if p < alpha:
+            num_rejects += 1
+    ratio = float(num_rejects) / num_tests
     report["agostino"] = {
         "name": "D'Agostino and Pearson's Test",
+        "num_tests": num_tests,
+        "num_rejects": num_rejects,
+        "ratio": ratio,
         "alpha": alpha,
-        "stat": stat,
-        "p": p,
-        "res": p > alpha
     }
 
-    statistic, critical_values, significance_level = st.anderson(x)
-    report["anderson"] = {
-        "name": "Anderson-Darling Test",
-        "statistic": statistic,
-        "critical": critical_values,
-        "sig_level": significance_level,
-        "res": [statistic < cv for cv in critical_values]
-    }
-
-    num_tests = 10 ** (3 if qq else 2)
+    num_tests = 10 ** 2
     num_rejects = 0
     for i in range(num_tests):
         normed_data = (x - np.mean(x)) / np.std(x)

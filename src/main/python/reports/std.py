@@ -79,8 +79,8 @@ class StandardSample:
         doc.add_heading("Ряды расстояний и распределения расстояний от максимумов образца до ближайшего максимума "
                         "эталона", 1)
         for factor, xr in zip(FACTORS_L, self.distance):
-            doc.add_paragraph(
-                "Ряд расстояний от максимумов фактор-образца {} до ближайшего максимума эталона:".format(factor))
+            doc.add_paragraph("Ряд расстояний от максимумов фактор-образца {} до ближайшего максимума эталона:"
+                              .format(factor))
             doc.add_paragraph(str_arr(xr))
 
         doc.add_heading("Кривая Гаусса и 4-х ядерных оценок плотности 4-х фактор-образцов", 1)
@@ -93,8 +93,8 @@ class StandardSample:
 
         doc.add_heading("Результаты статистического анализа распределения расстояний", 1)
         for factor, stat in zip(FACTORS_L, self.stat):
-            doc.add_heading(
-                "Результаты статистического анализа распределения расстояний фактор-образца {}".format(factor), 2)
+            doc.add_heading("Результаты статистического анализа распределения расстояний фактор-образца {}"
+                            .format(factor), 2)
             report_stats(stat, doc)
 
         doc.add_heading("Результаты тестирования нормальности", 1)
@@ -130,7 +130,3 @@ class StandardSample:
             doc.add_heading("Тестирование нормальности распределения расстояний от фактор-образца {}"
                             .format(factor), 2)
             report_ntest(ntest, doc)
-
-
-if __name__ == '__main__':
-    StandardSample(None, None)

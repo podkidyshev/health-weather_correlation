@@ -11,7 +11,7 @@ from science.classes import *
 
 from logic import dialog_open, set_main_window, error_dialog
 from logic.standard import QFrameStdSample, QFrameStdMulSamples
-from logic.sample import QFrameSampleStd, QFrameMulSamplesStd
+from logic.sample import QFrameSampleStd  # , QFrameMulSamplesStd
 
 from logic.utils import QFrameDefault
 
@@ -114,6 +114,9 @@ class Main(Ui_MainBaseForm):
             if lead in Standard.standards and (slave in Sample.samples or slave == "--Групповой--"):
                 self.set_data_frame(QFrameStdSample, lead, slave)
             elif lead in Standard.standards and slave == "--Группа--":
+                if len(Sample.samples) < 3:
+                    error_dialog("Для составления отчета по группе эталонов необходимо как минимум 3 образца")
+                    return
                 self.set_data_frame(QFrameStdMulSamples, lead)
             else:
                 error_dialog("Необработанный случай выбора фрейма: lead={}, slave={}, orient={}"
@@ -122,8 +125,8 @@ class Main(Ui_MainBaseForm):
         else:
             if (lead in Sample.samples or lead == "--Групповой--") and slave in Standard.standards:
                 self.set_data_frame(QFrameSampleStd, lead, slave)
-            elif lead == "--Группа--" and slave in Standard.standards:
-                self.set_data_frame(QFrameMulSamplesStd, slave)
+            # elif lead == "--Группа--" and slave in Standard.standards:
+            #     self.set_data_frame(QFrameMulSamplesStd, slave)
             else:
                 error_dialog("Необработанный случай выбора фрейма: lead={}, slave={}, orient={}"
                              .format(lead, slave, orientation), unknown=True)
@@ -139,13 +142,19 @@ class Main(Ui_MainBaseForm):
         else:
             error_dialog("Неизвестный тип данных в боксе: {}".format(lead_type), unknown=True)
             return
+        if self.slave_box.count():
+            slave_type = self.slave_box.currentText().split(' ')[0]
+            if slave_type != lead_type:
+                self.choose_data_frame()
+                return
         self.slave_box.clear()
         self.slave_box.addItems(items)
 
     def add_std_btn_clicked(self):
-        fname = dialog_open("Выбрать эталон", "txt")
-        if fname:
-            self.add_std(fname)
+        fnames = dialog_open("Выбрать эталон", "txt")
+        if fnames:
+            for fname in fnames:
+                self.add_std(fname)
 
     def del_std_btn_clicked(self):
         std = self.std_list.currentItem()
@@ -161,9 +170,10 @@ class Main(Ui_MainBaseForm):
         self.update_boxes()
 
     def add_sample_btn_clicked(self):
-        fname = dialog_open("Выбрать файл пациента", "xlsx")
-        if fname:
-            self.add_sample(fname)
+        fnames = dialog_open("Выбрать файл пациента", "xlsx")
+        if fnames:
+            for fname in fnames:
+                self.add_sample(fname)
 
     def del_sample_btn_clicked(self):
         sample = self.sample_list.currentItem()

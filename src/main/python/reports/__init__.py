@@ -1,8 +1,7 @@
+import os
 from io import BytesIO
 
 from docx import Document
-from docx.shared import Cm
-
 
 from science import ScienceError
 
@@ -59,28 +58,26 @@ class Printer:
 
     def add_paragraph(self, s):
         if self.destination == 'doc':
+            if s[-1] == "\n":
+                s = s[:-1]
             self.doc.add_paragraph(s)
         else:
             self.doc += s + '\n'
 
-    def add_picture(self, pic: bytes or bytearray):
+    def add_picture(self, pic: bytes or bytearray, **kwargs):
         if self.destination == 'doc':
-            self.doc.add_picture(BytesIO(pic))
+            self.doc.add_picture(BytesIO(pic), **kwargs)
 
     @staticmethod
     def create_docx():
-        doc = Document()
+        path_dev = r"src/docx/templates/default.docx"
+        doc = Document(path_dev if os.path.exists(path_dev) else None)
+        doc._body.clear_content()
         doc.core_properties.author = "Молчанов В.А."
         return doc
 
     @staticmethod
     def save_docx(doc, obj):
-        # TODO: убрать, настроить default-паттерн в src/docx
-        for section in doc.sections:
-            section.top_margin = Cm(2)
-            section.bottom_margin = Cm(2)
-            section.left_margin = Cm(2.5)
-            section.right_margin = Cm(1.5)
         try:
             doc.save(obj)
         except Exception as e:
