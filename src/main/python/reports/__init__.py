@@ -58,6 +58,8 @@ class Printer:
 
     def add_paragraph(self, s):
         if self.destination == 'doc':
+            if s[-1] == "\n":
+                s = s[:-1]
             self.doc.add_paragraph(s)
         else:
             self.doc += s + '\n'
