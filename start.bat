@@ -1,3 +1,3 @@
-SETCONSOLE /minimize
-call venv\Scripts\activate.bat
-start pythonw src\main\python\main.pyw
+setlocal
+set PATH=%cd%\venv\Scripts;%cd\venv\;%PATH%
+fbs run
