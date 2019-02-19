@@ -14,6 +14,7 @@ from logic import dialog_open, set_main_window, error_dialog
 from logic.standard import QFrameStdSample, QFrameStdMulSamples
 from logic.sample import QFrameSampleStd  # , QFrameMulSamplesStd
 
+from logic import PATH_SAMPLES
 from logic.utils import QFrameDefault
 
 matplotlib.use("Qt5Agg")
@@ -51,13 +52,13 @@ class Main(Ui_MainBaseForm):
         self.startup()
 
     def startup(self):
-        if os.path.exists(r'src/main/python/science/samples/'):
+        if PATH_SAMPLES is not None:
             for group in '123':
                 for idx in '123456':
-                    self.add_sample(r'src/main/python/science/samples/{}_{}.xlsx'.format(group, idx))
-            for entry in sorted(os.listdir(r'src/main/python/science/samples/')):
+                    self.add_sample(os.path.join(PATH_SAMPLES, '{}_{}.xlsx'.format(group, idx)))
+            for entry in sorted(os.listdir(PATH_SAMPLES)):
                 if entry[-3:] == 'txt':
-                    self.add_std(r'src/main/python/science/samples/{}'.format(entry))
+                    self.add_std(os.path.join(PATH_SAMPLES, entry))
 
     def add_sample(self, fname):
         try:

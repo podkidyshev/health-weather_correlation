@@ -5,6 +5,9 @@ from docx import Document
 
 from science import ScienceError
 
+PATH_DEV = r"src/docx/templates/default.docx"
+PATH_EXE = r"default.docx"
+
 
 def report_error(dest):
     def holy_crap(func):
@@ -70,8 +73,7 @@ class Printer:
 
     @staticmethod
     def create_docx():
-        path_dev = r"src/docx/templates/default.docx"
-        doc = Document(path_dev if os.path.exists(path_dev) else None)
+        doc = Document(PATH_EXE if os.path.exists(PATH_EXE) else PATH_DEV if os.path.exists(PATH_DEV) else None)
         doc._body.clear_content()
         doc.core_properties.author = "Молчанов В.А."
         return doc

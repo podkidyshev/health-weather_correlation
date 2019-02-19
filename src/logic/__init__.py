@@ -9,8 +9,9 @@ from PyQt5.QtWidgets import QFrame, QFileDialog, QLabel, QTextEdit, QVBoxLayout,
 root = os.path.dirname(sys.argv[0])
 main_window = None
 
-_samples = os.path.join(root, "science", "samples")
-samples = _samples if os.path.exists(_samples) else root
+_samples_dev = os.path.join(root, "science", "samples")
+_samples_exe = os.path.join(root, "samples")
+PATH_SAMPLES = _samples_exe if os.path.exists(_samples_exe) else _samples_dev if os.path.exists(_samples_dev) else root
 
 last_open = ""
 last_save = ""
@@ -41,7 +42,7 @@ def get_file_filter(formats: tuple):
 
 def dialog_open(title, *formats):
     global last_open
-    path = samples if last_open == "" else last_open
+    path = PATH_SAMPLES if last_open == "" else last_open
 
     dialog = QFileDialog(main_window, title, path, get_file_filter(formats))
     dialog.setLabelText(QFileDialog.Accept, "Добавить")
