@@ -1,4 +1,5 @@
 import sys
+sys.path = sys.path + ['src']
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 

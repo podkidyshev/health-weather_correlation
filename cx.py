@@ -14,14 +14,13 @@ build_exe_options = {
     ],
     "include_files": [
         # source
-        "src/main/python/frames",
-        "src/main/python/logic",
-        "src/main/python/reports",
-        "src/main/python/science",
-        "src/main/python/form.py",
+        "src/",
         # other
-        "src/main/python/science/samples",
-        "src/docx/templates/default.docx"
+        "src/science/samples",
+        "src/default.docx",
+        # qt
+        "venv/Lib/site-packages/PyQt5/Qt/bin/libEGL.dll",
+        "venv/Lib/site-packages/PyQt5/Qt/plugins/platforms",
     ]
 }
 
@@ -31,8 +30,10 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
+exe = Executable(script='src/main.py', base=base, icon='src/icon.ico', targetName='Health-weather correlation.exe')
+
 setup(name="Health-weather correlation",
-      version="1.1",
+      version="1.0",
       description="",
       options={"build_exe": build_exe_options},
-      executables=[Executable(script='src/main/python/main.py', base=base)])
+      executables=[exe])
